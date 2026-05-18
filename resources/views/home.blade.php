@@ -1,0 +1,15 @@
+@extends('layouts.app')
+
+@section('title', 'Home - Precious Real Estate Consulting')
+
+@section('content')
+    <div class="bg-grid">
+        <x-home.hero />
+        <x-home.stats />
+        <x-home.services />
+        <x-home.about />
+        <x-home.featured-properties />
+        <x-home.advantages />
+        <x-home.cta />
+    </div>
+@endsection

@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Outfit', sans-serif;
+    color: #1E1E1E;
+    background-color: #FFFFFF;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+  }
+}
+
+@layer components {
+  .bg-grid {
+    background-image: url('/brand-assets/website-pages/grid-background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-brand-black text-primary uppercase text-sm rounded-full font-medium hover:bg-gray-800 transition duration-300;
+  }
+
+  .btn-secondary {
+    @apply inline-flex text-sm items-center justify-center px-6 py-3 bg-white text-brand-black border uppercase border-brand-black rounded-full font-medium hover:bg-gray-100 transition duration-300;
+  }
+  
+  .badge-yellow {
+    @apply inline-flex items-center justify-center px-4 py-1.5 bg-primary text-brand-black rounded-full text-sm font-semibold mb-4;
+  }
+}
