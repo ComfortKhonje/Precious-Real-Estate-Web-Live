@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Home — Precious Real Estate')
+@section('title', 'Home - Precious Real Estate')
 @section('content')
     <x-home.hero />
     <x-home.stats />

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Login | PREC CMS</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="font-body text-brand-black bg-brand-white min-h-screen flex items-center justify-center px-6 py-16">
+    <img src="{{ asset('brand-assets/website-pages/grid-background.png') }}" alt="" class="fixed inset-0 w-full h-full object-cover opacity-15 -z-10">
+
+    <div class="w-full max-w-md bg-white/95 border border-gray-200 rounded-3xl p-8 shadow-sm">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-2xl bg-primary text-brand-black flex items-center justify-center font-heading text-2xl">P</div>
+            <div class="leading-tight">
+                <div class="font-heading text-3xl">PREC CMS</div>
+                <div class="text-sm text-brand-black/60">Staff login</div>
+            </div>
+        </div>
+
+        @if (session('status'))
+            <div class="mb-5 p-4 rounded-2xl bg-primary/30 border border-primary/40 text-sm font-medium">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="mb-5 p-4 rounded-2xl bg-red-50 border border-red-100 text-sm text-red-700">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('cms.login.submit') }}" class="space-y-4">
+            @csrf
+            <div class="space-y-2">
+                <label class="text-sm font-semibold tracking-wider text-brand-black">Email Address</label>
+                <input type="email" name="email" value="{{ old('email') }}" required autofocus
+                       class="w-full bg-gray-100 rounded-xl py-4 px-5 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-semibold tracking-wider text-brand-black">Password</label>
+                <input type="password" name="password" required
+                       class="w-full bg-gray-100 rounded-xl py-4 px-5 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+            </div>
+            <div class="flex items-center justify-between">
+                <label class="inline-flex items-center gap-2 text-sm text-brand-black/70">
+                    <input type="checkbox" name="remember" class="rounded border-gray-300 text-brand-black focus:ring-primary">
+                    Remember me
+                </label>
+                <a href="{{ route('home') }}" class="text-sm font-semibold text-brand-black hover:underline">Back to website</a>
+            </div>
+
+            <button type="submit" class="w-full mt-2 px-6 py-4 bg-brand-black text-white rounded-full font-bold uppercase tracking-widest hover:opacity-90 transition">
+                Login
+            </button>
+        </form>
+
+        <p class="mt-6 text-xs text-brand-black/60 leading-relaxed">
+            For security, access is limited to authorized PREC staff.
+        </p>
+    </div>
+</body>
+</html>
+

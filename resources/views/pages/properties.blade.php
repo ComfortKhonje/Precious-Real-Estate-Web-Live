@@ -1,9 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Properties — Precious Real Estate')
+@section('title', 'Properties - Precious Real Estate')
 @section('content')
     <x-properties.page-hero />
-    <x-properties.search-bar />
-    <x-properties.available-properties />
-    <x-shared.cta-get-started />
-    <x-shared.contact-info />
+    <x-properties.property-list />
+    <x-home.cta
+        badge="Get Started"
+        title="Need Professional Property Assistance?"
+        description="Our team is ready to support you with trusted real estate solutions."
+    />
 @endsection
