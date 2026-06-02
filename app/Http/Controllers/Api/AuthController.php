@@ -44,9 +44,6 @@ class AuthController extends Controller
             ]);
         }
 
-        // Revoke existing tokens for this user (optional for security)
-        $user->tokens()->delete();
-
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json(['user' => $user, 'token' => $token]);

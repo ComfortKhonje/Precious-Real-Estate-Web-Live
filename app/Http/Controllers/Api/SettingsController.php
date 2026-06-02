@@ -10,7 +10,16 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        return response()->json(Setting::all());
+        // Only return non-sensitive settings for general view
+        $sensitiveKeys = ['api_key', 'secret', 'password', 'token', 'stripe', 'mail_'];
+        
+        $settings = Setting::where(function ($query) use ($sensitiveKeys) {
+            foreach ($sensitiveKeys as $key) {
+                $query->where('key', 'not like', '%' . $key . '%');
+            }
+        })->get();
+
+        return response()->json($settings);
     }
 
     public function store(Request $request)
