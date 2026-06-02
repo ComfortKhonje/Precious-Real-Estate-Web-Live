@@ -45,26 +45,16 @@ Route::prefix('cms')->name('cms.')->group(function () {
             'password' => ['required', 'string'],
         ]);
 
-        $cmsEmail = (string) env('CMS_EMAIL', '');
-        $cmsPasswordHash = (string) env('CMS_PASSWORD_HASH', '');
-        $cmsPassword = (string) env('CMS_PASSWORD', '');
+        $user = \App\Models\User::where('email', $validated['email'])->first();
 
-        $emailOk = $cmsEmail !== '' && hash_equals($cmsEmail, $validated['email']);
-        $passwordOk = false;
-
-        if ($cmsPasswordHash !== '') {
-            $passwordOk = Hash::check($validated['password'], $cmsPasswordHash);
-        } elseif ($cmsPassword !== '') {
-            // Local/dev fallback only. Prefer CMS_PASSWORD_HASH.
-            $passwordOk = hash_equals($cmsPassword, $validated['password']);
-        }
-
-        if (!($emailOk && $passwordOk)) {
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
             return back()
                 ->withErrors(['login' => 'Invalid credentials.'])
                 ->withInput(['email' => $validated['email']]);
         }
 
+        // Log the user into the web guard and keep legacy session flag for middleware compatibility
+        auth()->login($user, $request->filled('remember'));
         $request->session()->regenerate();
         $request->session()->put('cms_authenticated', true);
 
@@ -72,9 +62,15 @@ Route::prefix('cms')->name('cms.')->group(function () {
     })->name('login.submit');
 
     Route::post('/logout', function (Request $request) {
+        // logout from web guard and clear cms session flag
+        if (auth()->check()) {
+            auth()->logout();
+        }
+
         $request->session()->forget('cms_authenticated');
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('cms.login')->with('status', 'Logged out.');
     })->name('logout');
 
@@ -82,29 +78,30 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/', fn () => redirect()->route('cms.dashboard'));
         Route::get('/dashboard', fn () => view('cms.dashboard'))->name('dashboard');
 
-        Route::get('/properties', fn () => view('cms.properties.index'))->name('properties.index');
-        Route::get('/properties/create', fn () => view('cms.properties.create'))->name('properties.create');
+        Route::get('/properties', [\App\Http\Controllers\Cms\PropertiesController::class, 'index'])->name('properties.index');
+        Route::get('/properties/create', [\App\Http\Controllers\Cms\PropertiesController::class, 'create'])->name('properties.create');
+        Route::post('/properties', [\App\Http\Controllers\Cms\PropertiesController::class, 'store'])->name('properties.store');
+        Route::post('/properties/upload-media', [\App\Http\Controllers\Cms\PropertiesController::class, 'uploadMedia'])->name('properties.upload_media');
+        Route::get('/properties/{property}/edit', [\App\Http\Controllers\Cms\PropertiesController::class, 'edit'])->name('properties.edit');
+        Route::put('/properties/{property}', [\App\Http\Controllers\Cms\PropertiesController::class, 'update'])->name('properties.update');
+        Route::delete('/properties/{property}', [\App\Http\Controllers\Cms\PropertiesController::class, 'destroy'])->name('properties.destroy');
 
         Route::get('/featured', fn () => view('cms.featured.index'))->name('featured.index');
 
-        Route::get('/services', fn () => view('cms.services.index'))->name('services.index');
-        Route::get('/services/{slug}', function (string $slug) {
-            $titleMap = [
-                'property-valuation' => 'Property Valuation',
-                'property-management' => 'Property Management',
-                'property-development' => 'Property Development',
-                'property-sales-letting' => 'Property Sales & Letting',
-                'title-deed-processing' => 'Title Deed Processing',
-            ];
+        Route::get('/services', [\App\Http\Controllers\Cms\ServicesController::class, 'index'])->name('services.index');
+        Route::get('/services/{slug}', [\App\Http\Controllers\Cms\ServicesController::class, 'edit'])->name('services.edit');
+        Route::put('/services/{slug}', [\App\Http\Controllers\Cms\ServicesController::class, 'update'])->name('services.update');
 
-            $serviceTitle = $titleMap[$slug] ?? str($slug)->replace('-', ' ')->title();
-            return view('cms.services.edit', compact('serviceTitle'));
-        })->name('services.edit');
+        Route::get('/inquiries', [\App\Http\Controllers\Cms\InquiriesController::class, 'index'])->name('inquiries.index');
+        Route::get('/inquiries/{inquiry}', [\App\Http\Controllers\Cms\InquiriesController::class, 'show'])->name('inquiries.show');
+        Route::delete('/inquiries/{inquiry}', [\App\Http\Controllers\Cms\InquiriesController::class, 'destroy'])->name('inquiries.destroy');
 
-        Route::get('/inquiries', fn () => view('cms.inquiries.index'))->name('inquiries.index');
-
-        Route::get('/announcements', fn () => view('cms.announcements.index'))->name('announcements.index');
-        Route::get('/announcements/create', fn () => view('cms.announcements.create'))->name('announcements.create');
+        Route::get('/announcements', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'index'])->name('announcements.index');
+        Route::get('/announcements/create', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'create'])->name('announcements.create');
+        Route::post('/announcements', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'store'])->name('announcements.store');
+        Route::get('/announcements/{announcement}/edit', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'edit'])->name('announcements.edit');
+        Route::put('/announcements/{announcement}', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'update'])->name('announcements.update');
+        Route::delete('/announcements/{announcement}', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'destroy'])->name('announcements.destroy');
 
         Route::get('/contact', fn () => view('cms.contact.index'))->name('contact.index');
         Route::get('/analytics', fn () => view('cms.analytics.index'))->name('analytics.index');
