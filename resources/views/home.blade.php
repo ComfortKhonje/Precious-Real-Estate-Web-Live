@@ -6,7 +6,7 @@
     <div class="bg-grid">
         <x-home.hero />
         <x-home.stats />
-        <x-home.services />
+        <x-home.services :services="$services" />
         <x-home.about />
         <x-home.featured-properties :properties="$featuredProperties" />
         <x-home.advantages />

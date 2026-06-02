@@ -63,24 +63,20 @@ Route::prefix('cms')->name('cms.')->group(function () {
 
         Route::get('/featured', fn () => view('cms.featured.index'))->name('featured.index');
 
-        Route::get('/services', fn () => view('cms.services.index'))->name('services.index');
-        Route::get('/services/{slug}', function (string $slug) {
-            $titleMap = [
-                'property-valuation' => 'Property Valuation',
-                'property-management' => 'Property Management',
-                'property-development' => 'Property Development',
-                'property-sales-letting' => 'Property Sales & Letting',
-                'title-deed-processing' => 'Title Deed Processing',
-            ];
+        Route::get('/services', [\App\Http\Controllers\Cms\ServicesController::class, 'index'])->name('services.index');
+        Route::get('/services/{slug}', [\App\Http\Controllers\Cms\ServicesController::class, 'edit'])->name('services.edit');
+        Route::put('/services/{slug}', [\App\Http\Controllers\Cms\ServicesController::class, 'update'])->name('services.update');
 
-            $serviceTitle = $titleMap[$slug] ?? str($slug)->replace('-', ' ')->title();
-            return view('cms.services.edit', compact('serviceTitle'));
-        })->name('services.edit');
+        Route::get('/inquiries', [\App\Http\Controllers\Cms\InquiriesController::class, 'index'])->name('inquiries.index');
+        Route::get('/inquiries/{inquiry}', [\App\Http\Controllers\Cms\InquiriesController::class, 'show'])->name('inquiries.show');
+        Route::delete('/inquiries/{inquiry}', [\App\Http\Controllers\Cms\InquiriesController::class, 'destroy'])->name('inquiries.destroy');
 
-        Route::get('/inquiries', fn () => view('cms.inquiries.index'))->name('inquiries.index');
-
-        Route::get('/announcements', fn () => view('cms.announcements.index'))->name('announcements.index');
-        Route::get('/announcements/create', fn () => view('cms.announcements.create'))->name('announcements.create');
+        Route::get('/announcements', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'index'])->name('announcements.index');
+        Route::get('/announcements/create', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'create'])->name('announcements.create');
+        Route::post('/announcements', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'store'])->name('announcements.store');
+        Route::get('/announcements/{announcement}/edit', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'edit'])->name('announcements.edit');
+        Route::put('/announcements/{announcement}', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'update'])->name('announcements.update');
+        Route::delete('/announcements/{announcement}', [\App\Http\Controllers\Cms\AnnouncementsController::class, 'destroy'])->name('announcements.destroy');
 
         Route::get('/contact', fn () => view('cms.contact.index'))->name('contact.index');
         Route::get('/analytics', fn () => view('cms.analytics.index'))->name('analytics.index');

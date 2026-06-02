@@ -1,0 +1,737 @@
+PREC Dashboard / CMS UI & UX Requirements
+Document
+Precious Real Estate Consulting (PREC)
+Admin Dashboard & Content Management System (CMS)
+Prepared for: Precious Real Estate Consulting (PREC)
+Prepared by: Abstract Digital Solutions
+1. Dashboard Overview
+The PREC Dashboard is a simple content management and property administration system designed to
+help the PREC team manage website content, property listings, inquiries, and general company information
+without requiring technical expertise.
+The system should prioritize:
+Simplicity
+Ease of navigation
+Accessibility
+Mobile responsiveness
+Quick content management
+Clear data organization
+The dashboard will be accessible only to authorized PREC staff through a secure login system.
+2. Dashboard Navigation Structure
+Main Navigation Menu
+Dashboard Overview
+Property Listings
+Featured Properties
+Services Content
+Inquiries
+Announcements & News
+Contact Information
+Analytics
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+1
+
+Settings
+3. Dashboard Home / Overview
+Purpose
+Provide a quick overview of website activity, inquiries, and property performance.
+Key UI Elements
+Summary Cards
+Total Properties
+Featured Properties
+Total Inquiries
+New Inquiries
+Published Announcements
+Recent Activity Section
+Displays:
+Recent inquiries
+Newly added properties
+Recently updated content
+Quick Actions
+Buttons for:
+Add Property
+Add Announcement
+Edit Services
+View Inquiries
+Property Status Overview
+Simple visual breakdown:
+Available
+Sold
+Rented
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+2
+
+Data Handled
+Property counts
+Inquiry counts
+Property statuses
+Recent updates
+Announcement statistics
+UX Notes
+Dashboard should load important information first
+Cards should be visually clear and easy to scan
+Quick action buttons should remain visible on desktop and mobile
+4. Property Listings Management
+Purpose
+Allow the PREC team to manage all property listings displayed on the website.
+Main Listings Page
+Key UI Elements
+Listings Table / Grid
+Displays:
+Property image
+Property title
+Property type
+Location
+Price
+Status
+Featured badge
+Date added
+Search Bar
+Search by:
+Property name
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+3
+
+Location
+Property type
+Filters
+Available
+Sold
+Rented
+Featured
+Residential
+Commercial
+Action Buttons
+Add Property
+Edit
+Delete
+Archive
+Mark as Featured
+Add / Edit Property Form
+Property Information
+Property title
+Property description
+Property category
+Property type
+Price
+Location
+Property status
+Property Details
+Bedrooms
+Bathrooms
+Land size
+Parking availability
+Additional features
+Media Uploads
+Property images
+Gallery uploads
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+4
+
+Inquiry Settings
+Enable inquiry form
+Featured property toggle
+Data Handled
+Property information
+Property descriptions
+Property pricing
+Property images
+Property status
+Property features
+Inquiry availability
+Key Actions
+Add property
+Edit listing
+Delete listing
+Archive listing
+Mark as featured
+Update availability status
+UX Notes
+Image uploads should support drag-and-drop
+Listing forms should be simple and sectioned clearly
+Featured properties should display visible badges
+Confirmation modal required before deletion
+5. Featured Properties Management
+Purpose
+Manage which listings appear in featured sections across the website.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+5
+
+Key UI Elements
+Featured Properties List
+Displays:
+Property image
+Property title
+Location
+Status
+Featured order
+Reorder Functionality
+Drag-and-drop arrangement
+Quick Actions
+Remove from featured
+Open listing
+Edit listing
+Data Handled
+Featured status
+Display order
+Featured visibility
+UX Notes
+Limit featured properties to a manageable number
+Drag-and-drop interactions should feel simple and responsive
+6. Services Content Management
+Purpose
+Allow the PREC team to manage website service information and descriptions.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+6
+
+Services Covered
+Property Valuation
+Property Management
+Property Development
+Property Sales & Letting
+Title Deed Processing
+Key UI Elements
+Services List
+Displays:
+Service title
+Last updated date
+Visibility status
+Service Editor
+Editable fields:
+Service title
+Short description
+Full description
+Key service points
+Banner image
+Content Formatting Tools
+Basic formatting only:
+Headings
+Bold text
+Lists
+Paragraph spacing
+Data Handled
+Service descriptions
+Service highlights
+Service images
+Service visibility
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+7
+
+Key Actions
+Edit content
+Publish updates
+Save drafts
+UX Notes
+Keep editor clean and simple
+Avoid overly complex formatting tools
+Live preview section optional
+7. Inquiry Management
+Purpose
+Provide a centralized inbox for all website inquiries and contact form submissions.
+Inquiry Types
+General inquiries
+Service inquiries
+Property inquiries
+Appointment requests
+Main Inquiry Page
+Key UI Elements
+Inquiry Table
+Displays:
+Inquiry ID
+Name
+Email
+Phone number
+Inquiry type
+Related property/service
+Submission date
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+8
+
+Search Bar
+Search by:
+Name
+Email
+Property
+Service
+Filters
+Inquiry type
+New inquiries
+Recent inquiries
+Inquiry Detail Panel
+Displays:
+Full inquiry message
+Contact details
+Related property/service
+Submission date
+Data Handled
+Customer names
+Email addresses
+Phone numbers
+Inquiry messages
+Inquiry categories
+Related property references
+Key Actions
+View inquiry
+Delete inquiry
+Filter inquiries
+Search inquiries
+UX Notes
+New inquiries should be visually highlighted
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+9
+
+Inquiry details should open without leaving the page
+Mobile layout should stack inquiry information clearly
+8. Announcements & News Updates
+Purpose
+Allow PREC to publish updates, notices, and company announcements.
+Key UI Elements
+Announcements List
+Displays:
+Announcement title
+Publish date
+Status
+Featured status
+Add/Edit Announcement Form
+Fields:
+Title
+Short summary
+Full content
+Cover image
+Publish status
+Publishing Controls
+Draft
+Publish
+Archive
+Data Handled
+Announcement titles
+Content
+Images
+Publish dates
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+10
+
+Visibility status
+Key Actions
+Create announcement
+Edit announcement
+Publish content
+Archive content
+UX Notes
+Rich text editing should remain simple
+Featured announcements should display clearly
+9. Contact Information Management
+Purpose
+Manage company contact details displayed throughout the website.
+Key UI Elements
+Contact Information Form
+Office Details
+Office name
+Physical address
+Postal address
+Working hours
+Contact Details
+Phone numbers
+Email addresses
+WhatsApp number
+Social Media Links
+Facebook
+WhatsApp
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+11
+
+YouTube
+TikTok
+Embedded Map Settings
+Google Maps link
+Office coordinates
+Data Handled
+Office information
+Contact numbers
+Email addresses
+Social links
+Business hours
+Key Actions
+Edit contact details
+Update office information
+Update social links
+UX Notes
+Contact updates should reflect immediately on the website
+Forms should support multiple office locations
+10. Analytics Overview
+Purpose
+Provide a simplified overview of website engagement and inquiry activity.
+Key UI Elements
+Analytics Cards
+Total website visits
+Property views
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+12
+
+Inquiry submissions
+Most viewed properties
+Performance Charts
+Weekly visits
+Monthly inquiries
+Property engagement
+Top Performing Properties
+Displays:
+Property image
+Views
+Inquiries received
+Data Handled
+Website traffic
+Inquiry statistics
+Property engagement metrics
+UX Notes
+Keep analytics visual and easy to understand
+Avoid technical or overly advanced reporting
+11. Settings & Basic Administration
+Purpose
+Provide access to general dashboard and website configuration settings.
+Key UI Elements
+General Settings
+Website name
+Website logo
+System email
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+13
+
+Time zone
+Password Management
+Change password
+Secure login settings
+Website Preferences
+Homepage featured property limits
+Inquiry email destination
+Default property status
+Data Handled
+Website settings
+Login credentials
+Notification settings
+Basic system preferences
+Key Actions
+Update settings
+Change password
+Save configuration
+UX Notes
+Sensitive actions should require confirmation
+Settings sections should remain minimal and organized
+12. Core UX & Interface Guidelines
+General UI Direction
+The dashboard should follow a clean and modern interface style that remains approachable for non-
+technical users.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+14
+
+UX Principles
+Simplicity
+Minimal clutter
+Clear spacing
+Straightforward navigation
+Accessibility
+Readable typography
+High contrast
+Mobile responsiveness
+Consistency
+Reusable button styles
+Consistent form layouts
+Unified spacing system
+Feedback & States
+System should provide:
+Success messages
+Error messages
+Loading indicators
+Empty states
+Recommended Dashboard Behavior
+Empty States
+Provide helpful guidance when:
+No properties exist
+No inquiries exist
+No announcements published
+Confirmation Actions
+Require confirmation for:
+Deleting listings
+Archiving content
+Removing featured properties
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+15
+
+Responsive Design
+Dashboard should function smoothly on:
+Desktop
+Tablet
+Mobile devices
+13. Summary
+The PREC Dashboard/CMS is intended to provide a simple and efficient internal management system for
+handling:
+Property listings
+Website content
+Customer inquiries
+Featured properties
+Company updates
+Website settings
+Basic analytics
+The platform should prioritize ease of use, fast content updates, and accessibility while maintaining a
+professional and modern administrative experience for the PREC team.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+16

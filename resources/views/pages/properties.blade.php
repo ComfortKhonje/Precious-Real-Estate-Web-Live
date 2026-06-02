@@ -61,7 +61,7 @@
                     }
 
                     grid.insertAdjacentHTML('beforeend', html);
-                    
+
                     const newPage = parseInt(nextPage) + 1;
                     this.setAttribute('data-next-page', newPage);
                     this.innerText = 'LOAD MORE PROPERTIES';

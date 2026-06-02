@@ -25,7 +25,6 @@
             @endforeach
         </div>
 
-        {{-- Browse All CTA --}}
         <div class="text-center">
             <a href="{{ route('properties') }}" class="btn-primary px-12 py-5 text-sm tracking-[0.2em] font-bold shadow-xl hover:scale-105 active:scale-95 transition-all duration-300">BROWSE ALL PROPERTIES</a>
         </div>

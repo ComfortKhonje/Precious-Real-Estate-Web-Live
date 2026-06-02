@@ -112,6 +112,7 @@
                     </div>
                 </div>
             </div>
+            <input type="hidden" name="media" value="{{ old('media') }}">
         </div>
 
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
@@ -139,6 +140,11 @@
         <div class="flex flex-wrap gap-3 justify-end">
             <a href="{{ route('cms.properties.index') }}" class="btn-secondary">Cancel</a>
             <button type="submit" class="btn-primary">Save Property</button>
+            <button type="submit" class="btn-primary">Save Property</button>
         </div>
     </form>
+
+    @push('scripts')
+        @vite('resources/js/cms-media.js')
+    @endpush
 @endsection
