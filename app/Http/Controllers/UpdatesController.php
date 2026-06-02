@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\View\View;
 
-class PropertiesController extends Controller
+class UpdatesController extends Controller
 {
     public function __invoke(): View
     {
-        return view('pages.properties');
+        return view('pages.updates');
     }
 }
+

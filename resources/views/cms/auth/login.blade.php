@@ -37,15 +37,16 @@
 
         <form method="POST" action="{{ route('cms.login.submit') }}" class="space-y-4">
             @csrf
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider text-brand-black">Email Address</label>
-                <input type="email" name="email" value="{{ old('email') }}" required autofocus
-                       class="w-full bg-gray-100 rounded-xl py-4 px-5 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+            <div class="space-y-1.5">
+                <label class="text-xs tracking-widest text-gray-400 uppercase font-bold">Email Address</label>
+                <input type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="admin@preciousrealestate.mw" class="w-full bg-gray-100 rounded-xl py-4 px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white border-none text-md">
+                @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider text-brand-black">Password</label>
-                <input type="password" name="password" required
-                       class="w-full bg-gray-100 rounded-xl py-4 px-5 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+            <div class="space-y-1.5">
+                <label class="text-xs tracking-widest text-gray-400 uppercase font-bold">Password</label>
+                <input type="password" name="password" required placeholder="••••••••" class="w-full bg-gray-100 rounded-xl py-4 px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white border-none text-md">
+                @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                @error('login') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
             <div class="flex items-center justify-between">
                 <label class="inline-flex items-center gap-2 text-sm text-brand-black/70">

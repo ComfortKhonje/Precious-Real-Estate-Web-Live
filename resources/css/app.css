@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  [x-cloak] {
+    display: none !important;
+  }
+
   html {
     font-family: 'Outfit', sans-serif;
     color: #1E1E1E;
@@ -33,5 +37,32 @@
   
   .badge-yellow {
     @apply inline-flex items-center justify-center px-4 py-1.5 bg-primary text-brand-black rounded-full text-sm font-semibold mb-4;
+  }
+
+  .cms-shell {
+    background:
+      radial-gradient(circle at top right, rgba(255, 229, 34, 0.12), transparent 28%),
+      radial-gradient(circle at bottom left, rgba(138, 165, 169, 0.12), transparent 24%),
+      #f8f8f4;
+  }
+
+  .cms-panel {
+    @apply bg-white/95 border border-gray-200/80 rounded-[1.75rem] shadow-[0_16px_40px_rgba(30,30,30,0.05)];
+  }
+
+  .cms-soft-panel {
+    @apply bg-[#f6f5ef] border border-[#ebe8d8] rounded-[1.5rem];
+  }
+
+  .cms-input {
+    @apply w-full bg-gray-100 rounded-2xl py-4 px-5 border border-transparent text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary/20;
+  }
+
+  .cms-select {
+    @apply w-full bg-gray-100 rounded-2xl py-4 px-5 border border-transparent text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary/20 cursor-pointer;
+  }
+
+  .cms-section-title {
+    @apply font-heading text-3xl leading-none;
   }
 }

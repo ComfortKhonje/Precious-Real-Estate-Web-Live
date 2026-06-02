@@ -8,7 +8,7 @@
         <x-home.stats />
         <x-home.services />
         <x-home.about />
-        <x-home.featured-properties />
+        <x-home.featured-properties :properties="$featuredProperties" />
         <x-home.advantages />
         <x-home.cta />
     </div>

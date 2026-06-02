@@ -23,6 +23,7 @@
                         <li><a href="{{ route('about') }}" class="text-gray-400 hover:text-white transition whitespace-nowrap">About</a></li>
                         <li><a href="{{ route('services') }}" class="text-gray-400 hover:text-white transition whitespace-nowrap">Services</a></li>
                         <li><a href="{{ route('properties') }}" class="text-gray-400 hover:text-white transition whitespace-nowrap">Properties</a></li>
+                        <li><a href="{{ route('updates') }}" class="text-gray-400 hover:text-white transition whitespace-nowrap">Updates</a></li>
                         <li><a href="{{ route('team') }}" class="text-gray-400 hover:text-white transition whitespace-nowrap">Team</a></li>
                         <li><a href="{{ route('inquiry') }}" class="text-gray-400 hover:text-white transition whitespace-nowrap">Inquiry</a></li>
                     </ul>
@@ -34,9 +35,9 @@
                     <ul class="flex flex-wrap justify-center lg:flex-col lg:items-start gap-x-6 gap-y-4">
                         <li><a href="{{ route('services') }}#valuation" class="text-gray-400 hover:text-white transition whitespace-nowrap">Property Valuation</a></li>
                         <li><a href="{{ route('services') }}#management" class="text-gray-400 hover:text-white transition whitespace-nowrap">Property Management</a></li>
-                        <li><a href="{{ route('services') }}#sales" class="text-gray-400 hover:text-white transition whitespace-nowrap">Sales & Letting</a></li>
+                        <li><a href="{{ route('services') }}#sales-letting" class="text-gray-400 hover:text-white transition whitespace-nowrap">Sales & Letting</a></li>
                         <li><a href="{{ route('services') }}#development" class="text-gray-400 hover:text-white transition whitespace-nowrap">Property Development</a></li>
-                        <li><a href="{{ route('services') }}#title" class="text-gray-400 hover:text-white transition whitespace-nowrap">Title Deed Processing</a></li>
+                        <li><a href="{{ route('services') }}#title-deeds" class="text-gray-400 hover:text-white transition whitespace-nowrap">Title Deed Processing</a></li>
                     </ul>
                 </div>
             </div>

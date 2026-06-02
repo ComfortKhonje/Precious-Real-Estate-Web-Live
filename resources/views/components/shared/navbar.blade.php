@@ -36,6 +36,8 @@
 
                 <a href="{{ route('properties') }}" class="nav-link-item relative h-12 px-2 flex items-center text-sm tracking-wider uppercase transition-all duration-300 {{ request()->routeIs('properties') ? 'text-brand-black font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-primary' : 'text-brand-black/70 font-normal hover:text-brand-black hover:font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 hover:after:w-full after:bg-primary after:transition-all after:duration-300' }}">Properties</a>
 
+                <a href="{{ route('updates') }}" class="nav-link-item relative h-12 px-2 flex items-center text-sm tracking-wider uppercase transition-all duration-300 {{ request()->routeIs('updates') ? 'text-brand-black font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-primary' : 'text-brand-black/70 font-normal hover:text-brand-black hover:font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 hover:after:w-full after:bg-primary after:transition-all after:duration-300' }}">Updates</a>
+
                 <a href="{{ route('team') }}" class="nav-link-item relative h-12 px-2 flex items-center text-sm tracking-wider uppercase transition-all duration-300 {{ request()->routeIs('team') ? 'text-brand-black font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-primary' : 'text-brand-black/70 font-normal hover:text-brand-black hover:font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 hover:after:w-full after:bg-primary after:transition-all after:duration-300' }}">Team</a>
 
                 <a href="{{ route('contact') }}" class="nav-link-item relative h-12 px-2 flex items-center text-sm tracking-wider uppercase transition-all duration-300 {{ request()->routeIs('contact') ? 'text-brand-black font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-primary' : 'text-brand-black/70 font-normal hover:text-brand-black hover:font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 hover:after:w-full after:bg-primary after:transition-all after:duration-300' }}">Contact</a>
@@ -77,7 +79,7 @@
                 <div id="mobile-services-submenu" class="hidden pl-6 pr-4 py-2 space-y-2 bg-brand-black/5 rounded-2xl transition-all duration-300">
                     <a href="{{ route('services') }}" class="block px-4 py-2 rounded-xl text-sm font-medium text-brand-black/75 hover:text-brand-black hover:bg-brand-black/5 transition-colors">All Services</a>
                     <a href="{{ route('services') }}#valuation" class="block px-4 py-2 rounded-xl text-xs text-brand-black/70 hover:text-brand-black hover:bg-brand-black/5 transition-colors">Property Valuation</a>
-                    <a href="{{ route('services') }}#consulting" class="block px-4 py-2 rounded-xl text-xs text-brand-black/70 hover:text-brand-black hover:bg-brand-black/5 transition-colors">Property Management</a>
+                    <a href="{{ route('services') }}#management" class="block px-4 py-2 rounded-xl text-xs text-brand-black/70 hover:text-brand-black hover:bg-brand-black/5 transition-colors">Property Management</a>
                     <a href="{{ route('services') }}#sales-letting" class="block px-4 py-2 rounded-xl text-xs text-brand-black/70 hover:text-brand-black hover:bg-brand-black/5 transition-colors">Sales & Letting</a>
                     <a href="{{ route('services') }}#development" class="block px-4 py-2 rounded-xl text-xs text-brand-black/70 hover:text-brand-black hover:bg-brand-black/5 transition-colors">Property Development</a>
                     <a href="{{ route('services') }}#title-deeds" class="block px-4 py-2 rounded-xl text-xs text-brand-black/70 hover:text-brand-black hover:bg-brand-black/5 transition-colors">Title Deed Services</a>
@@ -85,6 +87,7 @@
             </div>
 
             <a href="{{ route('properties') }}" class="block px-4 py-2.5 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('properties') ? 'bg-primary text-brand-black font-bold' : 'text-brand-black/80 hover:bg-brand-black/5' }}">Properties</a>
+            <a href="{{ route('updates') }}" class="block px-4 py-2.5 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('updates') ? 'bg-primary text-brand-black font-bold' : 'text-brand-black/80 hover:bg-brand-black/5' }}">Updates</a>
             <a href="{{ route('team') }}" class="block px-4 py-2.5 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('team') ? 'bg-primary text-brand-black font-bold' : 'text-brand-black/80 hover:bg-brand-black/5' }}">Team</a>
             <a href="{{ route('contact') }}" class="block px-4 py-2.5 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('contact') ? 'bg-primary text-brand-black font-bold' : 'text-brand-black/80 hover:bg-brand-black/5' }}">Contact</a>
 
