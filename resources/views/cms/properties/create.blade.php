@@ -29,10 +29,10 @@
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Currency</label>
-                    <select name="currency" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <x-ui.select name="currency" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
                         <option value="MWK" {{ old('currency') == 'MWK' ? 'selected' : '' }}>MWK</option>
                         <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD</option>
-                    </select>
+                    </x-ui.select>
                     @error('currency') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="space-y-2">
@@ -42,10 +42,10 @@
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Listing Status</label>
-                    <select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <x-ui.select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
                         <option value="For Sale" {{ old('status') == 'For Sale' ? 'selected' : '' }}>For Sale</option>
                         <option value="For Rent" {{ old('status') == 'For Rent' ? 'selected' : '' }}>For Rent</option>
-                    </select>
+                    </x-ui.select>
                     @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="space-y-2 md:col-span-2">

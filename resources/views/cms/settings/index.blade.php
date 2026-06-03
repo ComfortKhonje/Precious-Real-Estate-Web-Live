@@ -25,11 +25,11 @@
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Default Property Status</label>
-                    <select class="cms-select">
+                    <x-ui.select class="cms-select">
                         <option>Available</option>
                         <option>Sold</option>
                         <option>Rented</option>
-                    </select>
+                    </x-ui.select>
                 </div>
             </div>
         </div>
@@ -40,18 +40,18 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Session Timeout</label>
-                    <select class="cms-select">
+                    <x-ui.select class="cms-select">
                         <option>30 minutes</option>
                         <option>1 hour</option>
                         <option>2 hours</option>
-                    </select>
+                    </x-ui.select>
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Login Security</label>
-                    <select class="cms-select">
+                    <x-ui.select class="cms-select">
                         <option>Require strong password</option>
                         <option>Require strong password + device review</option>
-                    </select>
+                    </x-ui.select>
                 </div>
             </div>
         </div>

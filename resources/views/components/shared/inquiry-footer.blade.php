@@ -1,5 +1,5 @@
 {{-- [Component: shared/inquiry-footer] Simplified footer for inquiry pages --}}
-<footer class="mt-auto w-full relative z-50">
+<footer class="mt-auto w-full relative z-10">
     {{-- Yellow Separator --}}
     <div class="h-1.5 bg-primary w-full"></div>
 

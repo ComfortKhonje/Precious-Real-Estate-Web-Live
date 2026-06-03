@@ -50,14 +50,14 @@
                         {{-- Service Needed --}}
                         <div class="space-y-2">
                             <label class="text-sm font-md text-brand-white tracking-widest pl-2">Service Needed</label>
-                            <select class="w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none">
+                            <x-ui.select class="w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none">
                                 <option>Select the service you need</option>
                                 <option>Property Valuation</option>
                                 <option>Property Management</option>
                                 <option>Sales & Letting</option>
                                 <option>Property Development</option>
                                 <option>Title Deed Processing</option>
-                            </select>
+                            </x-ui.select>
                         </div>
 
                         {{-- Message --}}

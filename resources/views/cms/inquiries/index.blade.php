@@ -22,8 +22,7 @@
                 </div>
                 <form id="inquiryFilters" method="GET" action="{{ route('cms.inquiries.index') }}"
                     class="flex flex-wrap gap-2 items-center">
-                    <select name="type"
-                        class="bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30 cursor-pointer">
+                    <x-ui.select name="type" class="bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30 cursor-pointer">
                         <option value="">All Types</option>
                         <option value="general" {{ request('type') === 'general' ? 'selected' : '' }}>General inquiries
                         </option>
@@ -33,7 +32,7 @@
                         </option>
                         <option value="appointment" {{ request('type') === 'appointment' ? 'selected' : '' }}>Appointment
                             requests</option>
-                    </select>
+                    </x-ui.select>
                     <button type="submit" class="btn-secondary">Filter</button>
                 </form>
             </div>

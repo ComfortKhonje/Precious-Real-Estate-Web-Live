@@ -64,8 +64,11 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/featured', fn () => view('cms.featured.index'))->name('featured.index');
 
         Route::get('/services', [\App\Http\Controllers\Cms\ServicesController::class, 'index'])->name('services.index');
+        Route::get('/services/create', [\App\Http\Controllers\Cms\ServicesController::class, 'create'])->name('services.create');
+        Route::post('/services', [\App\Http\Controllers\Cms\ServicesController::class, 'store'])->name('services.store');
         Route::get('/services/{slug}', [\App\Http\Controllers\Cms\ServicesController::class, 'edit'])->name('services.edit');
         Route::put('/services/{slug}', [\App\Http\Controllers\Cms\ServicesController::class, 'update'])->name('services.update');
+        Route::delete('/services/{service}', [\App\Http\Controllers\Cms\ServicesController::class, 'destroy'])->name('services.destroy');
 
         Route::get('/inquiries', [\App\Http\Controllers\Cms\InquiriesController::class, 'index'])->name('inquiries.index');
         Route::get('/inquiries/{inquiry}', [\App\Http\Controllers\Cms\InquiriesController::class, 'show'])->name('inquiries.show');

@@ -1,1 +1,5 @@
-// Application entry for Precious real estate theme.
+import Alpine from 'alpinejs'
+
+window.Alpine = Alpine
+
+Alpine.start()

@@ -31,12 +31,11 @@
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Publish Status</label>
-                    <select name="status"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <x-ui.select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
                         <option value="draft" {{ old('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                         <option value="published" {{ old('status') === 'published' ? 'selected' : '' }}>Published</option>
                         <option value="archived" {{ old('status') === 'archived' ? 'selected' : '' }}>Archived</option>
-                    </select>
+                    </x-ui.select>
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Featured</label>

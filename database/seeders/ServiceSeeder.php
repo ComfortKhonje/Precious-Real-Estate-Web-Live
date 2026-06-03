@@ -30,7 +30,7 @@ class ServiceSeeder extends Seeder
                 'visible' => true,
             ],
             [
-                'title' => 'Sales & Letting',
+                'title' => 'Sales And Letting',
                 'short_description' => 'Efficient property sales and letting services supported by local market insight.',
                 'content' => 'From marketing to closing, we support buyers and sellers with transparent pricing, negotiations and transaction guidance.',
                 'banner_image' => 'brand-assets/3 Services Page/Image 3.png',

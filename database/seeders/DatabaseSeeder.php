@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Database\Seeders\PropertySeeder;
 use Database\Seeders\ServiceSeeder;
 use Database\Seeders\TeamMemberSeeder;
+use Database\Seeders\UserSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,27 +18,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        $adminEmail = env('CMS_ADMIN_EMAIL', 'admin@preciousrealestate.test');
-
-        \App\Models\User::firstOrCreate([
-            'email' => $adminEmail,
-        ], [
-            'name' => 'Admin User',
-            'password' => 'password',
-        ]);
-
         $this->call([
+            UserSeeder::class,
             PropertySeeder::class,
             ServiceSeeder::class,
             TeamMemberSeeder::class,
-        ]);
-
-        $this->call([
-            // UserSeeder::class,
-            PropertySeeder::class,
-            // CategorySeeder::class,
         ]);
     }
 }

@@ -14,23 +14,23 @@
                 </svg>
             </div>
             <div class="flex flex-wrap gap-2">
-                <select name="location" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+                <x-ui.select name="location" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
                     <option value="">All Locations</option>
                     @foreach($locations as $location)
                         <option value="{{ $location }}" {{ request('location') == $location ? 'selected' : '' }}>{{ $location }}</option>
                     @endforeach
-                </select>
-                <select name="type" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+                </x-ui.select>
+                <x-ui.select name="type" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
                     <option value="">All Types</option>
                     @foreach($types as $type)
                         <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
                     @endforeach
-                </select>
-                <select name="status" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+                </x-ui.select>
+                <x-ui.select name="status" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
                     <option value="">All Status</option>
                     <option value="For Sale" {{ request('status') == 'For Sale' ? 'selected' : '' }}>For Sale</option>
                     <option value="For Rent" {{ request('status') == 'For Rent' ? 'selected' : '' }}>For Rent</option>
-                </select>
+                </x-ui.select>
                 @if(request()->anyFilled(['search', 'location', 'type', 'status']))
                     <a href="{{ route('cms.properties.index') }}" class="p-3 rounded-2xl bg-gray-100 text-brand-black/60 hover:bg-gray-200 transition" title="Clear Filters">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -19,13 +19,12 @@
         </form>
         <div class="flex gap-2 items-center">
             <form method="GET" action="{{ route('cms.announcements.index') }}" class="inline-flex">
-                <select name="status" onchange="this.form.submit()"
-                    class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30 cursor-pointer">
+                <x-ui.select name="status" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30 cursor-pointer">
                     <option value="">All Status</option>
                     <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                     <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>Published</option>
                     <option value="archived" {{ request('status') === 'archived' ? 'selected' : '' }}>Archived</option>
-                </select>
+                </x-ui.select>
             </form>
             <a href="{{ route('cms.announcements.create') }}" class="btn-primary">Add Announcement</a>
         </div>

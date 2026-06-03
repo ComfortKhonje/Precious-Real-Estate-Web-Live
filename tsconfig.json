@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "#components/*": ["resources/js/components/*"],
+      "#ui/*": ["resources/js/components/ui/*"],
+      "@/*": ["resources/js/*"]
+    }
+  }
+}
