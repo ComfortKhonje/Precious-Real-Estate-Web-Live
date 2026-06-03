@@ -8,13 +8,15 @@
 
 @php
     $isDark = $theme === 'dark';
-    $overlayClass = $isDark ? 'bg-brand-black/90' : 'bg-white/90';
-    $titleClass = $isDark ? 'text-primary' : 'text-brand-black';
-    $descClass = $isDark ? 'text-gray-300' : 'text-gray-600';
+    $overlayClass = $isDark ? 'bg-brand-black/80' : 'bg-white/80';
+    $titleClass = $isDark ? 'text-white' : 'text-brand-black';
+    $descClass = $isDark ? 'text-white/80' : 'text-gray-600';
     $iconBg = $isDark ? 'bg-primary' : 'bg-brand-black';
+    $cardBorder = $isDark ? 'border border-gray-800' : 'border border-gray-200';
+    $cardShadow = $isDark ? 'shadow-xl shadow-brand-black/20' : 'shadow-sm';
 @endphp
 
-<div class="relative rounded-2xl overflow-hidden h-full group transition duration-300 hover:-translate-y-2 flex flex-col">
+<div class="relative rounded-3xl overflow-hidden h-full group transition duration-300 hover:-translate-y-2 flex flex-col {{ $cardBorder }} {{ $cardShadow }}">
     {{-- Background Image --}}
     <img src="{{ $bgImage }}" alt="" class="absolute inset-0 w-full h-full object-cover z-0 transition duration-700 group-hover:scale-105">
 

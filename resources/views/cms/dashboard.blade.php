@@ -6,13 +6,12 @@
 
 @section('content')
     @php
-        // Placeholder UI data (frontend-only). Replace with real stats later.
         $cards = [
-            ['label' => 'Total Properties', 'value' => 0, 'icon' => 'building-estate'],
-            ['label' => 'Featured Properties', 'value' => 0, 'icon' => 'star'],
-            ['label' => 'Total Inquiries', 'value' => 0, 'icon' => 'mail'],
-            ['label' => 'New Inquiries', 'value' => 0, 'icon' => 'speakerphone'],
-            ['label' => 'Published Announcements', 'value' => 0, 'icon' => 'news'],
+            ['label' => 'Total Properties', 'value' => $totalProperties ?? 0, 'icon' => 'building-estate'],
+            ['label' => 'Featured Properties', 'value' => $featuredProperties ?? 0, 'icon' => 'star'],
+            ['label' => 'Total Inquiries', 'value' => $totalInquiries ?? 0, 'icon' => 'mail'],
+            ['label' => 'New Inquiries', 'value' => $newInquiries ?? 0, 'icon' => 'speakerphone'],
+            ['label' => 'Published Announcements', 'value' => $publishedAnnouncements ?? 0, 'icon' => 'news'],
         ];
         $quickActions = [
             ['label' => 'Add Property', 'route' => 'cms.properties.create', 'icon' => 'plus'],
@@ -86,7 +85,7 @@
                     </div>
                 </div>
                 <div class="mt-4 space-y-2">
-                    <div class="flex items-center justify-between text-sm"><span>Available</span><span class="font-semibold">{{ $availableProperties }}</span></div>
+                    <div class="flex items-center justify-between text-sm"><span>Available</span><span class="font-semibold">{{ $availableProperties ?? 0 }}</span></div>
                     <div class="flex items-center justify-between text-sm"><span>Sold</span><span class="font-semibold">0</span></div>
                     <div class="flex items-center justify-between text-sm"><span>Rented</span><span class="font-semibold">0</span></div>
                 </div>

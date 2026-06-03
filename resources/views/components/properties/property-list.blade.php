@@ -5,8 +5,7 @@
         {{-- Section Header with Sort --}}
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 md:mb-12 gap-2 md:gap-6">
             <div>
-                <div class="badge-yellow mb-2 md:mb-4 w-fit px-4 py-1.5 text-xs uppercase tracking-wider">Available
-                    Listings</div>
+                <div class="badge-yellow mb-2 md:mb-4 w-fit px-4 py-1.5 text-xs uppercase tracking-wider">Available Listings</div>
                 <h2 class="text-4xl font-heading text-brand-black uppercase">Explore Properties</h2>
             </div>
 

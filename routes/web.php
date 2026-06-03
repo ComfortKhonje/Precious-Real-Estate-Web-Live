@@ -52,7 +52,7 @@ Route::prefix('cms')->name('cms.')->group(function () {
 
     Route::middleware('cms.auth')->group(function () {
         Route::get('/', fn () => redirect()->route('cms.dashboard'));
-        Route::get('/dashboard', fn () => view('cms.dashboard'))->name('dashboard');
+        Route::get('/dashboard', CmsDashboardController::class)->name('dashboard');
 
         Route::get('/properties', [CmsPropertyController::class, 'index'])->name('properties.index');
         Route::get('/properties/create', [CmsPropertyController::class, 'create'])->name('properties.create');

@@ -22,7 +22,7 @@
                         description="{{ $service->short_description ?: $service->content }}"
                         icon="{{ $service->icon ?: 'property-valuation.svg' }}"
                         bgImage="{{ $service->banner_image ? asset($service->banner_image) : asset('brand-assets/services-images/property-valuation.jpg') }}"
-                        theme="light" />
+                        theme="{{ $loop->odd ? 'light' : 'dark' }}" />
                 @endforeach
 
                 <div

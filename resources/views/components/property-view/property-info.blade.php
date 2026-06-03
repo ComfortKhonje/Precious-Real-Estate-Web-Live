@@ -1,7 +1,7 @@
 @props(['property'])
 
-<section id="property-info" class="py-16 px-6 bg-complementary">
-    <div class="max-w-7xl mx-auto rounded-3xl bg-brand-white p-10">
+<section id="property-info" class="py-16 px-6">
+    <div class="max-w-7xl mx-auto rounded-3xl p-10">
         <h1 class="font-heading text-4xl">{{ $property->title }}</h1>
         <div class="mt-6 grid gap-6 md:grid-cols-2">
             <div class="space-y-4">
