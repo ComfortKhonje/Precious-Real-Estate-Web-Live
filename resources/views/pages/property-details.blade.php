@@ -36,7 +36,7 @@
 
             {{-- Back Button --}}
             <div class="mb-2 md:mb-4">
-                <a href="{{ route('properties') }}" class="inline-flex w-full md:w-fit justify-center items-center rounded-full text-gray-400 hover:text-brand-black border-2 border-gray-400 hover:bg-primary hover:border-gray-0 transition-all duration-300 group">
+                <a href="{{ route('properties') }}" class="inline-flex w-full md:w-fit justify-center items-center rounded-full text-gray-400 hover:text-brand-black border-2 border-gray-400 hover:bg-primary hover:border-primary transition-all duration-300 group">
                     <div class="w-5 h-10 rounded-full flex items-center justify-center mx-4">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </div>
@@ -165,7 +165,7 @@
                     {{-- Contact Us Buttons --}}
                     <div>
                         <h3 class="text-3xl font-heading text-brand-black mb-2 tracking-tight">Contact Us</h3>
-                        <div class="flex gap-4 w-full">
+                        <div class="flex flex-col md:flex-row gap-2 md:gap-4 w-full">
                             <a href="tel:+265884366756" class="w-full flex items-center gap-4 p-4 bg-brand-black text-white rounded-[1rem] hover:scale-[1.02] transition-transform shadow-lg">
                                 <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-brand-black shrink-0">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.44v3.53a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.12 2H6.65a2 2 0 0 1 2 1.72 12.81 12.81 0 0 0 .62 2.81 2 2 0 0 1-.45 2.11L7.33 10.13a16 16 0 0 0 6 6l1.47-1.47a2 2 0 0 1 2.11-.45 12.81 12.81 0 0 0 2.81.62 2 2 0 0 1 1.72 2z"></path></svg>

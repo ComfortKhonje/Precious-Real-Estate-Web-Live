@@ -43,6 +43,12 @@
     <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[90%] md:w-full max-w-7xl z-20">
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] py-5 px-4 md:py-8 md:px-6 shadow-xl border border-gray-100 w-full">
             <form action="{{ route('properties') }}" method="GET" class="flex flex-col lg:flex-row gap-6 lg:gap-4 items-stretch lg:items-center w-full">
+                {{-- Search (by title) --}}
+                <div class="w-full">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Search</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title or keywords" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary text-brand-black font-semibold text-md">
+                </div>
+
                 {{-- Location --}}
                 <div class="w-full">
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Location</label>
@@ -65,6 +71,7 @@
                 <div class="w-full">
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Status</label>
                     <select name="status" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                        <option value="" {{ request('status') === null || request('status') === '' ? 'selected' : '' }}>Any Status</option>
                         <option value="For Sale" {{ request('status') === 'For Sale' ? 'selected' : '' }}>For Sale</option>
                         <option value="For Rent" {{ request('status') === 'For Rent' ? 'selected' : '' }}>For Rent</option>
                     </select>

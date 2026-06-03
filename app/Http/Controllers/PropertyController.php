@@ -14,6 +14,11 @@ class PropertyController extends Controller
     {
         $query = Property::where('is_available', true);
 
+        // Search by title/keywords
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
         // Filter by location
         if ($request->filled('location') && $request->location !== 'Select Location') {
             $query->where('location', 'like', '%' . $request->location . '%');

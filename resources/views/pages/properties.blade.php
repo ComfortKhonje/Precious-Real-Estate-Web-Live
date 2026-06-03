@@ -9,13 +9,13 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             {{-- Section Header --}}
-            <div class="mb-16 md:mb-20">
-                <div class="badge-yellow mb-4">Latest Listings</div>
-                <h2 class="text-4xl md:text-6xl font-heading text-brand-black uppercase tracking-tight">Available <br><span class="text-gray-400">Properties</span></h2>
+            <div class="pt-60 md:pt-2 mb-6">
+                <div class="badge-yellow mb-2">Latest Listings</div>
+                <h2 class="text-4xl font-heading text-brand-black tracking-tight">Available Properties</h2>
             </div>
 
             {{-- Properties Grid --}}
-            <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+            <div id="property-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @include('components.properties.property-grid-items', ['properties' => $properties])
             </div>
 
