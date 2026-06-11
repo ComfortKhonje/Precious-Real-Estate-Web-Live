@@ -31,6 +31,7 @@ class AnnouncementsController extends Controller
         ]);
 
         $announcement = Announcement::create($data);
+
         return response()->json($announcement, 201);
     }
 
@@ -47,12 +48,14 @@ class AnnouncementsController extends Controller
         ]);
 
         $announcement->update($data);
+
         return response()->json($announcement);
     }
 
     public function destroy(Announcement $announcement)
     {
         $announcement->delete();
+
         return response()->json(['deleted' => true]);
     }
 }

@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Draft, publish, or archive announcements.')
 
 @section('content')
-    <form method="POST" action="{{ route('cms.announcements.store') }}" class="space-y-6">
+    <form method="POST" action="{{ route('cms.announcements.store') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
@@ -52,10 +52,9 @@
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
                 <div class="space-y-2 md:col-span-2">
-                    <label class="text-sm font-semibold tracking-wider">Cover Image URL</label>
-                    <input type="text" name="cover_image" value="{{ old('cover_image') }}"
-                        placeholder="https://example.com/image.jpg"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <label class="text-sm font-semibold tracking-wider">Cover Image</label>
+                    <input type="file" name="cover_image" accept="image/*"
+                        class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
             </div>
         </div>

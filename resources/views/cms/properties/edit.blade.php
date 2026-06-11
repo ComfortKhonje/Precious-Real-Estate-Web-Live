@@ -71,7 +71,7 @@
                 <p class="text-sm text-brand-black/60 mt-1">or click to browse</p>
                 <div class="mt-4 media-preview text-left"></div>
             </div>
-            <input type="hidden" name="media" value="{{ old('media', json_encode($property->media ?? [])) }}">
+            <input type="hidden" name="media" value="{{ old('media', json_encode($property->images->pluck('image_path')->toArray() ?? [])) }}">
         </div>
 
         <div class="flex flex-wrap gap-3 justify-end">

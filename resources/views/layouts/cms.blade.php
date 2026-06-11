@@ -17,7 +17,7 @@
     @stack('styles')
 </head>
 <body class="font-body text-brand-black bg-brand-white antialiased min-h-screen"
-      x-data="{ sidebarOpen: false, userMenuOpen: false }">
+      x-data="{ sidebarOpen: false, userMenuOpen: false, confirmModalOpen: false, confirmFormId: null, confirmMessage: 'Are you sure?' }">
     <div class="min-h-screen flex">
         {{-- Mobile overlay --}}
         <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-brand-black/40 lg:hidden"
@@ -37,32 +37,31 @@
                     </div>
                 </a>
                 <button type="button" class="lg:hidden p-2 rounded-lg hover:bg-white/10" @click="sidebarOpen = false" aria-label="Close sidebar">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
+                    <i data-lucide="x" class="w-6 h-6 text-white/70"></i>
                 </button>
             </div>
 
             <nav class="px-3 py-6 space-y-1">
                 @php
                     $nav = [
-                        ['label' => 'Dashboard Overview', 'route' => 'cms.dashboard'],
-                        ['label' => 'Property Listings', 'route' => 'cms.properties.index'],
-                        ['label' => 'Featured Properties', 'route' => 'cms.featured.index'],
-                        ['label' => 'Services Content', 'route' => 'cms.services.index'],
-                        ['label' => 'Inquiries', 'route' => 'cms.inquiries.index'],
-                        ['label' => 'Announcements & News', 'route' => 'cms.announcements.index'],
-                        ['label' => 'Contact Information', 'route' => 'cms.contact.index'],
-                        ['label' => 'Analytics', 'route' => 'cms.analytics.index'],
-                        ['label' => 'Settings', 'route' => 'cms.settings.index'],
+                        ['label' => 'Dashboard Overview', 'route' => 'cms.dashboard', 'icon' => 'layout-dashboard'],
+                        ['label' => 'Property Listings', 'route' => 'cms.properties.index', 'icon' => 'home'],
+                        ['label' => 'Featured Properties', 'route' => 'cms.featured.index', 'icon' => 'star'],
+                        ['label' => 'Services Content', 'route' => 'cms.services.index', 'icon' => 'briefcase'],
+                        ['label' => 'Inquiries', 'route' => 'cms.inquiries.index', 'icon' => 'mail'],
+                        ['label' => 'Announcements & News', 'route' => 'cms.announcements.index', 'icon' => 'megaphone'],
+                        ['label' => 'Team Members', 'route' => 'cms.team-members.index', 'icon' => 'users'],
+                        ['label' => 'Contact Information', 'route' => 'cms.contact.index', 'icon' => 'phone'],
+                        ['label' => 'Analytics', 'route' => 'cms.analytics.index', 'icon' => 'trending-up'],
+                        ['label' => 'Settings', 'route' => 'cms.settings.index', 'icon' => 'settings'],
                     ];
                 @endphp
 
                 @foreach($nav as $item)
                     <a href="{{ route($item['route']) }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                              {{ request()->routeIs($item['route']) ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
-                        <span class="w-2 h-2 rounded-full {{ request()->routeIs($item['route']) ? 'bg-primary' : 'bg-white/30' }}"></span>
+                              {{ request()->routeIs($item['route']) ? 'bg-white/10 text-white font-semibold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
+                        <i data-lucide="{{ $item['icon'] }}" class="w-5 h-5 {{ request()->routeIs($item['route']) ? 'text-primary' : 'text-white/60' }}"></i>
                         <span class="font-medium tracking-wide">{{ $item['label'] }}</span>
                     </a>
                 @endforeach
@@ -83,9 +82,7 @@
                     <div class="flex items-center gap-3">
                         <button type="button" class="lg:hidden p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition"
                                 @click="sidebarOpen = true" aria-label="Open sidebar">
-                            <svg class="w-6 h-6 text-brand-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
+                            <i data-lucide="menu" class="w-6 h-6 text-brand-black"></i>
                         </button>
                         <div>
                             <div class="font-heading text-3xl leading-none">@yield('page_title', 'Dashboard')</div>
@@ -105,9 +102,7 @@
                                     <div class="text-sm font-semibold text-brand-black">Admin</div>
                                     <div class="text-xs text-brand-black/60">PREC Staff</div>
                                 </div>
-                                <svg class="w-4 h-4 text-brand-black/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/>
-                                </svg>
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-brand-black/70"></i>
                             </button>
 
                             <div x-show="userMenuOpen" @click.outside="userMenuOpen = false" x-transition
@@ -132,6 +127,58 @@
         </div>
     </div>
 
+    {{-- Global Confirmation Modal --}}
+    <div x-show="confirmModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak style="display: none;">
+        {{-- Backdrop --}}
+        <div x-show="confirmModalOpen" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100" 
+             x-transition:leave="ease-in duration-200" 
+             x-transition:leave-start="opacity-100" 
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-brand-black/40 backdrop-blur-sm" 
+             @click="confirmModalOpen = false" aria-hidden="true"></div>
+
+        {{-- Dialog --}}
+        <div x-show="confirmModalOpen" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+             x-transition:leave="ease-in duration-200" 
+             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             class="relative bg-white rounded-3xl shadow-xl border border-gray-100 w-full max-w-md p-6 sm:p-8 z-[101] overflow-hidden">
+             
+            <div class="flex items-start gap-4 sm:gap-5">
+                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                </div>
+                <div class="flex-1 mt-1">
+                    <h3 class="font-heading text-2xl leading-tight mb-2">Confirm Deletion</h3>
+                    <p class="text-brand-black/70 text-sm leading-relaxed" x-text="confirmMessage"></p>
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <button type="button" @click="confirmModalOpen = false" 
+                        class="px-6 py-3 rounded-full border border-gray-200 font-semibold text-brand-black hover:bg-gray-50 transition text-sm">
+                    Cancel
+                </button>
+                <button type="button" @click="document.getElementById(confirmFormId).submit()" 
+                        class="px-6 py-3 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition text-sm shadow-sm shadow-red-200">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
     @stack('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.458.0/dist/umd/lucide.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
 </body>
 </html>

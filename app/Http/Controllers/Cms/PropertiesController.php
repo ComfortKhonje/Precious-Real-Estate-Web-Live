@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Cms;
 
 use App\Http\Controllers\Controller;
 use App\Models\Property;
+use App\Models\PropertyImage;
+use App\Services\MediaService;
 use Illuminate\Http\Request;
 
 class PropertiesController extends Controller
@@ -18,6 +20,7 @@ class PropertiesController extends Controller
         }
 
         $properties = $query->paginate(20);
+
         return view('cms.properties.index', compact('properties'));
     }
 
@@ -45,10 +48,26 @@ class PropertiesController extends Controller
             'media' => 'nullable|string',
         ]);
 
-        $data['features'] = $data['features'] ? array_map('trim', explode(',', $data['features'])) : [];
-        $data['media'] = $data['media'] ? json_decode($data['media'], true) : [];
+        $mediaJson = $data['media'] ?? null;
+        unset($data['media']);
 
-        Property::create($data);
+        $data['features'] = $data['features'] ? array_map('trim', explode(',', $data['features'])) : [];
+
+        $property = Property::create($data);
+
+        if ($mediaJson) {
+            $mediaPaths = json_decode($mediaJson, true);
+            if (is_array($mediaPaths)) {
+                foreach ($mediaPaths as $index => $path) {
+                    PropertyImage::create([
+                        'property_id' => $property->id,
+                        'image_path' => $path,
+                        'is_featured' => $index === 0,
+                        'sort_order' => $index,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('cms.properties.index')->with('status', 'Property created.');
     }
@@ -77,10 +96,28 @@ class PropertiesController extends Controller
             'media' => 'nullable|string',
         ]);
 
+        $mediaJson = $data['media'] ?? null;
+        unset($data['media']);
+
         $data['features'] = $data['features'] ? array_map('trim', explode(',', $data['features'])) : [];
-        $data['media'] = $data['media'] ? json_decode($data['media'], true) : [];
 
         $property->update($data);
+
+        $mediaPaths = $mediaJson ? json_decode($mediaJson, true) : [];
+        if (! is_array($mediaPaths)) {
+            $mediaPaths = [];
+        }
+
+        // Delete removed images (this triggers observer to delete physical files)
+        $property->images()->whereNotIn('image_path', $mediaPaths)->get()->each->delete();
+
+        // Sync remaining and new images
+        foreach ($mediaPaths as $index => $path) {
+            PropertyImage::updateOrCreate(
+                ['property_id' => $property->id, 'image_path' => $path],
+                ['is_featured' => $index === 0, 'sort_order' => $index]
+            );
+        }
 
         return redirect()->route('cms.properties.index')->with('status', 'Property updated.');
     }
@@ -88,18 +125,18 @@ class PropertiesController extends Controller
     public function destroy(Property $property)
     {
         $property->delete();
+
         return redirect()->route('cms.properties.index')->with('status', 'Property deleted.');
     }
 
     public function uploadMedia(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
         ]);
 
-        $file = $request->file('file');
-        $path = $file->store('properties', 'public');
+        $path = app(MediaService::class)->upload($request->file('file'), 'properties/gallery');
 
-        return response()->json(['url' => asset('storage/' . $path), 'path' => $path]);
+        return response()->json(['url' => asset('storage/'.$path.'/large.webp'), 'path' => $path]);
     }
 }

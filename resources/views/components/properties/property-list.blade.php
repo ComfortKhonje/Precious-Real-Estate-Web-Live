@@ -30,11 +30,20 @@
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                 @foreach ($properties as $property)
+                    @php
+                        // Safely get property image with fallback
+                        $image = 'brand-assets/4 Properties Page/Property image 1.png';
+                        if ($property->media && is_array($property->media) && isset($property->media[0])) {
+                            $image = $property->media[0];
+                        }
+                    @endphp
                     <x-shared.property-card
-                        image="{{ asset($property->media[0] ?? 'brand-assets/4 Properties Page/Property image 1.png') }}"
-                        location="{{ $property->location }}"
-                        price="{{ number_format($property->price, 0, '.', ',') }} MWK" status="{{ $property->status }}"
-                        description="{{ $property->description }}" href="{{ route('property.view', $property->id) }}" />
+                        image="{{ asset($image) }}"
+                        location="{{ $property->location ?? 'Location TBD' }}"
+                        price="{{ $property->price ? 'MWK ' . number_format($property->price, 0, '.', ',') : 'Price on Request' }}" 
+                        status="{{ $property->status ?? 'For Rent' }}"
+                        description="{{ $property->description ?? 'A beautiful property in a great location.' }}" 
+                        href="{{ route('property.view', $property->id) }}" />
                 @endforeach
             </div>
         @endif

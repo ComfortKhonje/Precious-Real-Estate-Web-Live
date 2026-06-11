@@ -21,6 +21,7 @@ class SettingsController extends Controller
         ]);
 
         $setting = Setting::updateOrCreate(['key' => $data['key']], ['value' => $data['value'] ?? null]);
+
         return response()->json($setting, 201);
     }
 
@@ -31,6 +32,7 @@ class SettingsController extends Controller
         ]);
 
         $setting = Setting::updateOrCreate(['key' => $key], ['value' => $data['value'] ?? null]);
+
         return response()->json($setting);
     }
 }

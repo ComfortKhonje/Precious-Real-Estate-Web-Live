@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Update announcement details.')
 
 @section('content')
-    <form method="POST" action="{{ route('cms.announcements.update', $announcement) }}" class="space-y-6">
+    <form method="POST" action="{{ route('cms.announcements.update', $announcement) }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -57,12 +57,14 @@
                         value="{{ old('published_at', optional($announcement->published_at)->format('Y-m-d\TH:i')) }}"
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
-                <div class="space-y-2 md:col-span-2">
-                    <label class="text-sm font-semibold tracking-wider">Cover Image URL</label>
-                    <input type="text" name="cover_image" value="{{ old('cover_image', $announcement->cover_image) }}"
-                        placeholder="https://example.com/image.jpg"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
-                </div>
+                    <label class="text-sm font-semibold tracking-wider">Cover Image</label>
+                    @if($announcement->cover_image)
+                        <div class="mb-3">
+                            <img src="{{ str_starts_with($announcement->cover_image, 'http') ? $announcement->cover_image : asset('storage/' . $announcement->cover_image . '/medium.webp') }}" class="h-24 w-auto rounded-lg object-cover">
+                        </div>
+                    @endif
+                    <input type="file" name="cover_image" accept="image/*"
+                        class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
             </div>
         </div>
 

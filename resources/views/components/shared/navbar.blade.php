@@ -38,6 +38,8 @@
 
                 <a href="{{ route('team') }}" class="nav-link-item relative h-12 px-2 flex items-center text-sm tracking-wider uppercase transition-all duration-300 {{ request()->routeIs('team') ? 'text-brand-black font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-primary' : 'text-brand-black/70 font-normal hover:text-brand-black hover:font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 hover:after:w-full after:bg-primary after:transition-all after:duration-300' }}">Team</a>
 
+                <a href="{{ route('news.index') }}" class="nav-link-item relative h-12 px-2 flex items-center text-sm tracking-wider uppercase transition-all duration-300 {{ request()->routeIs('news.*') ? 'text-brand-black font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-primary' : 'text-brand-black/70 font-normal hover:text-brand-black hover:font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 hover:after:w-full after:bg-primary after:transition-all after:duration-300' }}">News</a>
+
                 <a href="{{ route('contact') }}" class="nav-link-item relative h-12 px-2 flex items-center text-sm tracking-wider uppercase transition-all duration-300 {{ request()->routeIs('contact') ? 'text-brand-black font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-primary' : 'text-brand-black/70 font-normal hover:text-brand-black hover:font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 hover:after:w-full after:bg-primary after:transition-all after:duration-300' }}">Contact</a>
             </div>
 
@@ -86,6 +88,7 @@
 
             <a href="{{ route('properties') }}" class="block px-4 py-2.5 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('properties') ? 'bg-primary text-brand-black font-bold' : 'text-brand-black/80 hover:bg-brand-black/5' }}">Properties</a>
             <a href="{{ route('team') }}" class="block px-4 py-2.5 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('team') ? 'bg-primary text-brand-black font-bold' : 'text-brand-black/80 hover:bg-brand-black/5' }}">Team</a>
+            <a href="{{ route('news.index') }}" class="block px-4 py-2.5 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('news.*') ? 'bg-primary text-brand-black font-bold' : 'text-brand-black/80 hover:bg-brand-black/5' }}">News</a>
             <a href="{{ route('contact') }}" class="block px-4 py-2.5 rounded-2xl text-base font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('contact') ? 'bg-primary text-brand-black font-bold' : 'text-brand-black/80 hover:bg-brand-black/5' }}">Contact</a>
 
             <div class="pt-4 border-t border-brand-black/5 mt-4">

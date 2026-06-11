@@ -10,11 +10,7 @@
             <div class="relative">
                 <input type="text" placeholder="Search by property name..."
                     class="w-full bg-white border border-gray-200 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary focus:border-primary/30">
-                <svg class="w-5 h-5 text-brand-black/40 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
-                    stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="m21 21-4.35-4.35M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" />
-                </svg>
+                <i data-lucide="search" class="w-5 h-5 text-brand-black/40 absolute left-4 top-1/2 -translate-y-1/2"></i>
             </div>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -63,11 +59,11 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <a href="{{ route('cms.properties.edit', $prop) }}" class="text-sm font-semibold">Edit</a>
-                            <form method="POST" action="{{ route('cms.properties.destroy', $prop) }}"
-                                onsubmit="return confirm('Delete this property?');">
+                            <form id="delete-property-form-{{ $prop->id }}" method="POST" action="{{ route('cms.properties.destroy', $prop) }}">
                                 @csrf
                                 @method('DELETE')
-                                <button class="text-sm text-red-600">Delete</button>
+                                <button type="button" class="text-sm text-red-600"
+                                    @click="confirmFormId = 'delete-property-form-{{ $prop->id }}'; confirmMessage = 'Delete this property?'; confirmModalOpen = true">Delete</button>
                             </form>
                         </div>
                     </div>

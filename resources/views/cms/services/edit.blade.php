@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Update content with simple formatting.')
 
 @section('content')
-    <form method="POST" action="{{ route('cms.services.update', ['slug' => str($service->title)->slug()]) }}"
+    <form method="POST" action="{{ route('cms.services.update', ['slug' => str($service->title)->slug()]) }}" enctype="multipart/form-data"
         class="bg-white border border-gray-100 rounded-3xl p-6 space-y-6">
         @csrf
         @method('PUT')
@@ -38,10 +38,9 @@
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('content', $service->content) }}</textarea>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Banner Image URL</label>
-                    <input type="text" name="banner_image" value="{{ old('banner_image', $service->banner_image) }}"
-                        placeholder="https://example.com/banner.jpg"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <label class="text-sm font-semibold tracking-wider">Banner Image</label>
+                    <input type="file" name="banner_image" accept="image/*"
+                        class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Visibility</label>
@@ -65,15 +64,15 @@
             <div class="space-y-5">
                 <div class="bg-gray-50 border border-gray-100 rounded-3xl p-6">
                     <h4 class="font-heading text-3xl leading-none mb-2">Banner Preview</h4>
-                    <p class="text-sm text-brand-black/60 mb-5">Banner image URL will be used on the public service page.
+                    <p class="text-sm text-brand-black/60 mb-5">Current banner image used on the public service page.
                     </p>
                     <div class="border-2 border-dashed border-gray-200 rounded-3xl p-10 text-center bg-white">
                         @if ($service->banner_image)
-                            <img src="{{ $service->banner_image }}" alt="{{ $service->title }} banner"
+                            <img src="{{ str_starts_with($service->banner_image, 'http') ? $service->banner_image : asset('storage/' . $service->banner_image . '/medium.webp') }}" alt="{{ $service->title }} banner"
                                 class="mx-auto h-40 object-cover rounded-3xl">
                         @else
                             <p class="font-semibold">No banner image configured yet</p>
-                            <p class="text-sm text-brand-black/60 mt-1">Add a banner image URL above.</p>
+                            <p class="text-sm text-brand-black/60 mt-1">Upload a banner image to display one.</p>
                         @endif
                     </div>
                 </div>
@@ -88,5 +87,27 @@
                 </div>
             </div>
         </div>
+
+        <!-- Form Actions -->
+        <div class="flex gap-3 pt-6 border-t border-gray-100">
+            <a href="{{ route('cms.services.index') }}"
+                class="inline-flex items-center px-6 py-3 rounded-full border border-gray-200 font-semibold hover:bg-gray-50 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Back
+            </a>
+            <button type="submit"
+                class="inline-flex items-center px-6 py-3 rounded-full bg-primary text-brand-black font-semibold hover:bg-primary/90 transition ml-auto">
+                <i data-lucide="check" class="w-4 h-4 mr-2"></i> Save Changes
+            </button>
+            <button type="button" 
+                @click="confirmFormId = 'delete-service-form'; confirmMessage = 'Delete this service? This cannot be undone.'; confirmModalOpen = true"
+                class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-red-100 text-red-700 font-semibold hover:bg-red-200 transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+            </button>
+        </div>
+    </form>
+
+    <form id="delete-service-form" method="POST" action="{{ route('cms.services.destroy', $service) }}" class="hidden">
+        @csrf
+        @method('DELETE')
     </form>
 @endsection
