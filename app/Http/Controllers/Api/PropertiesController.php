@@ -69,12 +69,14 @@ class PropertiesController extends Controller
         ]);
 
         $property->update($data);
+
         return response()->json($property);
     }
 
     public function destroy(Property $property)
     {
         $property->delete();
+
         return response()->json(['deleted' => true]);
     }
 }

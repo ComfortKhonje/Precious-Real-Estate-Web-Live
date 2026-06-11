@@ -30,12 +30,84 @@ class InquiriesController extends Controller
         ]);
 
         $inquiry = Inquiry::create($data);
+
         return response()->json($inquiry, 201);
+    }
+
+    /**
+     * Store a new inquiry from public frontend form (no authentication required)
+     * Handles multi-step inquiry form with service-specific fields
+     */
+    public function storePublic(Request $request)
+    {
+        $data = $request->validate([
+            'service' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required|string|max:20',
+            'contactMethod' => 'required|string|in:Phone,Email,WhatsApp',
+            'location' => 'nullable|string|max:255',
+            'property_id' => 'nullable|exists:properties,id',
+            'additionalDetails' => 'nullable|string',
+            // Service-specific fields (optional depending on service)
+            'propertyType' => 'nullable|string',
+            'purposeOfValuation' => 'nullable|string',
+            'estimatedPropertySize' => 'nullable|string',
+            'managementNeeds' => 'nullable|string',
+            'numberOfProperties' => 'nullable|string',
+            'inquiryType' => 'nullable|string',
+            'budgetAskingPrice' => 'nullable|string',
+            'projectType' => 'nullable|string',
+            'projectStage' => 'nullable|string',
+            'currentStatus' => 'nullable|string',
+            'inquiryTopic' => 'nullable|string',
+            'preferredService' => 'nullable|string',
+        ]);
+
+        // Store all data as JSON in message field for reference
+        $data['type'] = $data['service'];
+        $data['message'] = json_encode([
+            'service' => $data['service'],
+            'contactMethod' => $data['contactMethod'],
+            'location' => $data['location'] ?? null,
+            'additionalDetails' => $data['additionalDetails'] ?? null,
+            'serviceFields' => [
+                'propertyType' => $data['propertyType'] ?? null,
+                'purposeOfValuation' => $data['purposeOfValuation'] ?? null,
+                'estimatedPropertySize' => $data['estimatedPropertySize'] ?? null,
+                'managementNeeds' => $data['managementNeeds'] ?? null,
+                'numberOfProperties' => $data['numberOfProperties'] ?? null,
+                'inquiryType' => $data['inquiryType'] ?? null,
+                'budgetAskingPrice' => $data['budgetAskingPrice'] ?? null,
+                'projectType' => $data['projectType'] ?? null,
+                'projectStage' => $data['projectStage'] ?? null,
+                'currentStatus' => $data['currentStatus'] ?? null,
+                'inquiryTopic' => $data['inquiryTopic'] ?? null,
+                'preferredService' => $data['preferredService'] ?? null,
+            ],
+        ]);
+
+        // Create inquiry
+        $inquiry = Inquiry::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'type' => $data['type'],
+            'message' => $data['message'],
+            'property_id' => $data['property_id'] ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'inquiry' => $inquiry,
+            'message' => 'Thank you for your inquiry. Our team will get back to you within 24 hours.',
+        ], 201);
     }
 
     public function destroy(Inquiry $inquiry)
     {
         $inquiry->delete();
+
         return response()->json(['deleted' => true]);
     }
 }

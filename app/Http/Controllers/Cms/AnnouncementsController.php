@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Cms;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Services\MediaService;
 use Illuminate\Http\Request;
 
 class AnnouncementsController extends Controller
@@ -13,7 +14,7 @@ class AnnouncementsController extends Controller
         $query = Announcement::query();
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->get('search') . '%');
+            $query->where('title', 'like', '%'.$request->get('search').'%');
         }
 
         if ($request->filled('status')) {
@@ -36,7 +37,7 @@ class AnnouncementsController extends Controller
             'title' => 'required|string|max:255',
             'summary' => 'nullable|string|max:500',
             'content' => 'nullable|string',
-            'cover_image' => 'nullable|string',
+            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
             'status' => 'required|string|in:draft,published,archived',
             'is_featured' => 'nullable|boolean',
             'published_at' => 'nullable|date',
@@ -44,6 +45,12 @@ class AnnouncementsController extends Controller
 
         $data['is_featured'] = $request->boolean('is_featured');
         $data['published_at'] = $data['published_at'] ?: now();
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = app(MediaService::class)->upload($request->file('cover_image'), 'announcements/featured');
+        } else {
+            unset($data['cover_image']);
+        }
 
         Announcement::create($data);
 
@@ -61,13 +68,24 @@ class AnnouncementsController extends Controller
             'title' => 'required|string|max:255',
             'summary' => 'nullable|string|max:500',
             'content' => 'nullable|string',
-            'cover_image' => 'nullable|string',
+            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
             'status' => 'required|string|in:draft,published,archived',
             'is_featured' => 'nullable|boolean',
             'published_at' => 'nullable|date',
         ]);
 
         $data['is_featured'] = $request->boolean('is_featured');
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = app(MediaService::class)->replace(
+                $request->file('cover_image'),
+                'announcements/featured',
+                $announcement->cover_image
+            );
+        } else {
+            unset($data['cover_image']);
+        }
+
         $announcement->update($data);
 
         return redirect()->route('cms.announcements.index')->with('status', 'Announcement updated.');
@@ -76,6 +94,7 @@ class AnnouncementsController extends Controller
     public function destroy(Announcement $announcement)
     {
         $announcement->delete();
+
         return redirect()->route('cms.announcements.index')->with('status', 'Announcement deleted.');
     }
 }

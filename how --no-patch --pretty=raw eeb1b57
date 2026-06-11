@@ -1,0 +1,59 @@
+[33mcommit eeb1b57cf60536becb740b8c1d52f61b2ab1d853[m[33m ([m[1;32mbackup-main[m[33m)[m
+Merge: d26cc67 4947e6f
+Author: jannytheedesigner <jannythedesigner@gmail.com>
+Date:   Thu Jun 11 21:49:54 2026 +0200
+
+    Initial commit
+
+ app/Http/Controllers/Api/AuthController.php        |    5 [32m+[m[31m-[m
+ app/Http/Controllers/Api/SettingsController.php    |   11 [32m+[m[31m-[m
+ app/Http/Controllers/Cms/DashboardController.php   |   20 [32m+[m
+ app/Http/Controllers/Cms/LoginController.php       |   87 [32m+[m
+ app/Http/Controllers/Cms/PropertyController.php    |  184 [32m+[m
+ app/Http/Controllers/Cms/ServicesController.php    |   64 [32m+[m[31m-[m
+ app/Http/Controllers/HomeController.php            |   18 [32m+[m[31m-[m
+ app/Http/Controllers/PropertiesController.php      |   18 [31m-[m
+ app/Http/Controllers/PropertyController.php        |   77 [32m+[m
+ app/Http/Controllers/PropertyViewController.php    |   16 [31m-[m
+ app/Http/Controllers/UpdatesController.php         |   15 [32m+[m
+ app/Models/Property.php                            |   44 [32m+[m
+ app/View/Components/UI/Select.php                  |   30 [32m+[m
+ components.json                                    |   25 [32m+[m
+ composer.json                                      |    1 [31m-[m
+ composer.lock                                      |  162 [32m+[m[31m-[m
+ database/factories/PropertyFactory.php             |   15 [32m+[m[31m-[m
+ .../2026_06_02_000001_create_properties_table.php  |   36 [31m-[m
+ .../2026_06_02_102132_create_properties_table.php  |   50 [32m+[m
+ database/seeders/DatabaseSeeder.php                |   14 [32m+[m[31m-[m
+ database/seeders/PropertySeeder.php                |  135 [32m+[m
+ database/seeders/ServiceSeeder.php                 |    2 [32m+[m[31m-[m
+ database/seeders/UserSeeder.php                    |   44 [32m+[m
+ package-lock.json                                  | 8372 [32m+++++++++++++++++[m[31m---[m
+ package.json                                       |   37 [32m+[m[31m-[m
+ precious_real_estate_web                           |  Bin [31m0[m -> [32m163840[m bytes
+ .../services-icons/property-development.svg        |    2 [32m+[m[31m-[m
+ .../brand-assets/services-icons/sales-letting.svg  |   20 [32m+[m[31m-[m
+ resources/css/app.css                              |   39 [32m+[m
+ resources/js/app.js                                |    8 [32m+[m
+ resources/js/components/ui/select.tsx              |  201 [32m+[m
+ resources/js/lib/utils.ts                          |    6 [32m+[m
+ resources/views/cms/announcements/create.blade.php |    5 [32m+[m[31m-[m
+ resources/views/cms/announcements/edit.blade.php   |    5 [32m+[m[31m-[m
+ resources/views/cms/announcements/index.blade.php  |    5 [32m+[m[31m-[m
+ resources/views/cms/auth/login.blade.php           |   20 [32m+[m[31m-[m
+ resources/views/cms/dashboard.blade.php            |   55 [32m+[m[31m-[m
+ resources/views/cms/inquiries/index.blade.php      |    5 [32m+[m[31m-[m
+ resources/views/cms/properties/create.blade.php    |  139 [32m+[m[31m-[m
+ resources/views/cms/properties/edit.blade.php      |  159 [32m+[m[31m-[m
+ resources/views/cms/properties/index.blade.php     |  137 [32m+[m[31m-[m
+ resources/views/cms/services/create.blade.php      |   80 [32m+[m
+ resources/views/cms/services/edit.blade.php        |   39 [32m+[m[31m-[m
+ resources/views/cms/services/index.blade.php       |   53 [32m+[m[31m-[m
+ resources/views/cms/settings/index.blade.php       |   70 [32m+[m[31m-[m
+ resources/views/components/cms/icon.blade.php      |  109 [32m+[m
+ .../components/contact/contact-form.blade.php      |   15 [32m+[m
+ .../components/home/featured-properties.blade.php  |   43 [32m+[m[31m-[m
+ .../views/components/home/latest-updates.blade.php |   57 [32m+[m
+ .../views/components/home/service-card.blade.php   |   10 [32m+[m[31m-[m
+ resources/views/components/home/services.blade.php |    2 [32m+[m[31m-[m
+ .../components/inquiry/inquiry-form.blade.php      |  309

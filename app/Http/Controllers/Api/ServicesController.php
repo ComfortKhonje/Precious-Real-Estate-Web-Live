@@ -29,6 +29,7 @@ class ServicesController extends Controller
         ]);
 
         $service = Service::create($data);
+
         return response()->json($service, 201);
     }
 
@@ -43,12 +44,14 @@ class ServicesController extends Controller
         ]);
 
         $service->update($data);
+
         return response()->json($service);
     }
 
     public function destroy(Service $service)
     {
         $service->delete();
+
         return response()->json(['deleted' => true]);
     }
 }

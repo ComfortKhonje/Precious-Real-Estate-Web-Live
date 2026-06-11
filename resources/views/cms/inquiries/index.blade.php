@@ -13,11 +13,7 @@
                         <input type="search" name="search" form="inquiryFilters" value="{{ request('search') }}"
                             placeholder="Search by name, email, property, service..."
                             class="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary focus:border-primary/30">
-                        <svg class="w-5 h-5 text-brand-black/40 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m21 21-4.35-4.35M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" />
-                        </svg>
+                        <i data-lucide="search" class="w-5 h-5 text-brand-black/40 absolute left-4 top-1/2 -translate-y-1/2"></i>
                     </div>
                 </div>
                 <form id="inquiryFilters" method="GET" action="{{ route('cms.inquiries.index') }}"

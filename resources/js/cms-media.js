@@ -21,7 +21,19 @@ function initDropZone(containerId, inputName) {
     }
 
     // initialize existing
-    uploaded.forEach(u => createThumbnail(`/storage/${u}`));
+    uploaded.forEach(u => {
+        let url = u;
+        if (!url.startsWith('http')) {
+            if (!url.match(/\.[a-zA-Z0-9]+$/)) {
+                // new directory-based path
+                url = `/storage/${u}/thumbnail.webp`;
+            } else {
+                // old path with extension
+                url = `/storage/${u}`;
+            }
+        }
+        createThumbnail(url);
+    });
 
     container.addEventListener('click', () => fileInput.click());
 

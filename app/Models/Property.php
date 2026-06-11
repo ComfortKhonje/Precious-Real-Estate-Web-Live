@@ -15,41 +15,95 @@ class Property extends Model
         'title',
         'slug',
         'description',
-        'location',
-        'price',
-        'currency',
-        'status',
+        'category',
         'type',
+        'price',
+        'location',
+        'status',
         'bedrooms',
         'bathrooms',
         'land_size',
-        'parking_spaces',
-        'featured_image',
-        'gallery',
+        'parking',
+        'features',
         'is_featured',
-        'is_available',
     ];
 
     protected $casts = [
-        'gallery' => 'array',
-        'is_featured' => 'boolean',
-        'is_available' => 'boolean',
-        'price' => 'decimal:2',
+        'is_featured' => 'bool',
+        'features' => 'array',
     ];
 
     /**
-     * Get the route key for the model.
+     * Get all inquiries related to this property
      */
-    public function getRouteKeyName(): string
+    public function inquiries()
     {
-        return 'slug';
+        return $this->hasMany(Inquiry::class);
     }
 
     /**
-     * Format the price for display.
+     * Get all images related to this property
      */
-    public function getFormattedPriceAttribute(): string
+    public function images()
     {
-        return $this->currency . ' ' . number_format($this->price, 0);
+        return $this->hasMany(PropertyImage::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Get the featured cover image
+     */
+    public function coverImage()
+    {
+        return $this->hasOne(PropertyImage::class)->where('is_featured', true)->latestOfMany();
+    }
+
+    /**
+     * Get featured properties
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    /**
+     * Get available properties (for sale/rent)
+     */
+    public function scopeAvailable($query)
+    {
+        return $query->where('status', 'available')->orWhere('status', 'active');
+    }
+
+    /**
+     * Search properties by title or location
+     */
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('title', 'like', "%{$search}%")
+            ->orWhere('location', 'like', "%{$search}%")
+            ->orWhere('description', 'like', "%{$search}%");
+    }
+
+    /**
+     * Filter by price range
+     */
+    public function scopePriceRange($query, $minPrice, $maxPrice)
+    {
+        return $query->whereBetween('price', [$minPrice, $maxPrice]);
+    }
+
+    /**
+     * Filter by type (residential, commercial, etc)
+     */
+    public function scopeByType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
+     * Filter by bedrooms
+     */
+    public function scopeByBedrooms($query, $bedrooms)
+    {
+        return $query->where('bedrooms', '>=', $bedrooms);
     }
 }

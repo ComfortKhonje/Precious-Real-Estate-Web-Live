@@ -5,80 +5,142 @@
 @section('page_subtitle', 'Update office details, contacts, social links, and map settings.')
 
 @section('content')
-    <form class="space-y-6">
+    @if ($errors->any())
+        <div class="mb-6 bg-red-50 border border-red-200 rounded-3xl p-6">
+            <h3 class="font-semibold text-red-900 mb-3">Errors:</h3>
+            <ul class="space-y-2 text-sm text-red-800">
+                @foreach ($errors->all() as $error)
+                    <li>• {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if (session('success'))
+        <div class="mb-6 bg-green-50 border border-green-200 rounded-3xl p-6">
+            <h3 class="font-semibold text-green-900 flex items-center gap-2"><i data-lucide="check-circle" class="w-5 h-5"></i> {{ session('success') }}</h3>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('cms.contact.update') }}" class="space-y-6">
+        @csrf
+        @method('PUT')
+
+        <!-- Office Details -->
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
             <h3 class="font-heading text-3xl leading-none mb-1">Office Details</h3>
-            <p class="text-sm text-brand-black/60 mb-6">Supports multiple office locations later (backend wiring).</p>
+            <p class="text-sm text-brand-black/60 mb-6">Primary office contact information.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Office Name</label>
-                    <input type="text" placeholder="Precious Real Estate Consulting" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="text" name="office_name" placeholder="Precious Real Estate Consulting"
+                        value="{{ $settings['office_name'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Working Hours</label>
-                    <input type="text" placeholder="Mon-Fri, 08:00-17:00" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="text" name="working_hours" placeholder="Mon-Fri, 08:00-17:00"
+                        value="{{ $settings['working_hours'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Physical Address</label>
-                    <input type="text" placeholder="Enter physical address" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <textarea name="office_address" placeholder="Enter physical address" rows="2"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ $settings['office_address'] ?? '' }}</textarea>
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Postal Address</label>
-                    <input type="text" placeholder="Enter postal address" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <textarea name="postal_address" placeholder="Enter postal address" rows="2"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ $settings['postal_address'] ?? '' }}</textarea>
                 </div>
             </div>
         </div>
 
+        <!-- Contact Methods -->
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
-            <h3 class="font-heading text-3xl leading-none mb-1">Contact Details</h3>
-            <p class="text-sm text-brand-black/60 mb-6">Phone numbers, email addresses, WhatsApp.</p>
+            <h3 class="font-heading text-3xl leading-none mb-1">Contact Methods</h3>
+            <p class="text-sm text-brand-black/60 mb-6">Phone, email, and messaging contact details.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Phone Numbers</label>
-                    <input type="text" placeholder="+265 ..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <label class="text-sm font-semibold tracking-wider">Office Phone</label>
+                    <input type="tel" name="office_phone" placeholder="+265 1 2345 6789"
+                        value="{{ $settings['office_phone'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
                 </div>
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Email Addresses</label>
-                    <input type="text" placeholder="info@..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <label class="text-sm font-semibold tracking-wider">Office Email</label>
+                    <input type="email" name="office_email" placeholder="info@preciousrealestate.mw"
+                        value="{{ $settings['office_email'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
                 </div>
-                <div class="space-y-2 md:col-span-2">
+                <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">WhatsApp Number</label>
-                    <input type="text" placeholder="+265 ..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="tel" name="whatsapp_number" placeholder="+265 9 12 34 56 78"
+                        value="{{ $settings['whatsapp_number'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
                 </div>
             </div>
         </div>
 
+        <!-- Location -->
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
-            <h3 class="font-heading text-3xl leading-none mb-1">Social Media Links</h3>
-            <p class="text-sm text-brand-black/60 mb-6">Facebook, WhatsApp, YouTube, TikTok.</p>
+            <h3 class="font-heading text-3xl leading-none mb-1">Location</h3>
+            <p class="text-sm text-brand-black/60 mb-6">GPS coordinates for map integration.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div class="space-y-2"><label class="text-sm font-semibold tracking-wider">Facebook</label><input type="text" placeholder="https://facebook.com/..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20"></div>
-                <div class="space-y-2"><label class="text-sm font-semibold tracking-wider">WhatsApp</label><input type="text" placeholder="https://wa.me/..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20"></div>
-                <div class="space-y-2"><label class="text-sm font-semibold tracking-wider">YouTube</label><input type="text" placeholder="https://youtube.com/..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20"></div>
-                <div class="space-y-2"><label class="text-sm font-semibold tracking-wider">TikTok</label><input type="text" placeholder="https://tiktok.com/@..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20"></div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Latitude</label>
+                    <input type="number" name="latitude" placeholder="-13.9626" step="0.0001"
+                        value="{{ $settings['latitude'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Longitude</label>
+                    <input type="number" name="longitude" placeholder="33.7741" step="0.0001"
+                        value="{{ $settings['longitude'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
+                </div>
             </div>
         </div>
 
+        <!-- Social Links -->
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
-            <h3 class="font-heading text-3xl leading-none mb-1">Embedded Map Settings</h3>
-            <p class="text-sm text-brand-black/60 mb-6">Google maps link and coordinates.</p>
+            <h3 class="font-heading text-3xl leading-none mb-1">Social Media</h3>
+            <p class="text-sm text-brand-black/60 mb-6">Links to social media profiles.</p>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Google Maps Link</label>
-                    <input type="text" placeholder="https://maps.google.com/..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <label class="text-sm font-semibold tracking-wider">Facebook URL</label>
+                    <input type="url" name="facebook_url" placeholder="https://facebook.com/..."
+                        value="{{ $settings['facebook_url'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
                 </div>
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Office Coordinates</label>
-                    <input type="text" placeholder="-13.9, 33.7" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <label class="text-sm font-semibold tracking-wider">Instagram URL</label>
+                    <input type="url" name="instagram_url" placeholder="https://instagram.com/..."
+                        value="{{ $settings['instagram_url'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">LinkedIn URL</label>
+                    <input type="url" name="linkedin_url" placeholder="https://linkedin.com/..."
+                        value="{{ $settings['linkedin_url'] ?? '' }}"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
                 </div>
             </div>
         </div>
 
-        <div class="flex flex-wrap gap-3 justify-end">
-            <button type="button" class="btn-primary">Save Changes</button>
+        <!-- Form Actions -->
+        <div class="flex gap-3">
+            <button type="submit" class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-primary text-brand-black font-semibold hover:bg-primary/90 transition">
+                <i data-lucide="check" class="w-5 h-5"></i>
+                Save Changes
+            </button>
+            <a href="{{ route('cms.dashboard') }}" class="inline-flex items-center justify-center px-8 py-4 rounded-full border border-gray-200 font-semibold hover:bg-gray-50 transition">
+                Cancel
+            </a>
         </div>
     </form>
 @endsection

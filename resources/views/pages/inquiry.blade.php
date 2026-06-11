@@ -24,7 +24,7 @@
         </a>
     </div>
 
-    <x-inquiry.inquiry-form />
+    <x-inquiry.inquiry-form :property_id="request()->query('property_id')" />
 
     <x-shared.inquiry-footer />
 @endsection
