@@ -52,7 +52,6 @@
                         ['label' => 'Announcements & News', 'route' => 'cms.announcements.index', 'icon' => 'megaphone'],
                         ['label' => 'Team Members', 'route' => 'cms.team-members.index', 'icon' => 'users'],
                         ['label' => 'Contact Information', 'route' => 'cms.contact.index', 'icon' => 'phone'],
-                        ['label' => 'Analytics', 'route' => 'cms.analytics.index', 'icon' => 'trending-up'],
                         ['label' => 'Settings', 'route' => 'cms.settings.index', 'icon' => 'settings'],
                     ];
                 @endphp

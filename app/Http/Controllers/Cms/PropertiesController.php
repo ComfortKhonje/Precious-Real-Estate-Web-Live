@@ -51,8 +51,13 @@ class PropertiesController extends Controller
         $mediaJson = $data['media'] ?? null;
         unset($data['media']);
 
-        $data['features'] = $data['features'] ? array_map('trim', explode(',', $data['features'])) : [];
-
+        $data['features'] = collect(
+            explode(',', $request->input('features', ''))
+        )
+            ->map(fn ($item) => trim($item))
+            ->filter()
+            ->values()
+            ->toArray();
         $property = Property::create($data);
 
         if ($mediaJson) {
