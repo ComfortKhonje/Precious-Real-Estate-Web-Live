@@ -14,8 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-body text-brand-black bg-brand-white min-h-screen flex items-center justify-center px-6 py-16">
-    <img src="{{ asset('brand-assets/website-pages/grid-background.png') }}" alt="" class="fixed inset-0 w-full h-full object-cover opacity-15 -z-10">
+<body class="font-body text-brand-black bg-brand-white bg-grid min-h-screen flex items-center justify-center px-6 py-16">
 
     <div class="w-full max-w-md bg-white/95 border border-gray-200 rounded-3xl p-8 shadow-sm">
         <div class="flex items-center gap-3 mb-6">

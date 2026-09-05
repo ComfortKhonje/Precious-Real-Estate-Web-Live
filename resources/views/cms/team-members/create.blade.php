@@ -76,7 +76,8 @@
                     @error('photo_url')
                         <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-xs text-brand-black/50 mt-1">Upload a professional photo.</p>
+                    <p id="photoSizeError" class="text-xs text-amber-600 mt-1 hidden"></p>
+                    <p class="text-xs text-brand-black/50 mt-1">Upload a professional photo. Max 5MB.</p>
                 </div>
 
                 <!-- Order -->
@@ -115,7 +116,7 @@
 
                     <!-- Photo Preview -->
                     <div class="mb-4 h-48 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center overflow-hidden">
-                        <img id="photoPreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+                        <img loading="lazy" decoding="async" id="photoPreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
                         <i data-lucide="user" class="w-16 h-16 text-brand-black/40" id="photoPlaceholder"></i>
                     </div>
 
@@ -172,18 +173,43 @@
                 } else if (this.name === 'bio') {
                     document.getElementById('previewBio').textContent = this.value || 'Brief biography...';
                 } else if (this.name === 'photo_url') {
+                    // 2026-09-04: this used to do `preview.src = this.value`
+                    // — for a file input, `.value` is the browser's fake
+                    // "C:\fakepath\..." placeholder string, never a loadable
+                    // URL, so this preview never actually worked for a real
+                    // selected photo. FileReader reads the real file instead.
+                    //
+                    // Also rejects anything over 5MB (matches the server's
+                    // own `max:5120` rule) before it's attached to the form
+                    // at all — a real upload here once slipped past PHP's
+                    // upload_max_filesize/post_max_size and surfaced as a
+                    // raw PostTooLargeException page instead of a normal
+                    // validation message.
                     const preview = document.getElementById('photoPreview');
                     const placeholder = document.getElementById('photoPlaceholder');
-                    if (this.value) {
-                        preview.src = this.value;
-                        preview.onload = () => {
+                    const sizeError = document.getElementById('photoSizeError');
+                    const file = this.files && this.files[0];
+                    const maxBytes = 5 * 1024 * 1024;
+
+                    sizeError.classList.add('hidden');
+
+                    if (file && file.size > maxBytes) {
+                        sizeError.textContent = `"${file.name}" is over the 5MB limit and wasn't added.`;
+                        sizeError.classList.remove('hidden');
+                        this.value = '';
+                        preview.classList.add('hidden');
+                        placeholder.classList.remove('hidden');
+                        return;
+                    }
+
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            preview.src = e.target.result;
                             preview.classList.remove('hidden');
                             placeholder.classList.add('hidden');
                         };
-                        preview.onerror = () => {
-                            preview.classList.add('hidden');
-                            placeholder.classList.remove('hidden');
-                        };
+                        reader.readAsDataURL(file);
                     } else {
                         preview.classList.add('hidden');
                         placeholder.classList.remove('hidden');

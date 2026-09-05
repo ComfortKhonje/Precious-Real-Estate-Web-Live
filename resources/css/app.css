@@ -20,11 +20,18 @@
 }
 
 @layer components {
+  /* Subtle grid texture, pure CSS — no image file to go missing or need
+     recompressing. Replaces `brand-assets/website-pages/grid-background.png`,
+     which never existed in this repo (missing since the 2026-09-02 review)
+     and was, until 2026-09-05, referenced two redundant, both-broken ways:
+     this class as a silent no-op, and a raw <img> pointed at the same
+     nonexistent file on the CMS login and error pages. Both now converge on
+     this one class. */
   .bg-grid {
-    background-image: url('/brand-assets/website-pages/grid-background.png');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+    background-image:
+      linear-gradient(to right, rgba(30, 30, 30, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(30, 30, 30, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
   .btn-primary {

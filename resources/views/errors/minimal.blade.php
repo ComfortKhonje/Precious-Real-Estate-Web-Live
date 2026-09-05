@@ -10,8 +10,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-body bg-brand-white text-brand-black min-h-screen">
-    <div class="relative min-h-screen flex items-center justify-center px-6 py-16 overflow-hidden">
-        <img src="{{ asset('brand-assets/website-pages/grid-background.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none">
+    <div class="relative min-h-screen flex items-center justify-center px-6 py-16 overflow-hidden bg-grid">
 
         <div class="relative z-10 w-full max-w-2xl bg-white/95 border border-gray-200 rounded-3xl p-8 md:p-12 shadow-sm text-center">
             <p class="text-sm tracking-[0.2em] uppercase text-brand-black/50 mb-3">Error {{ $code ?? 'Error' }}</p>
