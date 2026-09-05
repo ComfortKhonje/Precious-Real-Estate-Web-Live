@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -49,5 +50,24 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return back()->with('error', $message);
+        });
+
+        // 2026-09-06: GET /cms/team-members/6 (no /edit) threw a raw
+        // MethodNotAllowedHttpException — that URI only had PUT/DELETE
+        // registered. Root cause fixed directly for properties,
+        // announcements, and team-members (routes/web.php now redirects
+        // the bare URL to the edit form — there's no separate read-only
+        // "view" screen in this CMS, so that's always the right landing
+        // spot). This is the fallback for any other bare-method mismatch
+        // that turns up the same way: land somewhere useful instead of a
+        // raw exception page.
+        $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'That action isn\'t available that way.'], 405);
+            }
+
+            $fallback = $request->is('cms/*') ? route('cms.dashboard') : route('home');
+
+            return redirect($fallback)->with('error', 'That page isn\'t reachable directly — you were redirected here instead.');
         });
     })->create();

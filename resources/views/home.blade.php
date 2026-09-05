@@ -3,7 +3,7 @@
 @section('title', 'Home - Precious Real Estate Consulting')
 
 @section('content')
-    <div class="bg-grid">
+    <div>
         <x-home.hero />
         <x-home.stats />
         <x-home.services :services="$services" />

@@ -13,7 +13,7 @@
     removed and /updates absorbed its functionality.
 --}}
 @section('content')
-    <section class="px-6 pt-32 pb-10 bg-grid">
+    <section class="px-6 pt-32 pb-10">
         <div class="max-w-4xl mx-auto">
             <a href="{{ route('updates') }}" class="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-brand-black/60 hover:text-primary transition-colors mb-8">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>

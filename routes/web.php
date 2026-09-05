@@ -117,6 +117,13 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/properties', [App\Http\Controllers\Cms\PropertiesController::class, 'index'])->name('properties.index');
         Route::get('/properties/create', [App\Http\Controllers\Cms\PropertiesController::class, 'create'])->name('properties.create');
         Route::post('/properties', [App\Http\Controllers\Cms\PropertiesController::class, 'store'])->name('properties.store');
+        // Bare GET (no /edit) 405'd with a raw MethodNotAllowedHttpException —
+        // only PUT/DELETE were registered on this URI. There's no separate
+        // read-only "view" screen in this admin CMS, so send it straight to
+        // the edit form instead of a dead end. Same fix applied below for
+        // announcements and team-members (found 2026-09-06, same pattern,
+        // same root cause on all three).
+        Route::get('/properties/{property}', fn (App\Models\Property $property) => redirect()->route('cms.properties.edit', $property));
         Route::get('/properties/{property}/edit', [App\Http\Controllers\Cms\PropertiesController::class, 'edit'])->name('properties.edit');
         Route::put('/properties/{property}', [App\Http\Controllers\Cms\PropertiesController::class, 'update'])->name('properties.update');
         Route::delete('/properties/{property}', [App\Http\Controllers\Cms\PropertiesController::class, 'destroy'])->name('properties.destroy');
@@ -135,6 +142,7 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/announcements', [AnnouncementsController::class, 'index'])->name('announcements.index');
         Route::get('/announcements/create', [AnnouncementsController::class, 'create'])->name('announcements.create');
         Route::post('/announcements', [AnnouncementsController::class, 'store'])->name('announcements.store');
+        Route::get('/announcements/{announcement}', fn (App\Models\Announcement $announcement) => redirect()->route('cms.announcements.edit', $announcement));
         Route::get('/announcements/{announcement}/edit', [AnnouncementsController::class, 'edit'])->name('announcements.edit');
         Route::put('/announcements/{announcement}', [AnnouncementsController::class, 'update'])->name('announcements.update');
         Route::delete('/announcements/{announcement}', [AnnouncementsController::class, 'destroy'])->name('announcements.destroy');
@@ -142,6 +150,7 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/team-members', [TeamMembersController::class, 'index'])->name('team-members.index');
         Route::get('/team-members/create', [TeamMembersController::class, 'create'])->name('team-members.create');
         Route::post('/team-members', [TeamMembersController::class, 'store'])->name('team-members.store');
+        Route::get('/team-members/{teamMember}', fn (App\Models\TeamMember $teamMember) => redirect()->route('cms.team-members.edit', $teamMember));
         Route::get('/team-members/{teamMember}/edit', [TeamMembersController::class, 'edit'])->name('team-members.edit');
         Route::put('/team-members/{teamMember}', [TeamMembersController::class, 'update'])->name('team-members.update');
         Route::delete('/team-members/{teamMember}', [TeamMembersController::class, 'destroy'])->name('team-members.destroy');

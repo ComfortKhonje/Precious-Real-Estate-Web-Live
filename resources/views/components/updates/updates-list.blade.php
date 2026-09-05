@@ -15,7 +15,7 @@
     site-wide — both genuinely useful to someone reading updates, not
     filler text.
 --}}
-<section id="updates-list" class="px-6 pb-20 bg-grid">
+<section id="updates-list" class="px-6 pb-20">
     <div class="max-w-7xl mx-auto grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div class="space-y-6">
             @if($news->isEmpty())

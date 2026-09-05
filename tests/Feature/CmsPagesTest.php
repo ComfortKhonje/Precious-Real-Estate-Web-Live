@@ -175,3 +175,30 @@ test('deleting an announcement removes its gallery rows', function () {
 
     expect(AnnouncementImage::count())->toBe(0);
 });
+
+/**
+ * 2026-09-06: GET /cms/team-members/6 (no /edit) 500'd with a raw
+ * MethodNotAllowedHttpException — that URI only had PUT/DELETE registered.
+ * Same gap existed for properties and announcements. Fixed by redirecting
+ * the bare URL to the edit form (there's no separate read-only "view"
+ * screen in this CMS) rather than assuming nobody would ever land there.
+ */
+test('visiting a bare CMS resource URL redirects to its edit form', function () {
+    asAdmin()->get('/cms/properties/'.$this->property->id)
+        ->assertRedirect(route('cms.properties.edit', $this->property));
+
+    asAdmin()->get('/cms/announcements/'.$this->announcement->id)
+        ->assertRedirect(route('cms.announcements.edit', $this->announcement));
+
+    asAdmin()->get('/cms/team-members/'.$this->teamMember->id)
+        ->assertRedirect(route('cms.team-members.edit', $this->teamMember));
+});
+
+test('a method mismatch on a real route shows a friendly redirect, not a raw exception page', function () {
+    // PATCH isn't registered on this URI (only GET/PUT/DELETE are) — this
+    // is the fallback for whatever bare-method mismatch isn't covered by
+    // an explicit fix like the test above.
+    asAdmin()->patch('/cms/properties/'.$this->property->id)
+        ->assertRedirect(route('cms.dashboard'))
+        ->assertSessionHas('error');
+});

@@ -1,5 +1,5 @@
 {{-- [Component: legal/terms-content] Terms page content section placeholder --}}
-<section class="bg-grid py-24 px-6 min-h-screen">
+<section class="py-24 px-6 min-h-screen">
     <div class="max-w-7xl mx-auto">
         {{-- Page Header --}}
         <div class="mb-36">
