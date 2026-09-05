@@ -21,25 +21,36 @@
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
                 <div class="space-y-2 md:col-span-2">
+                    <label class="text-sm font-semibold tracking-wider">Category</label>
+                    <select name="category" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                        <option value="">No category</option>
+                        @foreach(\App\Models\Announcement::CATEGORIES as $cat)
+                            <option value="{{ $cat }}" {{ old('category', $announcement->category) === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Short Summary</label>
                     <textarea name="summary" rows="3" placeholder="Short summary..."
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('summary', $announcement->summary) }}</textarea>
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Full Content</label>
-                    <textarea name="content" rows="8" placeholder="Full content..."
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('content', $announcement->content) }}</textarea>
+                    <div data-quill-editor="content">
+                        <textarea name="content" rows="8" placeholder="Full content...">{{ old('content', $announcement->content) }}</textarea>
+                    </div>
+                    @error('content') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Publish Status</label>
-                    <x-ui.select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
                         <option value="draft" {{ old('status', $announcement->status) === 'draft' ? 'selected' : '' }}>
                             Draft</option>
                         <option value="published"
                             {{ old('status', $announcement->status) === 'published' ? 'selected' : '' }}>Published</option>
                         <option value="archived"
                             {{ old('status', $announcement->status) === 'archived' ? 'selected' : '' }}>Archived</option>
-                    </x-ui.select>
+                    </select>
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Featured</label>
@@ -56,14 +67,32 @@
                         value="{{ old('published_at', optional($announcement->published_at)->format('Y-m-d\TH:i')) }}"
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
-                    <label class="text-sm font-semibold tracking-wider">Cover Image</label>
+                <div class="space-y-2 md:col-span-2">
                     @if($announcement->cover_image)
                         <div class="mb-3">
-                            <img src="{{ str_starts_with($announcement->cover_image, 'http') ? $announcement->cover_image : asset('storage/' . $announcement->cover_image . '/medium.webp') }}" class="h-24 w-auto rounded-lg object-cover">
+                            <img loading="lazy" decoding="async" src="{{ $announcement->coverImageUrl('medium') }}" alt="Current cover image for {{ $announcement->title }}" class="h-24 w-auto rounded-lg object-cover">
                         </div>
                     @endif
-                    <input type="file" name="cover_image" accept="image/*"
-                        class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <x-cms.image-upload name="cover_image" label="Click to replace cover image" help="Leave empty to keep the current one" />
+                </div>
+
+                <div class="space-y-2 md:col-span-2">
+                    @if($announcement->images->isNotEmpty())
+                        <label class="text-sm font-semibold tracking-wider block">Existing Gallery Images</label>
+                        <p class="text-xs text-brand-black/50 mb-2">Check any you want removed when you save.</p>
+                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 mb-4">
+                            @foreach($announcement->images as $image)
+                                <label class="relative block rounded-xl overflow-hidden border border-gray-100 cursor-pointer group">
+                                    <img loading="lazy" decoding="async" src="{{ $image->url('thumbnail') }}" alt="Gallery image" class="w-full h-20 object-cover">
+                                    <div class="absolute inset-0 bg-black/0 group-has-[:checked]:bg-red-600/60 transition flex items-center justify-center">
+                                        <input type="checkbox" name="remove_images[]" value="{{ $image->id }}" class="w-5 h-5">
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    @endif
+                    <x-cms.image-upload name="gallery[]" label="Add Gallery Images" :multiple="true" />
+                </div>
             </div>
         </div>
 
@@ -73,3 +102,7 @@
         </div>
     </form>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/cms-editor.js')
+@endpush

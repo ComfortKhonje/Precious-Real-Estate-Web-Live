@@ -1,16 +1,24 @@
 @extends('layouts.app')
 
 @section('title', $property->title . ' - Precious Real Estate')
+@section('meta_description', Str::limit(strip_tags($property->description), 155))
+@section('meta_image', $property->featuredImageUrl('large'))
+@section('meta_type', 'article')
+
+@push('schema')
+<script type="application/ld+json">@json(\App\Support\Schema::property($property), JSON_UNESCAPED_SLASHES)</script>
+@endpush
 
 @section('content')
 @php
-    $allImages = array_merge([$property->featured_image], $property->gallery ?? []);
+    $galleryImageUrls = $property->images->where('is_featured', false)->map(fn ($img) => $img->url('large'))->values()->all();
+    $allImages = array_merge([$property->featuredImageUrl('large')], $galleryImageUrls);
 @endphp
 
 <div x-data="{
         isOpen: false,
         currentIndex: 0,
-        images: {{ json_encode(array_map(fn($img) => asset($img), $allImages)) }},
+        images: {{ json_encode($allImages) }},
         openModal(index) {
             this.currentIndex = index;
             this.isOpen = true;
@@ -48,21 +56,20 @@
                 {{-- Main Large Image --}}
                 <div class="lg:col-span-8 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-lg border border-gray-100 aspect-[16/9] cursor-pointer group h-full"
                      @click="openModal(0)">
-                    <img src="{{ asset($property->featured_image) }}" alt="{{ $property->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <img loading="lazy" decoding="async" src="{{ $property->featuredImageUrl('large') }}" alt="{{ $property->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                 </div>
 
                 {{-- Thumbnail Grid --}}
                 <div class="lg:col-span-4 grid grid-cols-4 md:grid-cols-2 gap-2 md:gap-4">
                     @php
-                        $gallery = $property->gallery ?? [];
-                        $displayThumbnails = array_slice($gallery, 0, 4);
-                        $remainingCount = count($gallery) - 4;
+                        $displayThumbnails = array_slice($galleryImageUrls, 0, 4);
+                        $remainingCount = count($galleryImageUrls) - 4;
                     @endphp
 
                     @foreach($displayThumbnails as $index => $image)
                         <div class="relative rounded-[1rem] md:rounded-[1.5rem] overflow-hidden shadow-sm border border-gray-100 aspect-square group cursor-pointer"
                             @click="openModal({{ $index + 1 }})">
-                            <img src="{{ asset($image) }}" alt="Gallery Image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <img loading="lazy" decoding="async" src="{{ $image }}" alt="Gallery Image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             @if($index === 3 && $remainingCount > 0)
                                 <div class="absolute inset-0 bg-brand-black/60 flex items-center justify-center text-white text-2xl font-bold backdrop-blur-[2px]">
                                     +{{ $remainingCount }}
@@ -142,46 +149,50 @@
                     </div>
 
                     {{-- Location Details --}}
+                    {{-- 2026-09-04: was 100% hardcoded — every property showed the same
+                         fake paragraph and the same fixed five-item list regardless of
+                         its real location. Now driven by $property->nearby_amenities
+                         (staff-entered, CMS create/edit form), and hides entirely rather
+                         than showing a blank/fake section when nothing's been entered. --}}
+                    @if(!empty($property->nearby_amenities))
                     <div class="mb-2">
                         <h3 class="text-3xl font-heading text-brand-black mb-2 tracking-tight">Location Details</h3>
-                        <p class="text-gray-500 mb-2">Located in one of Lilongwe's established residential areas, the property offers easy access to:</p>
+                        <p class="text-gray-500 mb-2">Located near {{ $property->location }}, this property offers easy access to:</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            @php
-                                $locations = ['Schools', 'Shopping centers', 'Restaurants', 'Health facilities', 'Main road networks'];
-                            @endphp
-                            @foreach($locations as $loc)
+                            @foreach($property->nearby_amenities as $amenity)
                                 <div class="flex items-center gap-3 px-6 py-4 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-primary/30 transition-colors">
                                     <div class="w-6 h-6 rounded-full bg-brand-black flex items-center justify-center shrink-0">
                                         <svg class="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                     </div>
-                                    <span class="text-sm font-semibold text-gray-700">{{ $loc }}</span>
+                                    <span class="text-sm font-semibold text-gray-700">{{ $amenity }}</span>
                                 </div>
                             @endforeach
                         </div>
                     </div>
 
                     <div class="w-full h-px bg-gray-200 my-4"></div>
+                    @endif
 
                     {{-- Contact Us Buttons --}}
                     <div>
                         <h3 class="text-3xl font-heading text-brand-black mb-2 tracking-tight">Contact Us</h3>
                         <div class="flex flex-col md:flex-row gap-2 md:gap-4 w-full">
-                            <a href="tel:+265884366756" class="w-full flex items-center gap-4 p-4 bg-brand-black text-white rounded-[1rem] hover:scale-[1.02] transition-transform shadow-lg">
+                            <a href="tel:{{ \App\Support\ContactInfo::phone() }}" class="w-full flex items-center gap-4 p-4 bg-brand-black text-white rounded-[1rem] hover:scale-[1.02] transition-transform shadow-lg">
                                 <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-brand-black shrink-0">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.44v3.53a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.12 2H6.65a2 2 0 0 1 2 1.72 12.81 12.81 0 0 0 .62 2.81 2 2 0 0 1-.45 2.11L7.33 10.13a16 16 0 0 0 6 6l1.47-1.47a2 2 0 0 1 2.11-.45 12.81 12.81 0 0 0 2.81.62 2 2 0 0 1 1.72 2z"></path></svg>
                                 </div>
                                 <div>
                                     <p class="text-[10px] text-primary uppercase font-bold tracking-widest">Phone</p>
-                                    <p class="text-sm font-bold text-primary">+265 884 366 756</p>
+                                    <p class="text-sm font-bold text-primary">{{ \App\Support\ContactInfo::phone() }}</p>
                                 </div>
                             </a>
-                            <a href="mailto:info@preciousrealestate.mw" class="w-full flex items-center gap-4 p-4 bg-brand-black text-white rounded-[1rem] hover:scale-[1.02] transition-transform shadow-lg">
+                            <a href="mailto:{{ \App\Support\ContactInfo::email() }}" class="w-full flex items-center gap-4 p-4 bg-brand-black text-white rounded-[1rem] hover:scale-[1.02] transition-transform shadow-lg">
                                 <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-brand-black shrink-0">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                 </div>
                                 <div>
                                     <p class="text-[10px] text-primary uppercase font-bold tracking-widest">Email</p>
-                                    <p class="text-sm font-bold text-primary">info@preciousrealestate.mw</p>
+                                    <p class="text-sm font-bold text-primary">{{ \App\Support\ContactInfo::email() }}</p>
                                 </div>
                             </a>
                         </div>
@@ -212,29 +223,89 @@
                         </div>
 
                         {{-- Inquiry Form Block --}}
-                        <div class="bg-white rounded-[2rem] p-6 border border-gray-200">
-                            <div class="badge-yellow">Interested in This Property?</div>
-                            <h4 class="text-2xl font-heading text-brand-black mb-4 uppercase tracking-tight">Request More Information</h4>
+                        {{-- 2026-09-02: was a dead form (action="#", no name attrs, no submit
+                             handler) — every "Interested in This Property?" submission on the
+                             whole site silently did nothing. Now a real form posting straight
+                             to /api/inquiries/public, same endpoint the full multi-step
+                             /inquiry flow uses, with property_id set so it shows up correctly
+                             tagged in the CMS inquiries list. --}}
+                        <div class="bg-white rounded-[2rem] p-6 border border-gray-200"
+                             x-data="{
+                                submitting: false,
+                                sent: false,
+                                error: null,
+                                form: { name: '', phone: '', email: '', message: '' },
+                                async submit() {
+                                    this.submitting = true;
+                                    this.error = null;
+                                    try {
+                                        const res = await fetch('/api/inquiries/public', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-Requested-With': 'XMLHttpRequest',
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                            },
+                                            body: JSON.stringify({
+                                                service: 'Property Inquiry',
+                                                contactMethod: 'Phone',
+                                                property_id: {{ $property->id }},
+                                                name: this.form.name,
+                                                phone: this.form.phone,
+                                                email: this.form.email,
+                                                additionalDetails: this.form.message,
+                                            }),
+                                        });
+                                        if (!res.ok) {
+                                            const body = await res.json().catch(() => ({}));
+                                            throw new Error(body.message || 'Something went wrong — please try again or call us directly.');
+                                        }
+                                        this.sent = true;
+                                    } catch (e) {
+                                        this.error = e.message;
+                                    } finally {
+                                        this.submitting = false;
+                                    }
+                                }
+                             }">
+                            <template x-if="!sent">
+                                <div>
+                                    <div class="badge-yellow">Interested in This Property?</div>
+                                    <h4 class="text-2xl font-heading text-brand-black mb-4 uppercase tracking-tight">Request More Information</h4>
 
-                            <form action="#" class="space-y-2">
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Full Name</label>
-                                    <input type="text" placeholder="e.g., John Doe" class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all">
+                                    <form @submit.prevent="submit" class="space-y-2">
+                                        <div class="space-y-1">
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Full Name</label>
+                                            <input type="text" x-model="form.name" required placeholder="e.g., John Doe" class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all">
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phone Number</label>
+                                            <input type="tel" x-model="form.phone" required placeholder="+265 999 123 456" class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all">
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email Address</label>
+                                            <input type="email" x-model="form.email" required placeholder="email@example.com" class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all">
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Message</label>
+                                            <textarea rows="4" x-model="form.message" placeholder="Write your message here..." class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all resize-none"></textarea>
+                                        </div>
+                                        <p x-show="error" x-text="error" class="text-red-600 text-xs font-semibold"></p>
+                                        <button type="submit" :disabled="submitting" class="w-full btn-primary py-4 text-xs tracking-widest mt-4 disabled:opacity-50">
+                                            <span x-text="submitting ? 'SENDING...' : 'SEND INQUIRY'"></span>
+                                        </button>
+                                    </form>
                                 </div>
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phone Number</label>
-                                    <input type="tel" placeholder="+265 999 123 456" class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all">
+                            </template>
+                            <template x-if="sent">
+                                <div class="text-center py-6">
+                                    <div class="w-14 h-14 mx-auto rounded-full bg-primary flex items-center justify-center mb-4">
+                                        <svg class="w-7 h-7 text-brand-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <h4 class="text-xl font-heading text-brand-black uppercase tracking-tight mb-2">Inquiry Sent</h4>
+                                    <p class="text-sm text-gray-500">Our team will get back to you within 24 working hours.</p>
                                 </div>
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email Address</label>
-                                    <input type="email" placeholder="email@example.com" class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Message</label>
-                                    <textarea rows="4" placeholder="Write your message here..." class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all resize-none"></textarea>
-                                </div>
-                                <button type="submit" class="w-full btn-primary py-4 text-xs tracking-widest mt-4">SEND INQUIRY</button>
-                            </form>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -254,10 +325,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
             @foreach($relatedProperties as $related)
                 <x-shared.property-card
-                    :image="asset($related->featured_image)"
+                    :image="$related->featuredImageUrl('medium')"
                     :title="$related->title"
                     :location="$related->location"
-                    :price="$related->formatted_price . ($related->status === 'For Rent' ? ' / month' : '')"
+                    :price="$related->formatted_price"
                     :type="$related->status === 'For Sale' ? 'Sale' : 'Rent'"
                     :slug="$related->slug"
                     :description="$related->description"
@@ -329,7 +400,7 @@
             </button>
 
             {{-- Main Image --}}
-            <img :src="images[currentIndex]"
+            <img loading="lazy" decoding="async" :src="images[currentIndex]" alt="{{ $property->title }}"
                 class="max-w-full max-h-full object-contain select-none"
                 alt="Property View"
             >
@@ -342,7 +413,7 @@
                     class="w-16 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0"
                     :class="currentIndex === index ? 'border-primary opacity-100' : 'border-transparent opacity-40 hover:opacity-70'"
                 >
-                    <img :src="img" class="w-full h-full object-cover">
+                    <img loading="lazy" decoding="async" :src="img" :alt="`{{ $property->title }} photo ${index + 1}`" class="w-full h-full object-cover">
                 </button>
             </template>
         </div>

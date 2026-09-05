@@ -16,12 +16,39 @@ class PropertiesController extends Controller
 
         if ($request->filled('search')) {
             $s = $request->get('search');
-            $query->where('title', 'like', "%{$s}%")->orWhere('location', 'like', "%{$s}%");
+            // Grouped: without the closure the orWhere escaped the outer
+            // filters, so searching while filtered returned unrelated rows.
+            $query->where(function ($q) use ($s) {
+                $q->where('title', 'like', "%{$s}%")->orWhere('location', 'like', "%{$s}%");
+            });
         }
 
-        $properties = $query->paginate(20);
+        if ($request->filled('location')) {
+            $query->where('location', $request->get('location'));
+        }
 
-        return view('cms.properties.index', compact('properties'));
+        if ($request->filled('type')) {
+            $query->where('type', $request->get('type'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
+
+        $properties = $query->paginate(20)->withQueryString();
+
+        // The view renders Location and Type filter dropdowns from these.
+        // Neither was ever passed, so the CMS Property Listings page threw
+        // "Undefined variable $locations" and 500'd. Fixed 2026-09-03.
+        $locations = Property::query()
+            ->whereNotNull('location')
+            ->distinct()
+            ->orderBy('location')
+            ->pluck('location');
+
+        $types = Property::TYPES;
+
+        return view('cms.properties.index', compact('properties', 'locations', 'types'));
     }
 
     public function create()
@@ -29,49 +56,90 @@ class PropertiesController extends Controller
         return view('cms.properties.create');
     }
 
-    public function store(Request $request)
+    /**
+     * Shared validation rules for both create and edit. $featuredRequired
+     * is false on update since an existing image doesn't need re-uploading.
+     */
+    private function rules(bool $featuredRequired): array
     {
-        $data = $request->validate([
+        return [
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category' => 'nullable|string',
-            'type' => 'nullable|string',
-            'price' => 'nullable|numeric',
-            'location' => 'nullable|string',
-            'status' => 'nullable|string',
-            'bedrooms' => 'nullable|integer',
-            'bathrooms' => 'nullable|integer',
-            'land_size' => 'nullable|string',
-            'parking' => 'nullable|string',
+            'description' => 'required|string',
+            'category' => 'nullable|string|in:'.implode(',', Property::CATEGORIES),
+            'type' => 'required|string|in:'.implode(',', Property::TYPES),
+            'price' => 'required|numeric|min:0',
+            'currency' => 'required|string|in:'.implode(',', Property::CURRENCIES),
+            'location' => 'required|string|max:255',
+            'status' => 'required|string|in:'.implode(',', Property::STATUSES),
+            'bedrooms' => 'nullable|integer|min:0',
+            'bathrooms' => 'nullable|integer|min:0',
+            'land_size' => 'nullable|string|max:255',
+            'parking_spaces' => 'nullable|integer|min:0',
             'features' => 'nullable|string',
+            'nearby_amenities' => 'nullable|string',
             'is_featured' => 'nullable|boolean',
-            'media' => 'nullable|string',
-        ]);
+            'is_available' => 'nullable|boolean',
+            'featured_image' => ($featuredRequired ? 'required' : 'nullable').'|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'gallery.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'integer',
+        ];
+    }
 
-        $mediaJson = $data['media'] ?? null;
-        unset($data['media']);
-
-        $data['features'] = collect(
-            explode(',', $request->input('features', ''))
-        )
+    private function featuresFromInput(Request $request): array
+    {
+        return collect(explode(',', $request->input('features', '')))
             ->map(fn ($item) => trim($item))
             ->filter()
             ->values()
             ->toArray();
+    }
+
+    private function nearbyAmenitiesFromInput(Request $request): array
+    {
+        return collect(explode(',', $request->input('nearby_amenities', '')))
+            ->map(fn ($item) => trim($item))
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate($this->rules(featuredRequired: true));
+
+        unset($data['gallery'], $data['remove_images']);
+        $data['features'] = $this->featuresFromInput($request);
+        $data['nearby_amenities'] = $this->nearbyAmenitiesFromInput($request);
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_available'] = $request->boolean('is_available');
+
+        $media = app(MediaService::class);
+
+        // Featured image: stored both as PropertyImage (is_featured=true)
+        // and denormalized onto properties.featured_image, so list/card
+        // views can read a plain column instead of eager-loading a
+        // relationship for every row.
+        $featuredPath = $media->upload($request->file('featured_image'), 'properties/gallery');
+        $data['featured_image'] = $featuredPath;
+
         $property = Property::create($data);
 
-        if ($mediaJson) {
-            $mediaPaths = json_decode($mediaJson, true);
-            if (is_array($mediaPaths)) {
-                foreach ($mediaPaths as $index => $path) {
-                    PropertyImage::create([
-                        'property_id' => $property->id,
-                        'image_path' => $path,
-                        'is_featured' => $index === 0,
-                        'sort_order' => $index,
-                    ]);
-                }
-            }
+        PropertyImage::create([
+            'property_id' => $property->id,
+            'image_path' => $featuredPath,
+            'is_featured' => true,
+            'sort_order' => 0,
+        ]);
+
+        foreach ($request->file('gallery', []) as $i => $file) {
+            $path = $media->upload($file, 'properties/gallery');
+            PropertyImage::create([
+                'property_id' => $property->id,
+                'image_path' => $path,
+                'is_featured' => false,
+                'sort_order' => $i + 1,
+            ]);
         }
 
         return redirect()->route('cms.properties.index')->with('status', 'Property created.');
@@ -84,45 +152,52 @@ class PropertiesController extends Controller
 
     public function update(Request $request, Property $property)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category' => 'nullable|string',
-            'type' => 'nullable|string',
-            'price' => 'nullable|numeric',
-            'location' => 'nullable|string',
-            'status' => 'nullable|string',
-            'bedrooms' => 'nullable|integer',
-            'bathrooms' => 'nullable|integer',
-            'land_size' => 'nullable|string',
-            'parking' => 'nullable|string',
-            'features' => 'nullable|string',
-            'is_featured' => 'nullable|boolean',
-            'media' => 'nullable|string',
-        ]);
+        $data = $request->validate($this->rules(featuredRequired: false));
 
-        $mediaJson = $data['media'] ?? null;
-        unset($data['media']);
+        unset($data['gallery'], $data['remove_images']);
+        $data['features'] = $this->featuresFromInput($request);
+        $data['nearby_amenities'] = $this->nearbyAmenitiesFromInput($request);
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_available'] = $request->boolean('is_available');
 
-        $data['features'] = $data['features'] ? array_map('trim', explode(',', $data['features'])) : [];
+        $media = app(MediaService::class);
+
+        // Remove images the user unchecked in the edit form (never the
+        // featured image this way — replacing it is a separate action below).
+        $toRemove = collect($request->input('remove_images', []));
+        if ($toRemove->isNotEmpty()) {
+            $property->images()->whereIn('id', $toRemove)->get()->each->delete();
+        }
+
+        if ($request->hasFile('featured_image')) {
+            $oldFeatured = $property->images()->where('is_featured', true)->first();
+            $newPath = $media->replace($request->file('featured_image'), 'properties/gallery', $oldFeatured?->image_path);
+            $data['featured_image'] = $newPath;
+
+            if ($oldFeatured) {
+                $oldFeatured->update(['image_path' => $newPath]);
+            } else {
+                PropertyImage::create([
+                    'property_id' => $property->id,
+                    'image_path' => $newPath,
+                    'is_featured' => true,
+                    'sort_order' => 0,
+                ]);
+            }
+        }
+
+        $nextSort = (int) $property->images()->max('sort_order') + 1;
+        foreach ($request->file('gallery', []) as $i => $file) {
+            $path = $media->upload($file, 'properties/gallery');
+            PropertyImage::create([
+                'property_id' => $property->id,
+                'image_path' => $path,
+                'is_featured' => false,
+                'sort_order' => $nextSort + $i,
+            ]);
+        }
 
         $property->update($data);
-
-        $mediaPaths = $mediaJson ? json_decode($mediaJson, true) : [];
-        if (! is_array($mediaPaths)) {
-            $mediaPaths = [];
-        }
-
-        // Delete removed images (this triggers observer to delete physical files)
-        $property->images()->whereNotIn('image_path', $mediaPaths)->get()->each->delete();
-
-        // Sync remaining and new images
-        foreach ($mediaPaths as $index => $path) {
-            PropertyImage::updateOrCreate(
-                ['property_id' => $property->id, 'image_path' => $path],
-                ['is_featured' => $index === 0, 'sort_order' => $index]
-            );
-        }
 
         return redirect()->route('cms.properties.index')->with('status', 'Property updated.');
     }
@@ -132,16 +207,5 @@ class PropertiesController extends Controller
         $property->delete();
 
         return redirect()->route('cms.properties.index')->with('status', 'Property deleted.');
-    }
-
-    public function uploadMedia(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
-        ]);
-
-        $path = app(MediaService::class)->upload($request->file('file'), 'properties/gallery');
-
-        return response()->json(['url' => asset('storage/'.$path.'/large.webp'), 'path' => $path]);
     }
 }

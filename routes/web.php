@@ -9,13 +9,13 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CreditsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InquiryController;
-use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PrivacyController;
-use App\Http\Controllers\PropertiesController;
-use App\Http\Controllers\PropertyViewController;
+use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ServicesController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TermsController;
+use App\Http\Controllers\UpdatesController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -28,13 +28,23 @@ Route::get('/properties', [PropertyController::class, 'index'])->name('propertie
 Route::get('/properties/{property:slug}', [PropertyController::class, 'show'])->name('property.view');
 Route::get('/services', ServicesController::class)->name('services');
 Route::get('/contact', ContactController::class)->name('contact');
-Route::get('/updates', UpdatesController::class)->name('updates');
+Route::get('/updates', [UpdatesController::class, 'index'])->name('updates');
+Route::get('/updates/{id}', [UpdatesController::class, 'show'])->name('updates.show');
 Route::get('/terms', TermsController::class)->name('terms');
 Route::get('/privacy', PrivacyController::class)->name('privacy');
 Route::get('/credits', CreditsController::class)->name('credits');
 Route::get('/inquiry', InquiryController::class)->name('inquiry');
-Route::get('/news', [NewsController::class, 'index'])->name('news.index');
-Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
+
+// 2026-09-04: /news was a redundant second implementation of the same
+// concept as /updates (two nav tabs, two controllers, two Announcement
+// queries). Consolidated into /updates — these redirects keep old links
+// (already in the sitemap since the site's June launch) from 404ing.
+Route::redirect('/news', '/updates', 301);
+Route::get('/news/{id}', fn ($id) => redirect()->route('updates.show', $id, 301));
+
+// XML sitemap (added 2026-09-03). Generated per request so it can never
+// go stale after a listing is added or removed in the CMS.
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +59,19 @@ Route::prefix('cms')->name('cms.')->group(function () {
     })->name('login');
 
     Route::post('/login', function (Request $request) {
+        // 2026-09-02: this had zero rate limiting — unlimited credential
+        // guesses against a login that's currently reachable by anyone
+        // (the /cms path isn't secret). 5 attempts / minute per IP+email
+        // combo; Laravel's built-in throttle, not a custom implementation.
+        $throttleKey = 'cms-login:'.$request->ip().'|'.$request->input('email');
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($throttleKey);
+
+            return back()
+                ->withErrors(['login' => "Too many attempts. Try again in {$seconds} seconds."])
+                ->withInput(['email' => $request->input('email')]);
+        }
+
         $validated = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
@@ -57,10 +80,14 @@ Route::prefix('cms')->name('cms.')->group(function () {
         $user = User::where('email', $validated['email'])->first();
 
         if (! $user || ! Hash::check($validated['password'], $user->password)) {
+            \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
+
             return back()
                 ->withErrors(['login' => 'Invalid credentials.'])
                 ->withInput(['email' => $validated['email']]);
         }
+
+        \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
 
         // Log the user into the web guard and keep legacy session flag for middleware compatibility
         auth()->login($user, $request->filled('remember'));
@@ -90,12 +117,9 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/properties', [App\Http\Controllers\Cms\PropertiesController::class, 'index'])->name('properties.index');
         Route::get('/properties/create', [App\Http\Controllers\Cms\PropertiesController::class, 'create'])->name('properties.create');
         Route::post('/properties', [App\Http\Controllers\Cms\PropertiesController::class, 'store'])->name('properties.store');
-        Route::post('/properties/upload-media', [App\Http\Controllers\Cms\PropertiesController::class, 'uploadMedia'])->name('properties.upload_media');
         Route::get('/properties/{property}/edit', [App\Http\Controllers\Cms\PropertiesController::class, 'edit'])->name('properties.edit');
         Route::put('/properties/{property}', [App\Http\Controllers\Cms\PropertiesController::class, 'update'])->name('properties.update');
         Route::delete('/properties/{property}', [App\Http\Controllers\Cms\PropertiesController::class, 'destroy'])->name('properties.destroy');
-
-        Route::get('/featured', fn() => view('cms.featured.index'))->name('featured.index');
 
         Route::get('/services', [App\Http\Controllers\Cms\ServicesController::class, 'index'])->name('services.index');
         Route::get('/services/create', [App\Http\Controllers\Cms\ServicesController::class, 'create'])->name('services.create');
@@ -125,6 +149,8 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/contact', [App\Http\Controllers\Cms\ContactController::class, 'index'])->name('contact.index');
         Route::put('/contact', [App\Http\Controllers\Cms\ContactController::class, 'update'])->name('contact.update');
         Route::get('/analytics', fn() => view('cms.analytics.index'))->name('analytics.index');
-        Route::get('/settings', fn() => view('cms.settings.index'))->name('settings.index');
+        Route::get('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'update'])->name('settings.update');
+        Route::put('/settings/password', [App\Http\Controllers\Cms\SettingsController::class, 'updatePassword'])->name('settings.password');
     });
 });

@@ -16,7 +16,8 @@ class ContactController extends Controller
         // Get all contact settings
         $settings = Setting::whereIn('key', [
             'office_name',
-            'office_address',
+            'office_address_lilongwe',
+            'office_address_blantyre',
             'postal_address',
             'office_phone',
             'office_email',
@@ -39,7 +40,8 @@ class ContactController extends Controller
     {
         $validated = $request->validate([
             'office_name' => 'nullable|string|max:255',
-            'office_address' => 'nullable|string|max:500',
+            'office_address_lilongwe' => 'nullable|string|max:500',
+            'office_address_blantyre' => 'nullable|string|max:500',
             'postal_address' => 'nullable|string|max:500',
             'office_phone' => 'nullable|string|max:20',
             'office_email' => 'nullable|email|max:255',

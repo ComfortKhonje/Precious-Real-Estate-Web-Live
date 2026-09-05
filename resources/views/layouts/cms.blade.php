@@ -50,25 +50,28 @@
 
             <nav class="flex-1 overflow-y-auto px-3 py-6 space-y-1">
                 @php
+                // 'match' is a route-name pattern so child pages (create/edit/show)
+                // keep their parent nav item highlighted.
                 $nav = [
-                ['label' => 'Dashboard Overview', 'route' => 'cms.dashboard', 'icon' => 'layout-dashboard'],
-                ['label' => 'Property Listings', 'route' => 'cms.properties.index', 'icon' => 'home'],
-                ['label' => 'Featured Properties', 'route' => 'cms.featured.index', 'icon' => 'star'],
-                ['label' => 'Services Content', 'route' => 'cms.services.index', 'icon' => 'briefcase'],
-                ['label' => 'Inquiries', 'route' => 'cms.inquiries.index', 'icon' => 'mail'],
-                ['label' => 'Announcements & News', 'route' => 'cms.announcements.index', 'icon' => 'megaphone'],
-                ['label' => 'Team Members', 'route' => 'cms.team-members.index', 'icon' => 'users'],
-                ['label' => 'Contact Information', 'route' => 'cms.contact.index', 'icon' => 'phone'],
-                ['label' => 'Settings', 'route' => 'cms.settings.index', 'icon' => 'settings'],
+                ['label' => 'Dashboard Overview', 'route' => 'cms.dashboard', 'match' => 'cms.dashboard', 'icon' => 'layout-dashboard'],
+                ['label' => 'Analytics', 'route' => 'cms.analytics.index', 'match' => 'cms.analytics.*', 'icon' => 'chart-bar'],
+                ['label' => 'Property Listings', 'route' => 'cms.properties.index', 'match' => 'cms.properties.*', 'icon' => 'home'],
+                ['label' => 'Services Content', 'route' => 'cms.services.index', 'match' => 'cms.services.*', 'icon' => 'briefcase'],
+                ['label' => 'Inquiries', 'route' => 'cms.inquiries.index', 'match' => 'cms.inquiries.*', 'icon' => 'mail'],
+                ['label' => 'Announcements & News', 'route' => 'cms.announcements.index', 'match' => 'cms.announcements.*', 'icon' => 'megaphone'],
+                ['label' => 'Team Members', 'route' => 'cms.team-members.index', 'match' => 'cms.team-members.*', 'icon' => 'users'],
+                ['label' => 'Contact Information', 'route' => 'cms.contact.index', 'match' => 'cms.contact.*', 'icon' => 'phone'],
+                ['label' => 'Settings', 'route' => 'cms.settings.index', 'match' => 'cms.settings.*', 'icon' => 'settings'],
                 ];
                 @endphp
 
                 @foreach($nav as $item)
-                @php $isActive = request()->routeIs($item['match']); @endphp
+                @php $isActive = request()->routeIs($item['match'] ?? $item['route']); @endphp
                 <a href="{{ route($item['route']) }}"
+                    @if($isActive) aria-current="page" @endif
                     class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                              {{ request()->routeIs($item['route']) ? 'bg-white/10 text-white font-semibold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
-                    <i data-lucide="{{ $item['icon'] }}" class="w-5 h-5 {{ request()->routeIs($item['route']) ? 'text-primary' : 'text-white/60' }}"></i>
+                              {{ $isActive ? 'bg-white/10 text-white font-semibold' : 'text-white/70 hover:bg-white/10 hover:text-white' }}">
+                    <i data-lucide="{{ $item['icon'] }}" class="w-5 h-5 {{ $isActive ? 'text-primary' : 'text-white/60' }}"></i>
                     <span class="font-medium tracking-wide">{{ $item['label'] }}</span>
                 </a>
                 @endforeach

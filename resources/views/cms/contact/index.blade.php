@@ -44,10 +44,15 @@
                         value="{{ $settings['working_hours'] ?? '' }}"
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20" />
                 </div>
-                <div class="space-y-2 md:col-span-2">
-                    <label class="text-sm font-semibold tracking-wider">Physical Address</label>
-                    <textarea name="office_address" placeholder="Enter physical address" rows="2"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ $settings['office_address'] ?? '' }}</textarea>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Lilongwe Office Address</label>
+                    <textarea name="office_address_lilongwe" placeholder="Area 47/S3, GPH House, Lilongwe" rows="2"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ $settings['office_address_lilongwe'] ?? '' }}</textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Blantyre Office Address</label>
+                    <textarea name="office_address_blantyre" placeholder="Haji Latif Pavilion, Room 35, Blantyre" rows="2"
+                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ $settings['office_address_blantyre'] ?? '' }}</textarea>
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Postal Address</label>

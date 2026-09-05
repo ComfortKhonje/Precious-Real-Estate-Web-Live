@@ -20,22 +20,33 @@
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
                 <div class="space-y-2 md:col-span-2">
+                    <label class="text-sm font-semibold tracking-wider">Category</label>
+                    <select name="category" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                        <option value="">No category</option>
+                        @foreach(\App\Models\Announcement::CATEGORIES as $cat)
+                            <option value="{{ $cat }}" {{ old('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Short Summary</label>
                     <textarea name="summary" rows="3" placeholder="Short summary..."
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('summary') }}</textarea>
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Full Content</label>
-                    <textarea name="content" rows="8" placeholder="Full content..."
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('content') }}</textarea>
+                    <div data-quill-editor="content">
+                        <textarea name="content" rows="8" placeholder="Full content...">{{ old('content') }}</textarea>
+                    </div>
+                    @error('content') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Publish Status</label>
-                    <x-ui.select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
                         <option value="draft" {{ old('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                         <option value="published" {{ old('status') === 'published' ? 'selected' : '' }}>Published</option>
                         <option value="archived" {{ old('status') === 'archived' ? 'selected' : '' }}>Archived</option>
-                    </x-ui.select>
+                    </select>
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Featured</label>
@@ -51,9 +62,10 @@
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
                 <div class="space-y-2 md:col-span-2">
-                    <label class="text-sm font-semibold tracking-wider">Cover Image</label>
-                    <input type="file" name="cover_image" accept="image/*"
-                        class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <x-cms.image-upload name="cover_image" label="Select Cover Image" />
+                </div>
+                <div class="space-y-2 md:col-span-2">
+                    <x-cms.image-upload name="gallery[]" label="Upload Additional Gallery Images" :multiple="true" />
                 </div>
             </div>
         </div>
@@ -64,3 +76,7 @@
         </div>
     </form>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/cms-editor.js')
+@endpush

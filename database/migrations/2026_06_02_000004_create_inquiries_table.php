@@ -15,7 +15,14 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('type')->nullable();
             $table->text('message')->nullable();
-            $table->foreignId('property_id')->nullable()->constrained('properties')->nullOnDelete();
+            // FK constraint added separately in
+            // 2026_09_04_000000_add_property_foreign_key_to_inquiries_table.php
+            // because this migration runs (2026_06_02_000004) BEFORE
+            // create_properties_table (2026_06_02_102132) in timestamp order —
+            // declaring the FK inline here fails on a clean `migrate:fresh`
+            // with "Foreign key constraint is incorrectly formed" since
+            // `properties` doesn't exist yet at this point in the run.
+            $table->foreignId('property_id')->nullable();
             $table->timestamps();
         });
     }

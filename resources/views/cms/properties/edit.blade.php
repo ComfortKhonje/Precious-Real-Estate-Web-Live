@@ -9,221 +9,170 @@
     @csrf
     @method('PUT')
 
-    <!-- Property Information -->
     <div class="bg-white border border-gray-100 rounded-3xl p-6">
         <h3 class="font-heading text-3xl leading-none mb-1">Property Information</h3>
-        <p class="text-sm text-brand-black/60 mb-6">
-            Basic details shown on the property card and listing page.
-        </p>
+        <p class="text-sm text-brand-black/60 mb-6">Basic details shown on the property card and listing page.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Property Title</label>
-                <input type="text"
-                    name="title"
-                    value="{{ old('title', $property->title) }}"
-                    required
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">
+                <input type="text" name="title" value="{{ old('title', $property->title) }}" required class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                @error('title') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Property Category</label>
-                <select name="category"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 cursor-pointer">
+                <label class="text-sm font-semibold tracking-wider">Category</label>
+                <select name="category" class="w-full bg-gray-100 rounded-2xl py-4 px-5 cursor-pointer">
                     <option value="">Select category</option>
-                    <option value="Residential"
-                        {{ old('category', $property->category) === 'Residential' ? 'selected' : '' }}>
-                        Residential
-                    </option>
-                    <option value="Commercial"
-                        {{ old('category', $property->category) === 'Commercial' ? 'selected' : '' }}>
-                        Commercial
-                    </option>
+                    @foreach(\App\Models\Property::CATEGORIES as $option)
+                        <option value="{{ $option }}" {{ old('category', $property->category) === $option ? 'selected' : '' }}>{{ $option }}</option>
+                    @endforeach
                 </select>
+                @error('category') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Property Type</label>
-                <input type="text"
-                    name="type"
-                    value="{{ old('type', $property->type) }}"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Price</label>
-                <input type="text"
-                    name="price"
-                    value="{{ old('price', $property->price) }}"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Location</label>
-                <input type="text"
-                    name="location"
-                    value="{{ old('location', $property->location) }}"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Status</label>
-                <select name="status"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 cursor-pointer">
-                    <option value="Available"
-                        {{ old('status', $property->status) === 'Available' ? 'selected' : '' }}>
-                        Available
-                    </option>
-                    <option value="Sold"
-                        {{ old('status', $property->status) === 'Sold' ? 'selected' : '' }}>
-                        Sold
-                    </option>
-                    <option value="Rented"
-                        {{ old('status', $property->status) === 'Rented' ? 'selected' : '' }}>
-                        Rented
-                    </option>
+                <select name="type" class="w-full bg-gray-100 rounded-2xl py-4 px-5 cursor-pointer">
+                    @foreach(\App\Models\Property::TYPES as $option)
+                        <option value="{{ $option }}" {{ old('type', $property->type) === $option ? 'selected' : '' }}>{{ $option }}</option>
+                    @endforeach
                 </select>
+                @error('type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-semibold tracking-wider">Listing Status</label>
+                <select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 cursor-pointer">
+                    @foreach(\App\Models\Property::STATUSES as $option)
+                        <option value="{{ $option }}" {{ old('status', $property->status) === $option ? 'selected' : '' }}>{{ $option }}</option>
+                    @endforeach
+                </select>
+                <p class="text-xs text-brand-black/50">"For Rent" automatically shows "/ month" after the price on the site — don't type it into the price field.</p>
+                @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-semibold tracking-wider">Price (Numerical)</label>
+                <input type="number" step="0.01" name="price" value="{{ old('price', $property->price) }}" required class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                @error('price') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-semibold tracking-wider">Currency</label>
+                <select name="currency" class="w-full bg-gray-100 rounded-2xl py-4 px-5 cursor-pointer">
+                    @foreach(\App\Models\Property::CURRENCIES as $option)
+                        <option value="{{ $option }}" {{ old('currency', $property->currency) === $option ? 'selected' : '' }}>{{ $option }}</option>
+                    @endforeach
+                </select>
+                @error('currency') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="space-y-2 md:col-span-2">
+                <label class="text-sm font-semibold tracking-wider">Location</label>
+                <input type="text" name="location" value="{{ old('location', $property->location) }}" required class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                @error('location') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="space-y-2 md:col-span-2">
                 <label class="text-sm font-semibold tracking-wider">Property Description</label>
-                <textarea name="description"
-                    rows="5"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">{{ old('description', $property->description) }}</textarea>
+                <textarea name="description" rows="5" required class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('description', $property->description) }}</textarea>
+                @error('description') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
     </div>
 
-    <!-- Property Details -->
     <div class="bg-white border border-gray-100 rounded-3xl p-6">
         <h3 class="font-heading text-3xl leading-none mb-1">Property Details</h3>
-        <p class="text-sm text-brand-black/60 mb-6">
-            Extra details that help buyers and renters decide faster.
-        </p>
+        <p class="text-sm text-brand-black/60 mb-6">Extra details that help buyers and renters decide faster.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Bedrooms</label>
-                <input type="number"
-                    name="bedrooms"
-                    min="0"
-                    value="{{ old('bedrooms', $property->bedrooms) }}"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">
+                <input type="number" name="bedrooms" min="0" value="{{ old('bedrooms', $property->bedrooms) }}" class="w-full bg-gray-100 rounded-2xl py-4 px-5">
             </div>
-
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Bathrooms</label>
-                <input type="number"
-                    name="bathrooms"
-                    min="0"
-                    value="{{ old('bathrooms', $property->bathrooms) }}"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">
+                <input type="number" name="bathrooms" min="0" value="{{ old('bathrooms', $property->bathrooms) }}" class="w-full bg-gray-100 rounded-2xl py-4 px-5">
             </div>
-
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Land Size</label>
-                <input type="text"
-                    name="land_size"
-                    value="{{ old('land_size', $property->land_size) }}"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">
+                <input type="text" name="land_size" value="{{ old('land_size', $property->land_size) }}" class="w-full bg-gray-100 rounded-2xl py-4 px-5">
             </div>
-
             <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Parking Availability</label>
-                <select name="parking"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 cursor-pointer">
-                    <option value="">Select</option>
-                    <option value="Yes"
-                        {{ old('parking', $property->parking) === 'Yes' ? 'selected' : '' }}>
-                        Yes
-                    </option>
-                    <option value="No"
-                        {{ old('parking', $property->parking) === 'No' ? 'selected' : '' }}>
-                        No
-                    </option>
-                </select>
+                <label class="text-sm font-semibold tracking-wider">Parking Spaces</label>
+                <input type="number" name="parking_spaces" min="0" value="{{ old('parking_spaces', $property->parking_spaces) }}" class="w-full bg-gray-100 rounded-2xl py-4 px-5">
             </div>
-
             <div class="space-y-2 lg:col-span-2">
                 <label class="text-sm font-semibold tracking-wider">Additional Features</label>
-                <input type="text"
-                    name="features"
-                    value="{{ old('features', is_array($property->features) ? implode(', ', $property->features) : $property->features) }}"
-                    placeholder="e.g., Solar, Water tank, Electric fence"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5">
+                <input type="text" name="features" value="{{ old('features', is_array($property->features) ? implode(', ', $property->features) : $property->features) }}" placeholder="e.g., Solar, Water tank, Electric fence" class="w-full bg-gray-100 rounded-2xl py-4 px-5">
+            </div>
+            <div class="space-y-2 lg:col-span-2">
+                <label class="text-sm font-semibold tracking-wider">Nearby Amenities</label>
+                <input type="text" name="nearby_amenities" value="{{ old('nearby_amenities', is_array($property->nearby_amenities) ? implode(', ', $property->nearby_amenities) : $property->nearby_amenities) }}" placeholder="e.g., St. Andrews School, Game Complex, Kamuzu Central Hospital" class="w-full bg-gray-100 rounded-2xl py-4 px-5">
+                <p class="text-xs text-brand-black/50">Shown on the property page's "Location Details" section. Leave blank to hide that section entirely.</p>
             </div>
         </div>
     </div>
 
-    <!-- Media Uploads -->
     <div class="bg-white border border-gray-100 rounded-3xl p-6">
-        <h3 class="font-heading text-3xl leading-none mb-1">Media Uploads</h3>
-        <p class="text-sm text-brand-black/60 mb-6">
-            Drag and drop images. Uploads are stored in the public storage.
-        </p>
+        <h3 class="font-heading text-3xl leading-none mb-1">Media</h3>
+        <p class="text-sm text-brand-black/60 mb-6">Replace the featured image, add more gallery images, or remove existing ones.</p>
 
-        <div id="media-dropzone"
-            class="border-2 border-dashed border-gray-200 rounded-3xl p-6 text-center bg-gray-50 cursor-pointer">
-            <input type="file" accept="image/*" class="hidden" multiple />
-            <div class="w-16 h-16 mx-auto rounded-3xl bg-primary/35 border border-primary/50 mb-4"></div>
-            <p class="font-semibold">Drop images here</p>
-            <p class="text-sm text-brand-black/60 mt-1">or click to browse</p>
-            <div class="mt-4 media-preview text-left"></div>
+        <div class="space-y-4 mb-6">
+            @if($property->featured_image)
+                <img loading="lazy" decoding="async" src="{{ $property->featuredImageUrl('thumbnail') }}" alt="Current featured image" class="w-32 h-20 object-cover rounded-xl border border-gray-100">
+            @endif
+            <x-cms.image-upload name="featured_image" label="Click to replace featured image" help="Leave empty to keep the current one" />
         </div>
 
-        <input type="hidden"
-            name="media"
-            value="{{ old('media', json_encode($property->images->pluck('image_path')->toArray())) }}">
+        @php $galleryOnly = $property->images->where('is_featured', false); @endphp
+        @if($galleryOnly->isNotEmpty())
+            <div class="space-y-2 mb-6">
+                <label class="text-sm font-semibold tracking-wider block">Existing Gallery Images</label>
+                <p class="text-xs text-brand-black/50 mb-2">Check any you want removed when you save.</p>
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                    @foreach($galleryOnly as $image)
+                        <label class="relative block rounded-xl overflow-hidden border border-gray-100 cursor-pointer group">
+                            <img loading="lazy" decoding="async" src="{{ $image->url('thumbnail') }}" alt="Gallery image" class="w-full h-20 object-cover">
+                            <div class="absolute inset-0 bg-black/0 group-has-[:checked]:bg-red-600/60 transition flex items-center justify-center">
+                                <input type="checkbox" name="remove_images[]" value="{{ $image->id }}" class="w-5 h-5">
+                            </div>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <x-cms.image-upload name="gallery[]" label="Upload additional images" :multiple="true" />
     </div>
 
-    <!-- Inquiry Settings -->
     <div class="bg-white border border-gray-100 rounded-3xl p-6">
-        <h3 class="font-heading text-3xl leading-none mb-1">Inquiry Settings</h3>
-        <p class="text-sm text-brand-black/60 mb-6">
-            Control inquiry availability for this property.
-        </p>
+        <h3 class="font-heading text-3xl leading-none mb-1">Listing Settings</h3>
+        <p class="text-sm text-brand-black/60 mb-6">Visibility and promotion settings.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <label class="flex items-center justify-between gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100">
+            <label class="flex items-center justify-between gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100 cursor-pointer">
                 <div>
-                    <div class="font-semibold">Enable inquiry form</div>
-                    <div class="text-sm text-brand-black/60">
-                        Allow users to inquire about this listing.
-                    </div>
+                    <div class="font-semibold">Featured Listing</div>
+                    <div class="text-sm text-brand-black/60">Show this listing in featured sections.</div>
                 </div>
-
-                <input type="checkbox"
-                    name="enable_inquiry"
-                    value="1"
-                    {{ old('enable_inquiry', $property->enable_inquiry) ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-brand-black focus:ring-primary">
+                <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $property->is_featured) ? 'checked' : '' }} class="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary">
             </label>
 
-            <label class="flex items-center justify-between gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100">
+            <label class="flex items-center justify-between gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100 cursor-pointer">
                 <div>
-                    <div class="font-semibold">Featured property</div>
-                    <div class="text-sm text-brand-black/60">
-                        Show this listing in featured sections.
-                    </div>
+                    <div class="font-semibold">Available</div>
+                    <div class="text-sm text-brand-black/60">Listing is currently active and visible on the site.</div>
                 </div>
-
-                <input type="checkbox"
-                    name="is_featured"
-                    value="1"
-                    {{ old('is_featured', $property->is_featured) ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-brand-black focus:ring-primary">
+                <input type="checkbox" name="is_available" value="1" {{ old('is_available', $property->is_available) ? 'checked' : '' }} class="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary">
             </label>
         </div>
     </div>
 
     <div class="flex flex-wrap gap-3 justify-end">
-        <a href="{{ route('cms.properties.index') }}" class="btn-secondary">
-            Cancel
-        </a>
-
-        <button type="submit" class="btn-primary">
-            Save Property
-        </button>
+        <a href="{{ route('cms.properties.index') }}" class="btn-secondary">Cancel</a>
+        <button type="submit" class="btn-primary">Save Property</button>
     </div>
 </form>
 @endsection
