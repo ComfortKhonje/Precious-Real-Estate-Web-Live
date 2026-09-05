@@ -37,7 +37,6 @@ test('authenticated user can update a service', function () {
             'title' => 'Updated Service Title',
             'short_description' => 'Updated short description.',
             'content' => 'Updated full content here.',
-            'banner_image' => 'https://example.com/banner2.jpg',
             'icon' => 'star',
             'visible' => 0,
         ])

@@ -27,7 +27,7 @@
 
                 <div
                     class="bg-brand-black rounded-3xl p-10 shadow-lg flex flex-col justify-center items-center text-center h-full hover:-translate-y-2 transition duration-300 relative overflow-hidden group border border-gray-800">
-                    <img src="{{ asset('brand-assets/services-images/view-all-services.jpg') }}" alt=""
+                    <img loading="lazy" decoding="async" src="{{ asset('brand-assets/services-images/view-all-services.jpg') }}" alt=""
                         class="absolute inset-0 w-full h-full object-cover z-0 transition duration-700 group-hover:scale-105">
                     <div class="absolute inset-0 bg-brand-black/90 z-10 backdrop-blur-[2px]"></div>
                     <div class="bg-primary h-16 w-3 absolute top-9 right-0 rounded-l-lg z-30"></div>

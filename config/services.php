@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    // GA4 Measurement ID (looks like "G-XXXXXXXXXX"). Paid for in the
+    // original hosting proposal ("Analytics & Reporting" line item,
+    // MWK 65,000) but never actually added to the site — confirmed
+    // 2026-09-02, no tracking snippet existed anywhere. Set
+    // GOOGLE_ANALYTICS_ID in .env once a real GA4 property exists; the
+    // layout only renders the gtag snippet when this is non-empty, so it's
+    // a safe no-op until then.
+    'google_analytics_id' => env('GOOGLE_ANALYTICS_ID'),
+
 ];

@@ -9,13 +9,26 @@ use App\Http\Controllers\Api\ServicesController;
 use App\Http\Controllers\Api\SettingsController;
 use Illuminate\Support\Facades\Route;
 
-// Public auth endpoints
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+/*
+ * SECURITY, 2026-09-03: `POST /api/register` used to be public and
+ * unauthenticated. Because the CMS login (`/cms/login`) authenticates against
+ * the very same `users` table, anyone on the internet could self-register and
+ * then sign straight into the CMS with full admin rights — create/delete
+ * listings, read every inquiry (customer names, emails, phone numbers),
+ * change settings. PREC has a fixed, tiny set of staff accounts, so
+ * self-service registration has no legitimate use here at all.
+ *
+ * Accounts are now created deliberately with `php artisan prec:create-user`.
+ * If a real registration flow is ever needed, it must at minimum be
+ * invite-gated and must NOT share the CMS user table without a role column.
+ */
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
-// Public form submissions (no authentication required)
-Route::post('/inquiries/public', [InquiriesController::class, 'storePublic']);
-Route::post('/contact', [ContactSubmissionController::class, 'store']);
+// Public form submissions (no authentication required).
+// Throttled: these are unauthenticated write endpoints and were previously
+// wide open to automated spam / DB flooding.
+Route::post('/inquiries/public', [InquiriesController::class, 'storePublic'])->middleware('throttle:10,1');
+Route::post('/contact', [ContactSubmissionController::class, 'store'])->middleware('throttle:10,1');
 
 // Public data endpoints (read-only, no auth)
 Route::get('/properties', [PropertiesController::class, 'index']);

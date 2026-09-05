@@ -15,7 +15,7 @@
                     {{-- Member Image --}}
                     <div
                         class="relative aspect-[4/5] rounded-[1rem] md:rounded-[2.5rem] overflow-hidden mb-2 md:mb-4 border-2 md:border-4 border-primary shadow-md">
-                        <img src="{{ str_starts_with($member->photo_url, 'http') ? $member->photo_url : asset('storage/' . $member->photo_url . '/medium.webp') }}" class="h-full w-auto rounded-lg object-cover">
+                        <img loading="lazy" decoding="async" src="{{ str_starts_with($member->photo_url, 'http') ? $member->photo_url : asset('storage/' . $member->photo_url . '/medium.webp') }}" alt="{{ $member->name }}, {{ $member->role }}" class="h-full w-auto rounded-lg object-cover">
                     </div>
                     
 

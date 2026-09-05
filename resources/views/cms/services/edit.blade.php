@@ -77,7 +77,7 @@
                 </p>
                 <div class="border-2 border-dashed border-gray-200 rounded-3xl p-10 text-center bg-white">
                     @if ($service->banner_image)
-                    <img src="{{ str_starts_with($service->banner_image, 'http') ? $service->banner_image : asset('storage/' . $service->banner_image . '/medium.webp') }}" alt="{{ $service->title }} banner"
+                    <img loading="lazy" decoding="async" src="{{ str_starts_with($service->banner_image, 'http') ? $service->banner_image : asset('storage/' . $service->banner_image . '/medium.webp') }}" alt="{{ $service->title }} banner"
                         class="mx-auto h-40 object-cover rounded-3xl">
                     @else
                     <p class="font-semibold">No banner image configured yet</p>

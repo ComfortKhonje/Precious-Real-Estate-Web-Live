@@ -121,7 +121,7 @@
                     <div
                         class="rounded-2xl bg-white border-2 border-dashed border-gray-200 p-6 text-center min-h-[200px] flex items-center justify-center">
                         @if (old('banner_image'))
-                        <img src="{{ old('banner_image') }}" alt="Banner preview"
+                        <img loading="lazy" decoding="async" src="{{ old('banner_image') }}" alt="Banner preview"
                             class="max-h-[200px] object-cover rounded-xl" onerror="this.style.display='none'">
                         <div class="hidden" id="placeholder">
                             <p class="text-brand-black/60 text-sm">Banner image preview</p>

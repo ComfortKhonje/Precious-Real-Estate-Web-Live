@@ -1,10 +1,10 @@
 <section id="contact-form-section" class="relative mt-20">
-    <img src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover">
+    <img loading="lazy" decoding="async" src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover">
     <x-shared.contact-info variant="dark" :overlap="true" />
 
     {{-- House Image with Yellow Accent --}}
     <div class="absolute hidden md:block bottom-0 left-0 w-full max-w-2xl pointer-events-none z-0">
-        <img
+        <img loading="lazy" decoding="async"
             src="{{ asset('brand-assets/7 Contact Page/hand-holding-house-real-estate-property-model 1.png') }}"
             alt="Hand holding house model"
             class="relative z-10 w-full h-auto object-contain transform -translate-x-12">

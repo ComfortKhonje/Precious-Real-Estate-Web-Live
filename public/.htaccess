@@ -13,6 +13,23 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
+    # ------------------------------------------------------------------
+    # Serve pre-generated WebP versions of brand images (added 2026-09-03)
+    #
+    # `php artisan prec:optimize-images` writes a sibling next to every
+    # PNG/JPG in public/brand-assets — "Hero Image.png" gets
+    # "Hero Image.png.webp". When the browser advertises WebP support AND
+    # that sibling exists on disk, it is served instead. Anything without a
+    # sibling, or any browser that doesn't advertise WebP, falls through to
+    # the original file untouched — so this can never break an image.
+    #
+    # Measured on the current asset set: 17.9 MB of PNG/JPG -> 1.36 MB.
+    # ------------------------------------------------------------------
+    RewriteCond %{HTTP_ACCEPT} image/webp
+    RewriteCond %{REQUEST_FILENAME} \.(png|jpe?g)$ [NC]
+    RewriteCond %{REQUEST_FILENAME}\.webp -f
+    RewriteRule ^(.+)$ $1.webp [T=image/webp,E=REWRITTEN_WEBP:1,L]
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
@@ -23,3 +40,51 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Caches must vary on Accept, or a proxy can hand a WebP to a client that
+# asked for PNG (and vice versa).
+<IfModule mod_headers.c>
+    <FilesMatch "\.(png|jpe?g|webp|gif|svg)$">
+        Header append Vary Accept
+    </FilesMatch>
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Compression. Images are already compressed; text assets are not.
+# ----------------------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+    AddOutputFilterByType DEFLATE application/json application/xml
+    AddOutputFilterByType DEFLATE image/svg+xml application/rss+xml
+    AddOutputFilterByType DEFLATE font/woff2 font/ttf application/font-woff
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Browser caching. Vite output is content-hashed so it is safe to cache
+# hard; brand assets change rarely and are cached for a month.
+# ----------------------------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault                          "access plus 1 week"
+    ExpiresByType text/html                 "access plus 0 seconds"
+    ExpiresByType image/png                 "access plus 1 month"
+    ExpiresByType image/jpeg                "access plus 1 month"
+    ExpiresByType image/webp                "access plus 1 month"
+    ExpiresByType image/gif                 "access plus 1 month"
+    ExpiresByType image/svg+xml             "access plus 1 month"
+    ExpiresByType image/x-icon              "access plus 1 month"
+    ExpiresByType text/css                  "access plus 1 year"
+    ExpiresByType application/javascript    "access plus 1 year"
+    ExpiresByType font/woff2                "access plus 1 year"
+</IfModule>
+
+# Never serve dotfiles or environment/config leftovers, whatever ends up
+# in the document root.
+<FilesMatch "(^\.|\.(env|log|sql|sqlite|ini|bak|old|yml|yaml)$|^composer\.(json|lock)$|^package(-lock)?\.json$)">
+    Require all denied
+</FilesMatch>
+
+<Files "index.php">
+    Require all granted
+</Files>

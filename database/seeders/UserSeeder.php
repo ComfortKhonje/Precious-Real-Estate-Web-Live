@@ -13,6 +13,15 @@ class UserSeeder extends Seeder
 
     public function run(): void
     {
+        // These are demo accounts with the literal password "password".
+        // Running them on production would hand anyone who guesses the email
+        // full CMS access, so this seeder hard-refuses outside local/testing.
+        if (! app()->environment(['local', 'testing'])) {
+            $this->command?->error('UserSeeder is demo data and refuses to run outside local/testing.');
+
+            return;
+        }
+
         $users = [
             [
                 'name' => 'Esther Kachale',

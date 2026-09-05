@@ -4,7 +4,7 @@
 
         {{-- Dark CTA Box --}}
         <div class="bg-brand-black rounded-[32px] md:rounded-[40px] border-brand-black border-1 overflow-hidden relative mb-20 shadow-xl min-h-[400px] flex items-stretch">
-            <img src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover">
+            <img loading="lazy" decoding="async" src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover">
             <div class="grid grid-cols-1 lg:grid-cols-2 w-full h-fit">
 
             <div class="absolute inset-y-0 left-[35%] -translate-x-1/2 w-[40%] bg-gradient-to-l from-[#202020] to-transparent z-0"></div>
@@ -27,9 +27,9 @@
                 {{-- Image Content --}}
                 <div class="relative h-full w-full lg:h-full overflow-hidden">
                         {{-- Desktop Image --}}
-                        <img src="{{ asset('brand-assets/1 Home Page/CTA Image.png') }}" alt="CTA Image" class="hidden lg:block h-full w-full object-cover object-center">
+                        <img loading="lazy" decoding="async" src="{{ asset('brand-assets/1 Home Page/CTA Image.png') }}" alt="CTA Image" class="hidden lg:block h-full w-full object-cover object-center">
                         {{-- Mobile Image --}}
-                        <img src="{{ asset('brand-assets/1 Home Page/CTA Image mobile.png') }}" alt="CTA Image Mobile" class="block lg:hidden h-full w-full object-cover object-center">
+                        <img loading="lazy" decoding="async" src="{{ asset('brand-assets/1 Home Page/CTA Image mobile.png') }}" alt="CTA Image Mobile" class="block lg:hidden h-full w-full object-cover object-center">
                 </div>
             </div>
         </div>

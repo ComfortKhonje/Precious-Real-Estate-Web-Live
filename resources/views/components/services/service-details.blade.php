@@ -30,7 +30,7 @@
                         <div
                             class="relative inline-block w-full md:w-fit rounded-[32px] md:rounded-[40px] overflow-hidden bg-gray-800 z-10 border-primary border-2">
                             @if ($service->banner_image)
-                                <img src="{{ asset($service->banner_image) }}" alt="{{ $service->title }}"
+                                <img loading="lazy" decoding="async" src="{{ asset($service->banner_image) }}" alt="{{ $service->title }}"
                                     class="block w-full md:w-auto h-auto object-contain">
                             @else
                                 <div class="block w-full h-full bg-gray-200"></div>

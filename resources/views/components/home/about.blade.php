@@ -1,11 +1,11 @@
 <section class="py-8 md:py-24 bg-brand-black text-brand-white relative overflow-hidden border-primary border-t-8">
-    <img src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover">
+    <img loading="lazy" decoding="async" src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}" alt="" class="absolute inset-0 w-full h-full object-cover">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
 
             {{-- Image Content --}}
             <div class="relative inline-block w-full md:w-fit rounded-[40px] overflow-hidden bg-gray-800 z-10 border-primary border-2">
-                <img
+                <img loading="lazy" decoding="async"
                     src="{{ asset('brand-assets/1 Home Page/About Section Image.png') }}"
                     alt="About PREC"
                     class="block w-full md:w-auto h-auto object-contain rounded-[40px]"

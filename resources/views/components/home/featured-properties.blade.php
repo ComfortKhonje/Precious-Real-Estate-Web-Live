@@ -14,10 +14,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mb-12">
             @foreach($properties as $property)
                 <x-shared.property-card
-                    :image="asset($property->featured_image)"
+                    :image="$property->featuredImageUrl('medium')"
                     :title="$property->title"
                     :location="$property->location"
-                    :price="$property->formatted_price . ($property->status === 'For Rent' ? ' / month' : '')"
+                    :price="$property->formatted_price"
                     :type="$property->status === 'For Sale' ? 'Sale' : 'Rent'"
                     :slug="$property->slug"
                     :description="$property->description"

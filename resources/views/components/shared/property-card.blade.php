@@ -3,7 +3,7 @@
 <div class="rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-sm bg-brand-white border border-gray-100 flex flex-col hover:shadow-xl transition duration-300 p-2 gap-2 h-fit group">
     {{-- Image Container --}}
     <a href="{{ route('property.view', $slug) }}" class="h-52 md:h-64 mb-2 relative overflow-hidden rounded-[1.5rem] block">
-        <img src="{{ $image }}" alt="{{ $title }}" class="block absolute inset-0 w-full h-full object-cover pointer-events-none z-0 transition duration-700 group-hover:scale-110">
+        <img loading="lazy" decoding="async" src="{{ $image }}" alt="{{ $title }}" class="block absolute inset-0 w-full h-full object-cover pointer-events-none z-0 transition duration-700 group-hover:scale-110">
 
         {{-- Status Badge --}}
         <div class="absolute top-4 right-4">

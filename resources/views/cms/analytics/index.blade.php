@@ -7,13 +7,68 @@
 @section('content')
     @php
         use App\Models\Inquiry;
+        use App\Models\PageView;
         use App\Models\Property;
-        
+
         $totalInquiries = Inquiry::count();
         $inquiriesThisMonth = Inquiry::where('created_at', '>=', now()->startOfMonth())->count();
         $inquiriesThisWeek = Inquiry::where('created_at', '>=', now()->startOfWeek())->count();
         $totalProperties = Property::count();
+
+        // Self-hosted pageview counter (TrackPageView middleware, added
+        // 2026-09-02) — this is a rough traffic count, not full analytics.
+        // See config('services.google_analytics_id') for the real-GA hook.
+        $viewsToday = PageView::whereDate('created_at', today())->count();
+        $viewsThisWeek = PageView::where('created_at', '>=', now()->startOfWeek())->count();
+        $viewsThisMonth = PageView::where('created_at', '>=', now()->startOfMonth())->count();
+        $viewsAllTime = PageView::count();
+        $topPaths = PageView::selectRaw('path, COUNT(*) as views')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('path')
+            ->orderByDesc('views')
+            ->limit(8)
+            ->get();
     @endphp
+
+    <div class="mb-6">
+        <h3 class="font-heading text-2xl leading-none mb-1">Website Traffic</h3>
+        <p class="text-sm text-brand-black/60 mb-4">Self-hosted pageview count — rough traffic, not full analytics (no bounce rate, no session duration).
+            @unless(config('services.google_analytics_id'))
+                Real Google Analytics isn't connected yet — add <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded">GOOGLE_ANALYTICS_ID</code> to <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded">.env</code> once a GA4 property exists.
+            @endunless
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+            <div class="bg-white border border-gray-100 rounded-3xl p-6">
+                <p class="text-xs uppercase tracking-[0.2em] text-brand-black/50 mb-2">Today</p>
+                <div class="font-heading text-5xl leading-none">{{ $viewsToday }}</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-3xl p-6">
+                <p class="text-xs uppercase tracking-[0.2em] text-brand-black/50 mb-2">This Week</p>
+                <div class="font-heading text-5xl leading-none">{{ $viewsThisWeek }}</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-3xl p-6">
+                <p class="text-xs uppercase tracking-[0.2em] text-brand-black/50 mb-2">This Month</p>
+                <div class="font-heading text-5xl leading-none">{{ $viewsThisMonth }}</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-3xl p-6">
+                <p class="text-xs uppercase tracking-[0.2em] text-brand-black/50 mb-2">All Time</p>
+                <div class="font-heading text-5xl leading-none">{{ $viewsAllTime }}</div>
+            </div>
+        </div>
+        @if($topPaths->isNotEmpty())
+            <div class="bg-white border border-gray-100 rounded-3xl p-6">
+                <h4 class="font-heading text-xl mb-4">Most Viewed Pages (last 30 days)</h4>
+                <div class="space-y-2">
+                    @foreach($topPaths as $row)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                            <span class="text-sm font-mono">{{ $row->path }}</span>
+                            <span class="px-3 py-1 rounded-full bg-primary/20 text-brand-black text-sm font-semibold">{{ $row->views }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
@@ -159,10 +214,16 @@
         <!-- Property Status -->
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
             <h3 class="font-heading text-3xl leading-none mb-5">Properties Status</h3>
-            
+
+            {{-- 2026-09-02: was checking status against 'available'/'Available'/'active'/'Active'
+                 and 'sold'/'Sold'/'rented'/'Rented' — none of which are real values (canonical
+                 status is 'For Sale'/'For Rent'; availability is the separate is_available
+                 boolean). Always showed zero for both rows regardless of real data. --}}
             @php
-                $availableCount = Property::whereIn('status', ['available', 'Available', 'active', 'Active'])->count();
-                $unavailableCount = Property::whereIn('status', ['sold', 'Sold', 'rented', 'Rented'])->count();
+                $availableCount = Property::where('is_available', true)->count();
+                $unavailableCount = Property::where('is_available', false)->count();
+                $forSaleCount = Property::where('status', 'For Sale')->count();
+                $forRentCount = Property::where('status', 'For Rent')->count();
                 $featuredCount = Property::where('is_featured', true)->count();
             @endphp
 
@@ -174,6 +235,14 @@
                 <div class="flex items-center justify-between p-3 bg-orange-50 rounded-xl">
                     <span class="text-sm font-semibold">Unavailable</span>
                     <span class="px-3 py-1 rounded-full bg-orange-200 text-orange-700 text-sm font-semibold">{{ $unavailableCount }}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+                    <span class="text-sm font-semibold">For Sale</span>
+                    <span class="px-3 py-1 rounded-full bg-blue-200 text-blue-700 text-sm font-semibold">{{ $forSaleCount }}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-indigo-50 rounded-xl">
+                    <span class="text-sm font-semibold">For Rent</span>
+                    <span class="px-3 py-1 rounded-full bg-indigo-200 text-indigo-700 text-sm font-semibold">{{ $forRentCount }}</span>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-purple-50 rounded-xl">
                     <span class="text-sm font-semibold">Featured</span>

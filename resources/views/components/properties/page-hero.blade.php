@@ -52,13 +52,13 @@
                 {{-- Location --}}
                 <div class="w-full">
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Location</label>
-                    <x-ui.select name="location" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary text-brand-black font-semibold text-md cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                    <select name="location" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary text-brand-black font-semibold text-md cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                         <option value="">Select Location</option>
                         <option value="Lilongwe" {{ request('location') === 'Lilongwe' ? 'selected' : '' }}>Lilongwe</option>
                         <option value="Blantyre" {{ request('location') === 'Blantyre' ? 'selected' : '' }}>Blantyre</option>
                         <option value="Mzuzu" {{ request('location') === 'Mzuzu' ? 'selected' : '' }}>Mzuzu</option>
                         <option value="Zomba" {{ request('location') === 'Zomba' ? 'selected' : '' }}>Zomba</option>
-                    </x-ui.select>
+                    </select>
                 </div>
 
                 {{-- Property Type --}}
@@ -70,11 +70,11 @@
                 {{-- Status --}}
                 <div class="w-full">
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Status</label>
-                    <x-ui.select name="status" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                    <select name="status" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                         <option value="" {{ request('status') === null || request('status') === '' ? 'selected' : '' }}>Any Status</option>
                         <option value="For Sale" {{ request('status') === 'For Sale' ? 'selected' : '' }}>For Sale</option>
                         <option value="For Rent" {{ request('status') === 'For Rent' ? 'selected' : '' }}>For Rent</option>
-                    </x-ui.select>
+                    </select>
                 </div>
 
                 {{-- Price Range --}}
@@ -82,20 +82,20 @@
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Price Range</label>
                     <div class="flex gap-3">
                         <div class="flex-1">
-                            <x-ui.select name="min_price" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                            <select name="min_price" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                 <option value="">Min</option>
                                 <option value="K 200K" {{ request('min_price') === 'K 200K' ? 'selected' : '' }}>K 200K</option>
                                 <option value="K 500K" {{ request('min_price') === 'K 500K' ? 'selected' : '' }}>K 500K</option>
                                 <option value="K 1M" {{ request('min_price') === 'K 1M' ? 'selected' : '' }}>K 1M</option>
-                            </x-ui.select>
+                            </select>
                         </div>
                         <div class="flex-1">
-                            <x-ui.select name="max_price" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                            <select name="max_price" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                 <option value="">Max</option>
                                 <option value="K 1M" {{ request('max_price') === 'K 1M' ? 'selected' : '' }}>K 1M</option>
                                 <option value="K 20M" {{ request('max_price') === 'K 20M' ? 'selected' : '' }}>K 20M</option>
                                 <option value="K 20M+" {{ request('max_price') === 'K 20M+' ? 'selected' : '' }}>K 20M+</option>
-                            </x-ui.select>
+                            </select>
                         </div>
                     </div>
                 </div>

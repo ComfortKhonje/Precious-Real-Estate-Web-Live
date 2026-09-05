@@ -1,0 +1,83 @@
+/**
+ * Brand overrides for Quill's stock "snow" theme, used in the CMS
+ * announcement/update editor (resources/js/cms-editor.js). Added
+ * 2026-09-04 — the editor previously rendered with Quill's default gray
+ * toolbar and system-font icons, visually inconsistent with the rest of
+ * the CMS's rounded-3xl / primary-yellow / Barlow-Outfit design language.
+ * Visual only — no change to cms-editor.js's toolbar options or behavior.
+ */
+
+.ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 1px solid rgb(229 231 235);
+    padding: 0.75rem 1rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+.ql-container.ql-snow {
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+}
+
+.ql-editor {
+    min-height: 220px;
+    padding: 1.25rem;
+    color: #1E1E1E;
+}
+
+.ql-editor.ql-blank::before {
+    color: rgba(30, 30, 30, 0.4);
+    font-style: normal;
+}
+
+.ql-editor h2,
+.ql-editor h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+/* Toolbar buttons: brand-black icon strokes by default, primary-yellow on
+   hover/active instead of Quill's stock blue. */
+.ql-snow .ql-stroke {
+    stroke: #1E1E1E;
+}
+
+.ql-snow .ql-fill {
+    fill: #1E1E1E;
+}
+
+.ql-toolbar.ql-snow button,
+.ql-toolbar.ql-snow .ql-picker-label {
+    border-radius: 0.5rem;
+    transition: background-color 150ms ease;
+}
+
+.ql-toolbar.ql-snow button:hover,
+.ql-toolbar.ql-snow button:focus,
+.ql-toolbar.ql-snow .ql-picker-label:hover {
+    background-color: rgba(255, 229, 34, 0.35);
+}
+
+.ql-toolbar.ql-snow button.ql-active,
+.ql-toolbar.ql-snow .ql-picker-label.ql-active,
+.ql-toolbar.ql-snow .ql-picker-item.ql-selected {
+    background-color: #FFE522;
+}
+
+.ql-toolbar.ql-snow button.ql-active .ql-stroke,
+.ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-stroke {
+    stroke: #1E1E1E;
+}
+
+.ql-snow .ql-picker-options {
+    border-radius: 0.75rem;
+    border-color: rgb(229 231 235);
+    box-shadow: 0 10px 30px rgba(30, 30, 30, 0.08);
+}
+
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow .ql-toolbar button:hover .ql-stroke {
+    stroke: #1E1E1E;
+}

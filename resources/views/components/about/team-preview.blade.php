@@ -19,7 +19,7 @@
 
             {{-- Image Content --}}
             <div class="relative inline-block w-full md:w-fit rounded-[32px] md:rounded-[40px] overflow-hidden bg-gray-800 z-10 border-primary border-2">
-                <img src="{{ asset('brand-assets/2 About Us Page/Image 5.png') }}" alt="Man looking at papers" class="block w-full md:w-auto h-auto object-contain">
+                <img loading="lazy" decoding="async" src="{{ asset('brand-assets/2 About Us Page/Image 5.png') }}" alt="Man looking at papers" class="block w-full md:w-auto h-auto object-contain">
             </div>
         </div>
 </section>

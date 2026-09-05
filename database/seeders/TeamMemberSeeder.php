@@ -30,11 +30,19 @@ class TeamMemberSeeder extends Seeder
                 'visible' => true,
             ],
             [
+                'name' => 'Kondwani Nyirenda',
+                'role' => 'Valuation Officer',
+                'bio' => 'Supports valuation assignments with a focus on estate management and regulatory compliance.',
+                'photo_url' => '',
+                'order' => 3,
+                'visible' => true,
+            ],
+            [
                 'name' => 'Doreen Mpunga',
                 'role' => 'ICT & Compliance Officer',
                 'bio' => 'Ensures secure systems and compliance across all client and property records.',
                 'photo_url' => '',
-                'order' => 3,
+                'order' => 4,
                 'visible' => true,
             ],
             [
@@ -42,7 +50,7 @@ class TeamMemberSeeder extends Seeder
                 'role' => 'Records Officer',
                 'bio' => 'Manages documentation and client files to keep property processes organised and reliable.',
                 'photo_url' => '',
-                'order' => 4,
+                'order' => 5,
                 'visible' => true,
             ],
             [
@@ -50,7 +58,7 @@ class TeamMemberSeeder extends Seeder
                 'role' => 'Valuation Officer',
                 'bio' => 'Supports market research and property inspections for accurate valuations.',
                 'photo_url' => '',
-                'order' => 5,
+                'order' => 6,
                 'visible' => true,
             ],
         ];

@@ -1,8 +1,8 @@
 <section class="bg-brand-black text-brand-white py-12 border-primary border-t-8 relative overflow-hidden">
     {{-- Desktop Background --}}
-    <img src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}" alt="" class="hidden md:block absolute inset-0 w-full h-full object-cover">
+    <img loading="lazy" decoding="async" src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}" alt="" class="hidden md:block absolute inset-0 w-full h-full object-cover">
     {{-- Mobile Background --}}
-    <img src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls mobile.png') }}" alt="" class="block md:hidden absolute inset-0 w-full h-full object-cover">
+    <img loading="lazy" decoding="async" src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls mobile.png') }}" alt="" class="block md:hidden absolute inset-0 w-full h-full object-cover">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-4 relative z-10">

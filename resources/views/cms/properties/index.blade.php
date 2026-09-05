@@ -7,29 +7,34 @@
 @section('content')
 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
     <div class="flex-1">
+        {{-- 2026-09-03: this block had a closing </form> but no opening tag, and
+             the search input had no name attribute — so the filter selects'
+             this.form.submit() had no form to submit and the search box sent
+             nothing. Both fixed here. --}}
+        <form method="GET" action="{{ route('cms.properties.index') }}">
         <div class="relative">
-            <input type="text" placeholder="Search by property name..."
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by property name..."
                 class="w-full bg-white border border-gray-200 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary focus:border-primary/30">
             <i data-lucide="search" class="w-5 h-5 text-brand-black/40 absolute left-4 top-1/2 -translate-y-1/2"></i>
         </div>
         <div class="flex flex-wrap gap-2">
-            <x-ui.select name="location" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+            <select name="location" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
                 <option value="">All Locations</option>
                 @foreach($locations as $location)
                 <option value="{{ $location }}" {{ request('location') == $location ? 'selected' : '' }}>{{ $location }}</option>
                 @endforeach
-            </x-ui.select>
-            <x-ui.select name="type" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+            </select>
+            <select name="type" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
                 <option value="">All Types</option>
                 @foreach($types as $type)
                 <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
                 @endforeach
-            </x-ui.select>
-            <x-ui.select name="status" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+            </select>
+            <select name="status" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
                 <option value="">All Status</option>
                 <option value="For Sale" {{ request('status') == 'For Sale' ? 'selected' : '' }}>For Sale</option>
                 <option value="For Rent" {{ request('status') == 'For Rent' ? 'selected' : '' }}>For Rent</option>
-            </x-ui.select>
+            </select>
             @if(request()->anyFilled(['search', 'location', 'type', 'status']))
             <a href="{{ route('cms.properties.index') }}" class="p-3 rounded-2xl bg-gray-100 text-brand-black/60 hover:bg-gray-200 transition" title="Clear Filters">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,11 +58,12 @@
             @foreach ($properties as $prop)
             <div class="flex items-center justify-between border border-gray-50 rounded-2xl p-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-20 h-14 bg-gray-100 rounded-md flex items-center justify-center text-sm">Img</div>
+                    <img loading="lazy" decoding="async" src="{{ $prop->featuredImageUrl('thumbnail') }}" alt="{{ $prop->title }}" class="w-20 h-14 object-cover rounded-md bg-gray-100">
                     <div>
                         <div class="font-semibold">{{ $prop->title }}</div>
                         <div class="text-sm text-brand-black/60">{{ $prop->location }} — {{ $prop->type }} —
-                            {{ $prop->status }}
+                            {{ $prop->status }} — {{ $prop->formatted_price }}
+                            @unless($prop->is_available) <span class="text-red-500 font-semibold">(unavailable)</span> @endunless
                         </div>
                     </div>
                 </div>

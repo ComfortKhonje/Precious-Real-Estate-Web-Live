@@ -32,7 +32,7 @@
                     <!-- Photo -->
                     <div class="relative h-48 bg-gray-100 overflow-hidden">
                         @if ($member->photo_url)
-                            <img src="{{ str_starts_with($member->photo_url, 'http') ? $member->photo_url : asset('storage/' . $member->photo_url . '/medium.webp') }}" alt="{{ $member->name }}"
+                            <img loading="lazy" decoding="async" src="{{ str_starts_with($member->photo_url, 'http') ? $member->photo_url : asset('storage/' . $member->photo_url . '/medium.webp') }}" alt="{{ $member->name }}"
                                 class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10">

@@ -2,7 +2,9 @@
 
 use App\Models\TeamMember;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     $this->user = User::create([
@@ -35,7 +37,6 @@ test('authenticated user can update a team member', function () {
             'name' => 'John Updated',
             'role' => 'Lead Developer',
             'bio' => 'Likes coding a lot.',
-            'photo_url' => 'https://example.com/john-updated.jpg',
             'order' => 2,
             'visible' => 0,
         ])
@@ -60,4 +61,22 @@ test('authenticated user can delete a team member', function () {
         ->assertRedirect(route('cms.team-members.index'));
 
     expect(TeamMember::find($member->id))->toBeNull();
+});
+
+test('uploading a team member photo stores a media path', function () {
+    Storage::fake('public');
+
+    $this->actingAs($this->user)
+        ->withSession(['cms_authenticated' => true])
+        ->post(route('cms.team-members.store'), [
+            'name' => 'Jane Doe',
+            'role' => 'Valuation Officer',
+            'photo_url' => UploadedFile::fake()->image('jane.jpg', 400, 400),
+        ])
+        ->assertRedirect(route('cms.team-members.index'));
+
+    $member = TeamMember::where('name', 'Jane Doe')->firstOrFail();
+
+    expect($member->photo_url)->not->toBeEmpty();
+    expect(str_starts_with($member->photo_url, 'http'))->toBeFalse();
 });

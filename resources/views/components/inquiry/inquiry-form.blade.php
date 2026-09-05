@@ -9,7 +9,7 @@
             'bg-brand-white rounded-[1.5rem] p-6 md:p-12 border border-gray-100 flex-grow'">
 
         {{-- Success Background Image --}}
-        <img x-show="step === 5" src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}"
+        <img loading="lazy" decoding="async" alt="" x-show="step === 5" src="{{ asset('brand-assets/Backgrounds/Background 2 grain and swirls.png') }}"
             alt="" class="absolute inset-0 w-full h-full object-cover z-0">
 
         <div class="w-full relative z-10">
@@ -89,7 +89,7 @@
                                 <option value="Phone">Phone</option>
                                 <option value="Email">Email</option>
                                 <option value="WhatsApp">WhatsApp</option>
-                                </x-ui.select>
+                                </select>
                         </div>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                                         <option value="Industrial Property">Industrial Property</option>
                                         <option value="Agricultural Property">Agricultural Property</option>
                                         <option value="Other">Other</option>
-                                        </x-ui.select>
+                                        </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Purpose of
@@ -145,7 +145,7 @@
                                         <option value="Dispute Resolution">Dispute Resolution</option>
                                         <option value="Estate Matters">Estate Matters</option>
                                         <option value="Other">Other</option>
-                                        </x-ui.select>
+                                        </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Estimated
@@ -173,7 +173,7 @@
                                         <option value="Bill Payments">Bill Payments</option>
                                         <option value="Property Reporting">Property Reporting</option>
                                         <option value="Full Property Management">Full Property Management</option>
-                                        </x-ui.select>
+                                        </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Number of
@@ -199,11 +199,11 @@
                                         <option value="Let">Let Property</option>
                                         <option value="Buy">Buy Property</option>
                                         <option value="Rent">Rent Property</option>
-                                        </x-ui.select>
+                                        </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs tracking-widest text-gray-400">Property Type</label>
-                                    <x-ui.select x-model="formData.propertyType" class="w-full bg-gray-100 rounded-lg md:rounded-xl py-4 md:py-5 px-4 md:px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-md appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                                    <select x-model="formData.propertyType" class="w-full bg-gray-100 rounded-lg md:rounded-xl py-4 md:py-5 px-4 md:px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-md appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select Type</option>
                                         <option value="House">House</option>
                                         <option value="Apartment / Flat">Apartment / Flat</option>
@@ -211,7 +211,7 @@
                                         <option value="Office Space">Office Space</option>
                                         <option value="Commercial Building">Commercial Building</option>
                                         <option value="Other">Other</option>
-                                    </x-ui.select>
+                                    </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Budget /
@@ -238,17 +238,17 @@
                                         <option value="Land">Land Development</option>
                                         <option value="Renovation / Redevelopment">Renovation / Redevelopment</option>
                                         <option value="Other">Other</option>
-                                        </x-ui.select>
+                                        </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs tracking-widest text-gray-400">Service Needed</label>
-                                    <x-ui.select x-model="formData.serviceNeeded" class="w-full bg-gray-100 rounded-lg md:rounded-xl py-4 md:py-5 px-4 md:px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-md appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                                    <select x-model="formData.serviceNeeded" class="w-full bg-gray-100 rounded-lg md:rounded-xl py-4 md:py-5 px-4 md:px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-md appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select type</option>
                                         <option value="Residential">Site Identification</option>
                                         <option value="Commercial">Feasibility Analysis</option>
                                         <option value="Land">Project Coordination</option>
                                         <option value="Renovation / Redevelopment">Development Advisory</option>
-                                    </x-ui.select>
+                                    </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Project
@@ -261,7 +261,7 @@
                                         <option value="Ongoing">Early Development</option>
                                         <option value="Ongoing">Ongoing Project</option>
                                         <option value="Not Sure">Not Sure</option>
-                                        </x-ui.select>
+                                        </select>
                                 </div>
                             </div>
                         </template>
@@ -301,7 +301,7 @@
                                         <option value="Property Development">Property Development</option>
                                         <option value="Title Deed Processing">Title Deed Processing</option>
                                         <option value="General Consultation">General Consultation</option>
-                                        </x-ui.select>
+                                        </select>
                                 </div>
                             </div>
                         </template>

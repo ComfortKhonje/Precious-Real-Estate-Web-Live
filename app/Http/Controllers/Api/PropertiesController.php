@@ -10,14 +10,20 @@ class PropertiesController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Property::query();
+        // Only ever-listed properties on the public read endpoint — this
+        // feeds the public site's "Load More" pagination directly.
+        $query = Property::where('is_available', true);
 
         if ($request->filled('search')) {
             $s = $request->get('search');
             $query->where('title', 'like', "%{$s}%")->orWhere('location', 'like', "%{$s}%");
         }
 
-        return response()->json($query->paginate(20));
+        // Page size matches the properties page's initial server-rendered
+        // page (6) so "Load More" pages feel consistent, not jarring.
+        return response()->json(
+            $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc')->paginate(6)
+        );
     }
 
     public function show(Property $property)

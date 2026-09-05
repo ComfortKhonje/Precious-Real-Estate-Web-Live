@@ -21,8 +21,13 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Move existing property JSON media to property_images
-        $properties = DB::table('properties')->get();
+        // Move existing property JSON media to property_images.
+        // The `media` column only ever existed on databases created before the
+        // properties table was reshaped; on a fresh install it is absent, so
+        // both the backfill and the drop below are guarded.
+        $hasMediaColumn = Schema::hasColumn('properties', 'media');
+
+        $properties = $hasMediaColumn ? DB::table('properties')->get() : collect();
         foreach ($properties as $property) {
             if ($property->media) {
                 $mediaPaths = json_decode($property->media, true);
@@ -62,16 +67,20 @@ return new class extends Migration
             }
         }
 
-        Schema::table('properties', function (Blueprint $table) {
-            $table->dropColumn('media');
-        });
+        if ($hasMediaColumn) {
+            Schema::table('properties', function (Blueprint $table) {
+                $table->dropColumn('media');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
-            $table->json('media')->nullable();
-        });
+        if (! Schema::hasColumn('properties', 'media')) {
+            Schema::table('properties', function (Blueprint $table) {
+                $table->json('media')->nullable();
+            });
+        }
 
         Schema::dropIfExists('property_images');
     }

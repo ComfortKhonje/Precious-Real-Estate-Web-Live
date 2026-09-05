@@ -34,21 +34,22 @@ class PropertyController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Filter by price range
-        if ($request->filled('min_price') && $request->min_price !== 'Min') {
-            $minPrice = (float) str_replace(['K', ' ', 'M', '+'], ['', '', '000000', ''], $request->min_price);
-            if (str_contains($request->min_price, 'K') && !str_contains($request->min_price, 'M')) {
-                $minPrice = (float) str_replace(['K', ' ', '+'], ['', '', '000'], $request->min_price);
+        // Filter by price range. The hero form submits human labels
+        // ("K 200K", "K 1M", "K 20M+"), so they get parsed to a number here.
+        // The previous hand-rolled str_replace chain stripped the leading
+        // currency "K" and the "K" thousands suffix in the same pass, so
+        // "K 200K" resolved to 200 instead of 200,000 — a 1000x-off filter
+        // that quietly hid every listing. Fixed 2026-09-03.
+        if ($request->filled('min_price')) {
+            if (($min = $this->parsePriceLabel($request->input('min_price'))) !== null) {
+                $query->where('price', '>=', $min);
             }
-            $query->where('price', '>=', $minPrice);
         }
 
-        if ($request->filled('max_price') && $request->max_price !== 'Max') {
-            $maxPrice = (float) str_replace(['K', ' ', 'M', '+'], ['', '', '000000', ''], $request->max_price);
-             if (str_contains($request->max_price, 'K') && !str_contains($request->max_price, 'M')) {
-                $maxPrice = (float) str_replace(['K', ' ', '+'], ['', '', '000'], $request->max_price);
+        if ($request->filled('max_price')) {
+            if (($max = $this->parsePriceLabel($request->input('max_price'))) !== null) {
+                $query->where('price', '<=', $max);
             }
-            $query->where('price', '<=', $maxPrice);
         }
 
         $properties = $query->orderBy('is_featured', 'desc')
@@ -73,5 +74,36 @@ class PropertyController extends Controller
                                      ->get();
 
         return view('pages.property-details', compact('property', 'relatedProperties'));
+    }
+
+    /**
+     * Turn a price-filter label into a number.
+     * "K 200K" => 200000, "K 1M" => 1000000, "K 20M+" => 20000000.
+     * Returns null for placeholder options ("", "Min", "Max").
+     */
+    private function parsePriceLabel(?string $label): ?float
+    {
+        $label = trim((string) $label);
+
+        if ($label === '' || in_array($label, ['Min', 'Max'], true)) {
+            return null;
+        }
+
+        // Drop a leading currency marker ("K ", "MWK ") and any trailing "+".
+        $value = preg_replace('/^(MWK|K)\s+/i', '', $label);
+        $value = rtrim($value, '+');
+
+        if (! preg_match('/^([\d.,]+)\s*([KMB]?)$/i', trim($value), $matches)) {
+            return null;
+        }
+
+        $number = (float) str_replace(',', '', $matches[1]);
+
+        return match (strtoupper($matches[2])) {
+            'K' => $number * 1_000,
+            'M' => $number * 1_000_000,
+            'B' => $number * 1_000_000_000,
+            default => $number,
+        };
     }
 }

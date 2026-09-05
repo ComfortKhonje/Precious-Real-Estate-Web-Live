@@ -10,12 +10,12 @@
 
         <div class="grid gap-4 md:grid-cols-3">
             <div class="h-60 rounded-3xl overflow-hidden bg-brand-black/5">
-                <img src="{{ asset($mainImage) }}" alt="{{ $property->title }}" class="object-cover w-full h-full">
+                <img loading="lazy" decoding="async" src="{{ asset($mainImage) }}" alt="{{ $property->title }}" class="object-cover w-full h-full">
             </div>
             <div class="space-y-6">
                 @forelse($secondaryImages as $image)
                     <div class="h-28 rounded-3xl overflow-hidden bg-brand-black/5">
-                        <img src="{{ asset($image) }}" alt="{{ $property->title }}" class="object-cover w-full h-full">
+                        <img loading="lazy" decoding="async" src="{{ asset($image) }}" alt="{{ $property->title }}" class="object-cover w-full h-full">
                     </div>
                 @empty
                     <div class="h-28 rounded-3xl bg-brand-black/5"></div>

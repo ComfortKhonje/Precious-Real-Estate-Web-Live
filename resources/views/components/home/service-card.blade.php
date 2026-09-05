@@ -18,7 +18,7 @@
 
 <div class="relative rounded-3xl overflow-hidden h-full group transition duration-300 hover:-translate-y-2 flex flex-col {{ $cardBorder }} {{ $cardShadow }}">
     {{-- Background Image --}}
-    <img src="{{ $bgImage }}" alt="" class="absolute inset-0 w-full h-full object-cover z-0 transition duration-700 group-hover:scale-105">
+    <img loading="lazy" decoding="async" src="{{ $bgImage }}" alt="" class="absolute inset-0 w-full h-full object-cover z-0 transition duration-700 group-hover:scale-105">
 
     {{-- Overlay --}}
     <div class="absolute inset-0 {{ $overlayClass }}"></div>
@@ -27,7 +27,7 @@
     <div class="relative z-20 p-6 md:p-10 flex flex-col h-full">
         <div class="w-16 h-16 rounded-xl {{ $iconBg }} flex items-center justify-center mb-16">
             {{-- Assuming the SVGs have currentColor, but if they are fixed colors we just load them --}}
-            <img src="{{ asset('brand-assets/services-icons/' . $icon) }}" class="w-10 h-10" alt="{{ $title }} Icon">
+            <img loading="lazy" decoding="async" src="{{ asset('brand-assets/services-icons/' . $icon) }}" class="w-10 h-10" alt="{{ $title }} Icon">
         </div>
 
         <div class="mt-auto">

@@ -19,7 +19,7 @@
 
             {{-- Image Content --}}
             <div class="relative w-full aspect-auto lg:h-full rounded-[28px] md:rounded-[40px] overflow-hidden bg-gray-800 border-primary border-2">
-                <img src="{{ asset('brand-assets/6 Our Team Page/Who we are image 1.png') }}" alt="Team working in office" class="w-full h-full object-cover">
+                <img loading="lazy" decoding="async" src="{{ asset('brand-assets/6 Our Team Page/Who we are image 1.png') }}" alt="Team working in office" class="w-full h-full object-cover">
             </div>
         </div>
     </div>

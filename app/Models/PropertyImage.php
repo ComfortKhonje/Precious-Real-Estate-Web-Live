@@ -27,6 +27,15 @@ class PropertyImage extends Model
         return $this->belongsTo(Property::class);
     }
 
+    /**
+     * URL of this image at a given MediaService size
+     * ('thumbnail', 'medium', 'large').
+     */
+    public function url(string $size = 'medium'): string
+    {
+        return asset("storage/{$this->image_path}/{$size}.webp");
+    }
+
     protected static function booted()
     {
         static::deleted(function ($image) {

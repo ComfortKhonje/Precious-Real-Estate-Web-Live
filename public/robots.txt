@@ -1,2 +1,8 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# The CMS and the JSON API are not content — keep them out of the index.
+Disallow: /cms
+Disallow: /api
+
+Sitemap: https://preciousrealestate.mw/sitemap.xml

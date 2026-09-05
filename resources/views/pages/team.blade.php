@@ -1,5 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Our Team - Precious Real Estate')
+@section('title', 'Our Team - Precious Real Estate Consulting')
+@section('meta_description', 'Meet the registered valuers, estate managers and compliance staff behind Precious Real Estate Consulting.')
 @section('content')
     <x-team.page-hero />
     <x-team.who-we-are />

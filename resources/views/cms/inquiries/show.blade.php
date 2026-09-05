@@ -76,111 +76,69 @@
                 <h4 class="font-heading text-2xl mb-4">Message</h4>
                 
                 @php
-                    // Try to parse the message as JSON (service-specific fields)
-                    $messageData = null;
-                    $isJsonMessage = false;
-                    try {
-                        $decoded = json_decode($inquiry->message, true);
-                        if (is_array($decoded) && isset($decoded['service'])) {
-                            $messageData = $decoded;
-                            $isJsonMessage = true;
-                        }
-                    } catch (\Exception $e) {
-                        // Not JSON
-                    }
+                    // Structured inquiries (from the /inquiry multi-step form or the property
+                    // page's quick form) store their message as JSON — see
+                    // Api\InquiriesController::storePublic(). Field names read here now match
+                    // what that method actually writes (fixed 2026-09-02 — the old version here
+                    // switched on values like 'valuation'/'sales-letting' and read fields like
+                    // 'valuationDate'/'concerns' that were never what got stored, so every real
+                    // inquiry silently fell through to the generic fallback regardless of
+                    // service type).
+                    $messageData = json_decode($inquiry->message ?? '', true);
+                    $isJsonMessage = is_array($messageData) && isset($messageData['service']);
+                    $serviceFields = $isJsonMessage ? array_filter($messageData['serviceFields'] ?? []) : [];
+
+                    $fieldLabels = [
+                        'propertyType' => 'Property Type',
+                        'purposeOfValuation' => 'Purpose of Valuation',
+                        'estimatedPropertySize' => 'Estimated Size',
+                        'managementNeeds' => 'Management Needs',
+                        'numberOfProperties' => 'Number of Properties',
+                        'inquiryType' => 'Inquiry Type',
+                        'budgetAskingPrice' => 'Budget / Asking Price',
+                        'projectType' => 'Project Type',
+                        'projectStage' => 'Project Stage',
+                        'currentStatus' => 'Current Status',
+                        'inquiryTopic' => 'Inquiry Topic',
+                        'preferredService' => 'Preferred Service',
+                    ];
                 @endphp
 
-                @if ($isJsonMessage && $messageData)
+                @if ($isJsonMessage)
                     <!-- Structured Service Inquiry -->
                     <div class="space-y-5">
-                        <!-- Service Section -->
                         <div class="pb-5 border-b border-gray-100">
                             <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Service Type</h5>
-                            <p class="text-lg font-semibold text-brand-black capitalize">{{ $messageData['service'] ?? 'Not specified' }}</p>
+                            <p class="text-lg font-semibold text-brand-black">{{ $messageData['service'] ?? 'Not specified' }}</p>
                         </div>
 
-                        <!-- Service-Specific Fields -->
-                        @switch($messageData['service'] ?? null)
-                            @case('valuation')
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-5 border-b border-gray-100">
-                                    <div>
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Property Type</h5>
-                                        <p class="font-semibold text-brand-black">{{ $messageData['propertyType'] ?? '—' }}</p>
-                                    </div>
-                                    <div>
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Valuation Date</h5>
-                                        <p class="font-semibold text-brand-black">{{ $messageData['valuationDate'] ?? '—' }}</p>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Additional Details</h5>
-                                        <p class="text-brand-black/80 whitespace-pre-line">{{ $messageData['additionalDetails'] ?? '—' }}</p>
-                                    </div>
-                                </div>
-                                @break
+                        @if ($messageData['location'] ?? null)
+                            <div class="pb-5 border-b border-gray-100">
+                                <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Location</h5>
+                                <p class="font-semibold text-brand-black">{{ $messageData['location'] }}</p>
+                            </div>
+                        @endif
 
-                            @case('management')
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-5 border-b border-gray-100">
+                        @if (!empty($serviceFields))
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-5 border-b border-gray-100">
+                                @foreach ($serviceFields as $key => $value)
                                     <div>
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Property Type</h5>
-                                        <p class="font-semibold text-brand-black">{{ $messageData['propertyType'] ?? '—' }}</p>
+                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">{{ $fieldLabels[$key] ?? \Illuminate\Support\Str::headline($key) }}</h5>
+                                        <p class="font-semibold text-brand-black">{{ $value }}</p>
                                     </div>
-                                    <div>
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Units Count</h5>
-                                        <p class="font-semibold text-brand-black">{{ $messageData['unitsCount'] ?? '—' }}</p>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Concerns</h5>
-                                        <p class="text-brand-black/80 whitespace-pre-line">{{ $messageData['concerns'] ?? '—' }}</p>
-                                    </div>
-                                </div>
-                                @break
+                                @endforeach
+                            </div>
+                        @endif
 
-                            @case('sales-letting')
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-5 border-b border-gray-100">
-                                    <div>
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Type</h5>
-                                        <p class="font-semibold text-brand-black">{{ ucfirst($messageData['saleLettingType'] ?? 'Not specified') }}</p>
-                                    </div>
-                                    <div>
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Property Type</h5>
-                                        <p class="font-semibold text-brand-black">{{ $messageData['propertyType'] ?? '—' }}</p>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Description</h5>
-                                        <p class="text-brand-black/80 whitespace-pre-line">{{ $messageData['description'] ?? '—' }}</p>
-                                    </div>
-                                </div>
-                                @break
+                        <div>
+                            <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Additional Details</h5>
+                            <p class="text-brand-black/80 whitespace-pre-line">{{ $messageData['additionalDetails'] ?? '—' }}</p>
+                        </div>
 
-                            @case('development')
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-5 border-b border-gray-100">
-                                    <div>
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Project Type</h5>
-                                        <p class="font-semibold text-brand-black">{{ $messageData['projectType'] ?? '—' }}</p>
-                                    </div>
-                                    <div>
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Timeline</h5>
-                                        <p class="font-semibold text-brand-black">{{ $messageData['timeline'] ?? '—' }}</p>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Project Details</h5>
-                                        <p class="text-brand-black/80 whitespace-pre-line">{{ $messageData['projectDetails'] ?? '—' }}</p>
-                                    </div>
-                                </div>
-                                @break
-
-                            @default
-                                <div>
-                                    <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Additional Information</h5>
-                                    <p class="text-brand-black/80 whitespace-pre-line">{{ $messageData['additionalDetails'] ?? $messageData['message'] ?? '—' }}</p>
-                                </div>
-                        @endswitch
-
-                        <!-- Contact Preference -->
-                        @if (isset($messageData['contactMethod']))
+                        @if ($messageData['contactMethod'] ?? null)
                             <div class="pt-5 border-t border-gray-100">
                                 <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Preferred Contact Method</h5>
-                                <p class="font-semibold text-brand-black capitalize">{{ $messageData['contactMethod'] ?? '—' }}</p>
+                                <p class="font-semibold text-brand-black">{{ $messageData['contactMethod'] }}</p>
                             </div>
                         @endif
                     </div>

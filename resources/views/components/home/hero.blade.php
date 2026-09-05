@@ -25,8 +25,8 @@
     {{-- Premium Integrated House Image --}}
     <div class="relative lg:absolute bottom-0 right-0 h-[380px] lg:h-full w-full lg:w-[65%] max-w-[1200px] z-10 pointer-events-none select-none animate-hero-image mt-0">
         {{-- Mobile Image --}}
-        <img src="{{ asset('brand-assets/1 Home Page/Hero Section House Image mobile.png') }}" alt="House Image Mobile" class="block lg:hidden absolute bottom-0 right-0 w-full h-full object-contain object-bottom z-10">
+        <img src="{{ asset('brand-assets/1 Home Page/Hero Section House Image mobile.png') }}" alt="" fetchpriority="high" decoding="async" class="block lg:hidden absolute bottom-0 right-0 w-full h-full object-contain object-bottom z-10">
         {{-- Desktop Image --}}
-        <img src="{{ asset('brand-assets/1 Home Page/Hero Section House Image.png') }}" alt="House Image Desktop" class="hidden lg:block absolute bottom-0 right-0 w-full h-full object-contain object-right-bottom z-10">
+        <img src="{{ asset('brand-assets/1 Home Page/Hero Section House Image.png') }}" alt="" fetchpriority="high" decoding="async" class="hidden lg:block absolute bottom-0 right-0 w-full h-full object-contain object-right-bottom z-10">
     </div>
 </section>

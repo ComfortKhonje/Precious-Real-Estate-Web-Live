@@ -18,17 +18,12 @@
                 </div>
                 <form id="inquiryFilters" method="GET" action="{{ route('cms.inquiries.index') }}"
                     class="flex flex-wrap gap-2 items-center">
-                    <x-ui.select name="type" class="bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30 cursor-pointer">
+                    <select name="type" class="bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30 cursor-pointer">
                         <option value="">All Types</option>
-                        <option value="general" {{ request('type') === 'general' ? 'selected' : '' }}>General inquiries
-                        </option>
-                        <option value="service" {{ request('type') === 'service' ? 'selected' : '' }}>Service inquiries
-                        </option>
-                        <option value="property" {{ request('type') === 'property' ? 'selected' : '' }}>Property inquiries
-                        </option>
-                        <option value="appointment" {{ request('type') === 'appointment' ? 'selected' : '' }}>Appointment
-                            requests</option>
-                    </x-ui.select>
+                        @foreach($types as $type)
+                            <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                        @endforeach
+                    </select>
                     <button type="submit" class="btn-secondary">Filter</button>
                 </form>
             </div>
@@ -49,7 +44,12 @@
                                 <div>
                                     <div class="font-semibold text-brand-black">{{ $inquiry->name }}</div>
                                     <div class="text-sm text-brand-black/60">{{ $inquiry->email }} ·
-                                        {{ ucfirst($inquiry->type) }}</div>
+                                        {{ $inquiry->type ?? 'General' }}</div>
+                                    @if($inquiry->property_id)
+                                        <div class="text-xs text-primary font-semibold mt-1">
+                                            Re: {{ optional($inquiry->property)->title ?? 'Deleted property' }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="text-sm text-brand-black/50">{{ $inquiry->created_at->diffForHumans() }}</div>
                             </div>

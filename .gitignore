@@ -14,7 +14,6 @@
 /.zed
 /auth.json
 /node_modules
-/public/build
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
@@ -25,3 +24,20 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# 2026-09-03: public/build is deliberately NOT ignored. Shared cPanel hosting
+# has no Node, so the compiled Vite output has to travel with the repo or the
+# deployed site loads no CSS/JS at all. Run `npm run build` before committing
+# frontend changes - the CI workflow fails the build if you forget.
+
+# Local databases and dumps must never be committed (a stray SQLite file
+# named `precious_real_estate_web` was tracked at the repo root until
+# 2026-09-03).
+*.sqlite
+*.sqlite3
+*.sql
+/database/database.sqlite
+.tmp_*
+
+# Generated WebP siblings of brand assets ARE committed on purpose - see
+# app/Console/Commands/OptimizeBrandAssets.php and public/.htaccess.

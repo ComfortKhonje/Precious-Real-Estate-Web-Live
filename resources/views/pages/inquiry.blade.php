@@ -20,7 +20,7 @@
 
         {{-- Logo: Right on mobile, center/rightish on desktop --}}
         <a href="{{ route('home') }}" class="flex-shrink-0">
-            <img src="{{ asset('brand-assets/1. Logo Suite/2. Primary Logo Lockup/PNG/primary-logo-white-bg.png') }}" alt="Logo" class="h-12 md:h-16">
+            <img loading="lazy" decoding="async" src="{{ asset('brand-assets/1. Logo Suite/2. Primary Logo Lockup/PNG/primary-logo-white-bg.png') }}" alt="Logo" class="h-12 md:h-16">
         </a>
     </div>
 
