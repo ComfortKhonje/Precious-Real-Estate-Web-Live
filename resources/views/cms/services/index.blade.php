@@ -23,7 +23,14 @@
             <div class="group px-4 py-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition border border-gray-100">
                 <div class="flex items-start justify-between gap-3 mb-3">
                     <a href="{{ route('cms.services.edit', ['slug' => str($service->title)->slug()]) }}"
-                        class="flex-1 font-semibold text-brand-black hover:text-primary transition">
+                        class="flex-1 flex items-center gap-3 font-semibold text-brand-black hover:text-primary transition">
+                        <span class="w-8 h-8 rounded-lg bg-brand-black flex items-center justify-center shrink-0">
+                            @if ($service->serviceIcon)
+                                <img loading="lazy" decoding="async" src="{{ $service->serviceIcon->yellowUrl() }}" alt="" class="w-4 h-4 object-contain">
+                            @else
+                                <i data-lucide="image" class="w-4 h-4 text-white/40"></i>
+                            @endif
+                        </span>
                         {{ $service->title }}
                     </a>
                     <form id="delete-service-form-{{ $service->id }}" method="POST" action="{{ route('cms.services.destroy', $service) }}"

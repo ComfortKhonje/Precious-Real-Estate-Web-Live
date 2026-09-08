@@ -20,7 +20,7 @@
                 @foreach ($services as $service)
                     <x-home.service-card title="{{ $service->title }}"
                         description="{{ $service->short_description ?: $service->content }}"
-                        icon="{{ $service->icon ?: 'property-valuation.svg' }}"
+                        :serviceIcon="$service->serviceIcon"
                         bgImage="{{ $service->banner_image ? asset($service->banner_image) : asset('brand-assets/services-images/property-valuation.jpg') }}"
                         theme="{{ $loop->odd ? 'light' : 'dark' }}" />
                 @endforeach

@@ -10,9 +10,14 @@ class Service extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'short_description', 'content', 'banner_image', 'icon', 'visible'];
+    protected $fillable = ['title', 'tagline', 'short_description', 'content', 'features', 'banner_image', 'icon', 'service_icon_id', 'visible'];
 
-    protected $casts = ['visible' => 'bool'];
+    protected $casts = ['visible' => 'bool', 'features' => 'array'];
+
+    public function serviceIcon()
+    {
+        return $this->belongsTo(ServiceIcon::class);
+    }
 
     /**
      * Get visible services

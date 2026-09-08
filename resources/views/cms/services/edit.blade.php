@@ -37,20 +37,107 @@
                     class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
             </div>
             <div class="space-y-2">
+                <label class="text-sm font-semibold tracking-wider">Heading / Tagline</label>
+                <input type="text" name="tagline" value="{{ old('tagline', $service->tagline) }}"
+                    placeholder="e.g., Accurate Valuations You Can Trust"
+                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                <p class="text-xs text-brand-black/50 mt-1">Large headline on the services page. Falls back to the service title if left blank.</p>
+            </div>
+            <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Short Description</label>
                 <textarea name="short_description" rows="3" placeholder="Short summary..."
                     class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('short_description', $service->short_description) }}</textarea>
             </div>
             <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Full Description</label>
-                <textarea name="content" rows="7" placeholder="Full service description..."
+                <label class="text-sm font-semibold tracking-wider">Long Description (Services Page)</label>
+                <textarea name="content" rows="7" placeholder="Longer, more detailed description shown on the services page..."
                     class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('content', $service->content) }}</textarea>
+                <p class="text-xs text-brand-black/50 mt-1">Used on the services page instead of the short description above. Falls back to the short description if left blank. The home page always uses the short description.</p>
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-semibold tracking-wider">Highlights (Optional)</label>
+                <input type="text" name="features" value="{{ old('features', is_array($service->features) ? implode(', ', $service->features) : '') }}"
+                    placeholder="e.g., Registered valuers, Bank-accepted reports, Same-week turnaround"
+                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                <p class="text-xs text-brand-black/50 mt-1">Comma-separated. Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid.</p>
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Banner Image</label>
                 <input type="file" name="banner_image" accept="image/*"
                     class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
             </div>
+
+            <div class="space-y-2" x-data="serviceIconPicker({{ Js::from($icons->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'black_url' => $i->blackUrl(), 'yellow_url' => $i->yellowUrl()])) }}, {{ old('service_icon_id') ? (int) old('service_icon_id') : ($service->service_icon_id ?? 'null') }})">
+                <label class="text-sm font-semibold tracking-wider">Icon</label>
+                <p class="text-xs text-brand-black/50">Shown in the black-or-yellow color that keeps it readable on each card automatically — the toggle below is just a preview.</p>
+
+                <input type="hidden" name="service_icon_id" :value="selectedId">
+
+                <div class="flex items-center justify-end gap-1 bg-gray-100 rounded-full p-1 w-fit">
+                    <button type="button" @click="previewColor = 'black'"
+                        :class="previewColor === 'black' ? 'bg-brand-black text-white' : 'text-brand-black/60'"
+                        class="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition">Black</button>
+                    <button type="button" @click="previewColor = 'yellow'"
+                        :class="previewColor === 'yellow' ? 'bg-primary text-brand-black' : 'text-brand-black/60'"
+                        class="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition">Yellow</button>
+                </div>
+
+                <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    <template x-for="icon in icons" :key="icon.id">
+                        <button type="button" @click="selectedId = (selectedId === icon.id ? null : icon.id)"
+                            :class="selectedId === icon.id ? 'border-primary ring-2 ring-primary/30 bg-primary/10' : 'border-gray-200 hover:border-gray-300'"
+                            class="flex flex-col items-center gap-2 p-3 rounded-2xl border-2 bg-white transition">
+                            <img :src="previewColor === 'black' ? icon.black_url : icon.yellow_url" :alt="icon.name" class="w-8 h-8 object-contain">
+                            <span class="text-[10px] font-semibold text-center leading-tight line-clamp-2" x-text="icon.name"></span>
+                        </button>
+                    </template>
+
+                    <button type="button" @click="modalOpen = true"
+                        class="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border-2 border-dashed border-gray-300 hover:border-primary hover:bg-primary/5 transition text-brand-black/50 hover:text-brand-black">
+                        <i data-lucide="plus" class="w-6 h-6"></i>
+                        <span class="text-[10px] font-semibold text-center leading-tight">Add New</span>
+                    </button>
+                </div>
+
+                {{-- Add Icon Modal --}}
+                <div x-show="modalOpen" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div class="absolute inset-0 bg-black/50" @click="modalOpen = false"></div>
+                    <div class="relative bg-white rounded-3xl p-6 w-full max-w-md space-y-4" @click.stop>
+                        <h4 class="font-heading text-2xl leading-none">Add New Icon</h4>
+                        <p class="text-xs text-brand-black/50">Upload both the black and yellow SVG versions of the same icon.</p>
+
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold tracking-wider">Icon Name</label>
+                            <input type="text" x-model="newName" placeholder="e.g., Land Surveying"
+                                class="w-full bg-gray-100 rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary focus:bg-white border border-transparent">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold tracking-wider">Black Version (SVG)</label>
+                            <input type="file" accept=".svg,image/svg+xml" @change="newBlack = $event.target.files[0]"
+                                class="w-full bg-gray-100 rounded-xl py-2.5 px-4 text-sm border border-transparent">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold tracking-wider">Yellow Version (SVG)</label>
+                            <input type="file" accept=".svg,image/svg+xml" @change="newYellow = $event.target.files[0]"
+                                class="w-full bg-gray-100 rounded-xl py-2.5 px-4 text-sm border border-transparent">
+                        </div>
+
+                        <p x-show="uploadError" x-text="uploadError" class="text-xs text-red-600"></p>
+
+                        <div class="flex gap-2 pt-2">
+                            <button type="button" @click="modalOpen = false"
+                                class="flex-1 px-4 py-2.5 rounded-full border border-gray-200 font-semibold text-sm hover:bg-gray-50 transition">Cancel</button>
+                            <button type="button" @click="uploadIcon()" :disabled="uploading"
+                                class="flex-1 px-4 py-2.5 rounded-full bg-primary text-brand-black font-semibold text-sm hover:bg-primary/90 transition disabled:opacity-50">
+                                <span x-text="uploading ? 'Uploading...' : 'Upload Icon'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Visibility</label>
                 <div class="flex items-center gap-4">
@@ -118,4 +205,5 @@
     @csrf
     @method('DELETE')
 </form>
+@include('cms.services._icon-picker-script')
 @endsection

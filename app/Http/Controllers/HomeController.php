@@ -15,7 +15,8 @@ class HomeController extends Controller
                                       ->take(3)
                                       ->get();
 
-        $services = Service::where('visible', true)
+        $services = Service::with('serviceIcon')
+                           ->where('visible', true)
                            ->orderBy('title')
                            ->get();
 
