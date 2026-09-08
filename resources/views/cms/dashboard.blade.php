@@ -6,22 +6,34 @@
 
 @section('content')
 @php
+// Capped at 5 — the busiest, most-actionable numbers only. The other real
+// content types (Services, Team, draft Updates) still show, just demoted
+// to a smaller secondary strip below instead of competing for the same
+// visual weight as the top row. Trimmed 2026-09-08 (was 8 cards, 2 rows).
 $cards = [
 ['label' => 'Total Properties', 'value' => $totalProperties, 'icon' => 'home'],
 ['label' => 'Featured Properties', 'value' => $featuredProperties, 'icon' => 'star'],
 ['label' => 'Total Inquiries', 'value' => $totalInquiries, 'icon' => 'mail'],
-['label' => 'New Inquiries', 'value' => $newInquiries, 'icon' => 'inbox'],
-['label' => 'Published Announcements', 'value' => $publishedAnnouncements, 'icon' => 'megaphone'],
+['label' => 'New Inquiries (7d)', 'value' => $newInquiries, 'icon' => 'inbox'],
+['label' => 'Published Updates', 'value' => $publishedAnnouncements, 'icon' => 'megaphone'],
+];
+$secondaryStats = [
+['label' => 'Active Services', 'value' => $activeServices, 'icon' => 'briefcase'],
+['label' => 'Team Members', 'value' => $teamMembers, 'icon' => 'users'],
+['label' => 'Draft Updates', 'value' => $draftAnnouncements, 'icon' => 'file-text'],
 ];
 $quickActions = [
 ['label' => 'Add Property', 'route' => 'cms.properties.create', 'icon' => 'plus'],
 ['label' => 'Add Announcement', 'route' => 'cms.announcements.create', 'icon' => 'megaphone'],
 ['label' => 'Edit Services', 'route' => 'cms.services.index', 'icon' => 'briefcase'],
 ['label' => 'View Inquiries', 'route' => 'cms.inquiries.index', 'icon' => 'mail'],
+// Team Members got a stat card above but no shortcut down here — the
+// other 4 content types all had one. Added 2026-09-08.
+['label' => 'Add Team Member', 'route' => 'cms.team-members.create', 'icon' => 'user-plus'],
 ];
 @endphp
 
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
     @foreach($cards as $c)
     <div class="cms-panel p-6">
         <p class="text-xs uppercase tracking-[0.2em] text-brand-black/50 mb-2">{{ $c['label'] }}</p>
@@ -31,6 +43,20 @@ $quickActions = [
                 <i data-lucide="{{ $c['icon'] }}" class="w-5 h-5"></i>
             </div>
         </div>
+    </div>
+    @endforeach
+</div>
+
+{{-- Secondary stats — same numbers that used to crowd the top row, demoted
+     to a smaller, lower-emphasis strip so the primary 5 stay scannable. --}}
+<div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+    @foreach($secondaryStats as $s)
+    <div class="flex items-center justify-between px-5 py-3 rounded-2xl bg-gray-50 border border-gray-100">
+        <span class="text-xs font-semibold text-brand-black/60">{{ $s['label'] }}</span>
+        <span class="flex items-center gap-2">
+            <i data-lucide="{{ $s['icon'] }}" class="w-3.5 h-3.5 text-brand-black/40"></i>
+            <span class="font-heading text-xl leading-none">{{ $s['value'] }}</span>
+        </span>
     </div>
     @endforeach
 </div>
@@ -98,20 +124,26 @@ $quickActions = [
             @endforeach
         </div>
 
+        {{-- Was labeled Available/Sold/Rented but queried a status vocabulary
+             ('available'/'sold'/'rented') that never existed on this column
+             — always showed 0/0/0. The real schema only distinguishes For
+             Sale vs For Rent (Property::STATUSES) plus a separate
+             is_available flag for "still listed at all" — no sold/rented
+             distinction exists. Fixed 2026-09-08 to show what's real. --}}
         <div class="mt-6 border border-gray-100 rounded-2xl p-5 bg-[#fdfcf7]">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase tracking-[0.2em] text-brand-black/50">Property Status</p>
-                    <p class="text-sm text-brand-black/60 mt-1">Available, sold, rented.</p>
+                    <p class="text-sm text-brand-black/60 mt-1">Active listings by status.</p>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary">
                     <i data-lucide="pie-chart" class="w-6 h-6"></i>
                 </div>
             </div>
             <div class="mt-4 space-y-2">
-                <div class="flex items-center justify-between text-sm"><span>Available</span><span class="font-semibold">{{ $availableProperties }}</span></div>
-                <div class="flex items-center justify-between text-sm"><span>Sold</span><span class="font-semibold">{{ $soldProperties }}</span></div>
-                <div class="flex items-center justify-between text-sm"><span>Rented</span><span class="font-semibold">{{ $rentedProperties }}</span></div>
+                <div class="flex items-center justify-between text-sm"><span>For Sale</span><span class="font-semibold">{{ $forSaleProperties }}</span></div>
+                <div class="flex items-center justify-between text-sm"><span>For Rent</span><span class="font-semibold">{{ $forRentProperties }}</span></div>
+                <div class="flex items-center justify-between text-sm"><span>Inactive / Unlisted</span><span class="font-semibold">{{ $inactiveProperties }}</span></div>
             </div>
         </div>
     </div>
