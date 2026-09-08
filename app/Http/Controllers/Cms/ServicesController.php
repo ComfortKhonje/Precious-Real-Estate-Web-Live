@@ -40,7 +40,7 @@ class ServicesController extends Controller
         ]);
 
         $data['visible'] = $request->boolean('visible');
-        $data['service_icon_id'] = $data['service_icon_id'] ?: null;
+        $data['service_icon_id'] = $data['service_icon_id'] ?? null;
         $data['features'] = $this->featuresFromInput($request);
 
         if ($request->hasFile('banner_image')) {
@@ -80,7 +80,7 @@ class ServicesController extends Controller
         ]);
 
         $data['visible'] = $request->boolean('visible');
-        $data['service_icon_id'] = $data['service_icon_id'] ?: null;
+        $data['service_icon_id'] = $data['service_icon_id'] ?? null;
         $data['features'] = $this->featuresFromInput($request);
 
         if ($request->hasFile('banner_image')) {
