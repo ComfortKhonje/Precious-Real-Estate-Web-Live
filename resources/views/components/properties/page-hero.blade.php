@@ -40,7 +40,7 @@
     </div>
 
     {{-- Search Filter Card: Half overlaying --}}
-    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[90%] md:w-full max-w-7xl z-50">
+    <div id="properties-hero-search-card" class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[90%] md:w-full max-w-7xl z-50">
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] py-5 px-4 md:py-8 md:px-6 shadow-xl border border-gray-100 w-full">
             <form action="{{ route('properties') }}" method="GET" class="flex flex-col lg:flex-row gap-6 lg:gap-4 items-stretch lg:items-center w-full">
                 {{-- Search (by title) --}}
@@ -54,17 +54,28 @@
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Location</label>
                     <select name="location" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary text-brand-black font-semibold text-md cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                         <option value="">Select Location</option>
-                        <option value="Lilongwe" {{ request('location') === 'Lilongwe' ? 'selected' : '' }}>Lilongwe</option>
-                        <option value="Blantyre" {{ request('location') === 'Blantyre' ? 'selected' : '' }}>Blantyre</option>
-                        <option value="Mzuzu" {{ request('location') === 'Mzuzu' ? 'selected' : '' }}>Mzuzu</option>
-                        <option value="Zomba" {{ request('location') === 'Zomba' ? 'selected' : '' }}>Zomba</option>
+                        {{-- Cities pulled from actual listings (Property::cities()) instead of a
+                             hardcoded Lilongwe/Blantyre/Mzuzu/Zomba list — Mzuzu and Zomba had no
+                             listings (dead options, always returned empty) and Salima had a
+                             listing with no matching option at all. Fixed 2026-09-08. --}}
+                        @foreach (\App\Models\Property::cities() as $city)
+                            <option value="{{ $city }}" {{ request('location') === $city ? 'selected' : '' }}>{{ $city }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 {{-- Property Type --}}
                 <div class="w-full">
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Property Type</label>
-                    <input type="text" name="type" value="{{ request('type') }}" placeholder="e.g. House, Plot" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md placeholder:text-gray-400">
+                    {{-- Was a free-text input, out of step with the fixed Property::TYPES
+                         dropdown used everywhere else (CMS included) — a typo or unrecognized
+                         value here silently matched nothing. Fixed 2026-09-08. --}}
+                    <select name="type" class="w-full bg-gray-100 border-none px-5 py-4 rounded-xl focus:ring-2 focus:ring-primary text-brand-black font-semibold text-md cursor-pointer appearance-none bg-[length:16px_16px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                        <option value="">All Types</option>
+                        @foreach (\App\Models\Property::TYPES as $type)
+                            <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 {{-- Status --}}
@@ -78,23 +89,53 @@
                 </div>
 
                 {{-- Price Range --}}
-                <div class="w-full">
-                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Price Range</label>
+                {{-- Listings are priced in MWK or USD on completely different numeric
+                     scales — the old dropdowns only offered MWK-scale labels (K 200K...K 20M+)
+                     compared against the raw price column regardless of currency, so any USD
+                     listing (all far smaller numbers, e.g. $15,000) got silently excluded by
+                     almost any price filter. Now a currency toggle swaps in the matching
+                     option set, and the selected currency submits alongside the range so the
+                     backend only ever compares prices within one currency. Fixed 2026-09-08. --}}
+                <div class="w-full" x-data="{ currency: {{ Js::from(request('currency') === 'USD' ? 'USD' : 'MWK') }} }">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-400">Price Range</label>
+                        <div class="flex items-center gap-0.5 bg-gray-100 rounded-full p-0.5">
+                            <button type="button" @click="currency = 'MWK'"
+                                :class="currency === 'MWK' ? 'bg-brand-black text-primary' : 'text-gray-400'"
+                                class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition">MWK</button>
+                            <button type="button" @click="currency = 'USD'"
+                                :class="currency === 'USD' ? 'bg-brand-black text-primary' : 'text-gray-400'"
+                                class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition">USD</button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="currency" :value="currency">
                     <div class="flex gap-3">
                         <div class="flex-1">
-                            <select name="min_price" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                            <select name="min_price" x-show="currency === 'MWK'" x-cloak :disabled="currency !== 'MWK'" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                 <option value="">Min</option>
                                 <option value="K 200K" {{ request('min_price') === 'K 200K' ? 'selected' : '' }}>K 200K</option>
                                 <option value="K 500K" {{ request('min_price') === 'K 500K' ? 'selected' : '' }}>K 500K</option>
                                 <option value="K 1M" {{ request('min_price') === 'K 1M' ? 'selected' : '' }}>K 1M</option>
                             </select>
+                            <select name="min_price" x-show="currency === 'USD'" x-cloak :disabled="currency !== 'USD'" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                                <option value="">Min</option>
+                                <option value="$1K" {{ request('min_price') === '$1K' ? 'selected' : '' }}>$1K</option>
+                                <option value="$5K" {{ request('min_price') === '$5K' ? 'selected' : '' }}>$5K</option>
+                                <option value="$10K" {{ request('min_price') === '$10K' ? 'selected' : '' }}>$10K</option>
+                            </select>
                         </div>
                         <div class="flex-1">
-                            <select name="max_price" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                            <select name="max_price" x-show="currency === 'MWK'" x-cloak :disabled="currency !== 'MWK'" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                 <option value="">Max</option>
                                 <option value="K 1M" {{ request('max_price') === 'K 1M' ? 'selected' : '' }}>K 1M</option>
                                 <option value="K 20M" {{ request('max_price') === 'K 20M' ? 'selected' : '' }}>K 20M</option>
                                 <option value="K 20M+" {{ request('max_price') === 'K 20M+' ? 'selected' : '' }}>K 20M+</option>
+                            </select>
+                            <select name="max_price" x-show="currency === 'USD'" x-cloak :disabled="currency !== 'USD'" class="w-full bg-gray-100 border-none px-4 py-4 rounded-xl focus:ring-2 focus:ring-primary font-semibold text-brand-black text-md cursor-pointer appearance-none bg-[length:14px_14px] bg-[right_0.75rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                                <option value="">Max</option>
+                                <option value="$5K" {{ request('max_price') === '$5K' ? 'selected' : '' }}>$5K</option>
+                                <option value="$10K" {{ request('max_price') === '$10K' ? 'selected' : '' }}>$10K</option>
+                                <option value="$20K+" {{ request('max_price') === '$20K+' ? 'selected' : '' }}>$20K+</option>
                             </select>
                         </div>
                     </div>
