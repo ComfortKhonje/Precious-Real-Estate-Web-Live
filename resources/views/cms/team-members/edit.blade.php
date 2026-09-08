@@ -63,6 +63,22 @@
                     @enderror
                 </div>
 
+                <!-- Qualifications & Experience -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold tracking-wider">Qualifications</label>
+                        <input type="text" name="qualifications" value="{{ old('qualifications', $teamMember->qualifications) }}"
+                            placeholder="e.g., MSc Real Estate, MIS(SA)"
+                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold tracking-wider">Years of Experience</label>
+                        <input type="number" name="years_experience" value="{{ old('years_experience', $teamMember->years_experience) }}" min="0" max="100"
+                            placeholder="e.g., 12"
+                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    </div>
+                </div>
+
                 <!-- Bio -->
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Biography</label>
@@ -73,14 +89,10 @@
 
                 <!-- Photo -->
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Photo</label>
-                    <input type="file" name="photo_url" accept="image/*"
-                        class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 @error('photo_url') ring-2 ring-red-500 @enderror">
-                    @error('photo_url')
-                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                    <p id="photoSizeError" class="text-xs text-amber-600 mt-1 hidden"></p>
-                    <p class="text-xs text-brand-black/50 mt-1">Upload a professional photo. Max 5MB. Leave empty to keep the current one.</p>
+                    @if ($teamMember->photo_url)
+                        <img loading="lazy" decoding="async" src="{{ $teamMember->photoUrl('thumbnail') }}" alt="Current photo for {{ $teamMember->name }}" class="w-24 h-24 object-cover rounded-2xl border border-gray-100 mb-2">
+                    @endif
+                    <x-cms.image-upload name="photo_url" label="Click to replace photo" help="Leave empty to keep the current one" />
                 </div>
 
                 <!-- Order -->
@@ -119,16 +131,15 @@
                 <div class="bg-gray-50 border border-gray-100 rounded-3xl p-6 sticky top-4">
                     <h4 class="font-heading text-lg mb-4">Preview</h4>
 
-                    <!-- Photo Preview -->
-                    <div
-                        class="mb-4 h-48 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center overflow-hidden">
+                    {{-- Shows the current photo. New-file preview lives inline
+                         under the Photo field itself (x-cms.image-upload) —
+                         not mirrored here until saved. --}}
+                    <div class="mb-4 h-48 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center overflow-hidden">
                         @if ($teamMember->photo_url)
-                            <img loading="lazy" decoding="async" id="photoPreview" src="{{ str_starts_with($teamMember->photo_url, 'http') ? $teamMember->photo_url : asset('storage/' . $teamMember->photo_url . '/medium.webp') }}" alt="Preview"
-                                class="w-full h-full object-cover">
+                            <img loading="lazy" decoding="async" src="{{ $teamMember->photoUrl('medium') }}" alt="Preview" class="w-full h-full object-cover">
                         @else
-                            <img loading="lazy" decoding="async" id="photoPreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+                            <i data-lucide="user" class="w-16 h-16 text-brand-black/40"></i>
                         @endif
-                        <i data-lucide="user" class="w-16 h-16 text-brand-black/40 {{ $teamMember->photo_url ? 'hidden' : '' }}" id="photoPlaceholder"></i>
                     </div>
 
                     <!-- Info Preview -->
@@ -191,9 +202,10 @@
     </form>
 
     <script>
-        // Update preview as user types
+        // Update preview as user types. Photo preview lives inline under the
+        // Photo field itself (x-cms.image-upload) — not mirrored here.
         document.querySelectorAll(
-            'input[name="name"], input[name="role"], textarea[name="bio"], input[name="photo_url"], input[name="visible"]'
+            'input[name="name"], input[name="role"], textarea[name="bio"], input[name="visible"]'
             ).forEach(el => {
             el.addEventListener('input', function() {
                 if (this.name === 'name') {
@@ -204,46 +216,6 @@
                         '{{ $teamMember->role }}';
                 } else if (this.name === 'bio') {
                     document.getElementById('previewBio').textContent = this.value || 'Brief biography...';
-                } else if (this.name === 'photo_url') {
-                    // 2026-09-04: was `preview.src = this.value` — a file
-                    // input's `.value` is the browser's fake
-                    // "C:\fakepath\..." string, never a loadable URL, so
-                    // this never actually previewed a newly picked photo.
-                    //
-                    // Also rejects anything over 5MB (matches the server's
-                    // own `max:5120` rule) before it's attached to the form
-                    // — a real upload here once slipped past PHP's own
-                    // upload_max_filesize/post_max_size and surfaced as a
-                    // raw PostTooLargeException page.
-                    const preview = document.getElementById('photoPreview');
-                    const placeholder = document.getElementById('photoPlaceholder');
-                    const sizeError = document.getElementById('photoSizeError');
-                    const file = this.files && this.files[0];
-                    const maxBytes = 5 * 1024 * 1024;
-
-                    sizeError.classList.add('hidden');
-
-                    if (file && file.size > maxBytes) {
-                        sizeError.textContent = `"${file.name}" is over the 5MB limit and wasn't added.`;
-                        sizeError.classList.remove('hidden');
-                        this.value = '';
-                        preview.classList.add('hidden');
-                        placeholder.classList.remove('hidden');
-                        return;
-                    }
-
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            preview.src = e.target.result;
-                            preview.classList.remove('hidden');
-                            placeholder.classList.add('hidden');
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        preview.classList.add('hidden');
-                        placeholder.classList.remove('hidden');
-                    }
                 } else if (this.name === 'visible') {
                     const visibility = document.getElementById('previewVisibility');
                     if (this.value === '1') {

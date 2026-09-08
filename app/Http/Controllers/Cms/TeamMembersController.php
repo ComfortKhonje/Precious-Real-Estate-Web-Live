@@ -43,6 +43,8 @@ class TeamMembersController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'role' => 'required|string|max:255',
+            'qualifications' => 'nullable|string|max:255',
+            'years_experience' => 'nullable|integer|min:0|max:100',
             'bio' => 'nullable|string|max:1000',
             'photo_url' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
             'order' => 'nullable|integer|min:0',
@@ -80,6 +82,8 @@ class TeamMembersController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'role' => 'required|string|max:255',
+            'qualifications' => 'nullable|string|max:255',
+            'years_experience' => 'nullable|integer|min:0|max:100',
             'bio' => 'nullable|string|max:1000',
             'photo_url' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
             'order' => 'nullable|integer|min:0',
