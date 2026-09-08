@@ -5,9 +5,8 @@
 @section('page_subtitle', 'Operational preferences and access security.')
 
 @section('content')
-    @if(session('status'))
-        <div class="mb-4 p-4 rounded-2xl bg-primary/20 text-brand-black text-sm font-semibold">{{ session('status') }}</div>
-    @endif
+    {{-- Result now shows as a global toast (bottom-right) — see
+         x-shared.toast-container in the CMS layout. --}}
 
     <form method="POST" action="{{ route('cms.settings.update') }}" class="space-y-6 mb-6">
         @csrf
@@ -31,6 +30,7 @@
                     <label class="text-sm font-semibold tracking-wider">Inquiry Email Destination</label>
                     <input type="email" name="inquiry_email_destination" value="{{ old('inquiry_email_destination', $settings['inquiry_email_destination'] ?? '') }}" placeholder="info@preciousrealestate.mw" class="cms-input">
                     @error('inquiry_email_destination') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <p class="text-xs text-brand-black/50 mt-1">Every inquiry and contact-page submission emails a notification here. Leave blank to use the site default (info@preciousrealestate.mw).</p>
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Default Property Status</label>
