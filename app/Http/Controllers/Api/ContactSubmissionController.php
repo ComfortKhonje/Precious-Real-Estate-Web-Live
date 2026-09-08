@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContactFormSubmission;
 use App\Models\Inquiry;
+use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ContactSubmissionController extends Controller
 {
@@ -14,6 +17,18 @@ class ContactSubmissionController extends Controller
      */
     public function store(Request $request)
     {
+        // Honeypot — see resources/views/components/shared/honeypot.blade.php.
+        // A human never fills this field; a bot that blindly fills every
+        // field does. Return the normal success response without creating a
+        // row or sending mail, so an adaptive bot can't tell which field
+        // gave it away.
+        if ($request->filled('website')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Thank you for contacting us. We will get back to you shortly.',
+            ], 201);
+        }
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email',
@@ -31,6 +46,13 @@ class ContactSubmissionController extends Controller
             'message' => $data['message'],
             'property_id' => null,
         ]);
+
+        // Same destination lookup as the inquiry flow — CMS setting first,
+        // env/config fallback second.
+        $toEmail = Setting::where('key', 'inquiry_email_destination')->value('value')
+            ?: config('mail.to_address');
+
+        Mail::to($toEmail)->send(new ContactFormSubmission($data, config('mail.signature', '')));
 
         return response()->json([
             'success' => true,

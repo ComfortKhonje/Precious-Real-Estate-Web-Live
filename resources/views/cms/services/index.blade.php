@@ -5,11 +5,9 @@
 @section('page_subtitle', 'Edit website service descriptions, visibility, and image assets.')
 
 @section('content')
-@if (session('status'))
-<div class="mb-6 bg-green-50 border border-green-200 rounded-3xl p-6">
-    <h3 class="font-semibold text-green-900 flex items-center gap-2"><i data-lucide="check" class="w-5 h-5"></i> {{ session('status') }}</h3>
-</div>
-@endif
+{{-- Result now shows as a global toast (bottom-right) — see
+     x-shared.toast-container in the CMS layout, which reads session('status')
+     automatically on every page load. --}}
 
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
     <div class="bg-white border border-gray-100 rounded-3xl overflow-hidden">

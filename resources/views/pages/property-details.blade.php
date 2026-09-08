@@ -251,9 +251,11 @@
                                 error: null,
                                 form: { name: '', phone: '', email: '', message: '' },
                                 async submit() {
+                                    if (this.submitting) return; // guards a fast double-click, not just the disabled attribute
                                     this.submitting = true;
                                     this.error = null;
                                     try {
+                                        const website = document.querySelector('input[name="website"]')?.value || '';
                                         const res = await fetch('/api/inquiries/public', {
                                             method: 'POST',
                                             headers: {
@@ -269,6 +271,7 @@
                                                 phone: this.form.phone,
                                                 email: this.form.email,
                                                 additionalDetails: this.form.message,
+                                                website,
                                             }),
                                         });
                                         if (!res.ok) {
@@ -278,6 +281,7 @@
                                         this.sent = true;
                                     } catch (e) {
                                         this.error = e.message;
+                                        window.showToast('error', e.message);
                                     } finally {
                                         this.submitting = false;
                                     }
@@ -289,6 +293,7 @@
                                     <h4 class="text-2xl font-heading text-brand-black mb-4 uppercase tracking-tight">Request More Information</h4>
 
                                     <form @submit.prevent="submit" class="space-y-2">
+                                        <x-shared.honeypot />
                                         <div class="space-y-1">
                                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Full Name</label>
                                             <input type="text" x-model="form.name" required placeholder="e.g., John Doe" class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all">

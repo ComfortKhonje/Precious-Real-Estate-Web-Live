@@ -22,7 +22,8 @@
 </head>
 
 <body class="font-body text-brand-black bg-brand-white antialiased min-h-screen"
-    x-data="{ sidebarOpen: false, userMenuOpen: false, confirmModalOpen: false, confirmFormId: null, confirmMessage: 'Are you sure?' }">
+    x-data="{ sidebarOpen: false, userMenuOpen: false, confirmModalOpen: false, confirmFormId: null, confirmMessage: 'Are you sure?', confirmDeleting: false }"
+    x-init="$watch('confirmModalOpen', (open) => { if (open) confirmDeleting = false })">
     <div class="min-h-screen flex">
         {{-- Mobile overlay --}}
         <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-brand-black/40 lg:hidden"
@@ -116,9 +117,11 @@
                                 <div class="w-9 h-9 rounded-full bg-primary text-brand-black flex items-center justify-center">
                                     <x-cms.icon name="user-circle" class="w-5 h-5" />
                                 </div>
+                                {{-- Was hardcoded "Admin" / "PREC Staff" regardless of who was
+                                     actually logged in. Fixed 2026-09-08. --}}
                                 <div class="hidden sm:block text-left leading-tight">
-                                    <div class="text-sm font-semibold text-brand-black">Admin</div>
-                                    <div class="text-xs text-brand-black/60">PREC Staff</div>
+                                    <div class="text-sm font-semibold text-brand-black">{{ Auth::user()->name ?? 'Admin' }}</div>
+                                    <div class="text-xs text-brand-black/60">{{ Auth::user()->email ?? 'PREC Staff' }}</div>
                                 </div>
                                 <i data-lucide="chevron-down" class="w-4 h-4 text-brand-black/70"></i>
                             </button>
@@ -211,19 +214,64 @@
                     class="px-6 py-3 rounded-full border border-gray-200 font-semibold text-brand-black hover:bg-gray-50 transition text-sm">
                     Cancel
                 </button>
-                <button type="button" @click="document.getElementById(confirmFormId).submit()"
-                    class="px-6 py-3 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition text-sm shadow-sm shadow-red-200">
-                    Yes, Delete
+                {{-- form.submit() (as opposed to a real submit-button click) never
+                     fires the form's 'submit' event, so the generic double-submit
+                     guard below can't catch this one — guarded here directly instead. --}}
+                <button type="button" @click="confirmDeleting = true; document.getElementById(confirmFormId).submit()"
+                    :disabled="confirmDeleting"
+                    class="px-6 py-3 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition text-sm shadow-sm shadow-red-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span x-show="!confirmDeleting">Yes, Delete</span>
+                    <span x-show="confirmDeleting">Deleting&hellip;</span>
                 </button>
             </div>
         </div>
     </div>
+
+    <x-shared.toast-container />
 
     @stack('scripts')
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.458.0/dist/umd/lucide.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
+        });
+
+        // Generic double-submit guard for every plain server-rendered CMS
+        // form (create/edit/save-settings/etc.) — this app has no client-side
+        // framework wiring each of those individually, so one delegated
+        // listener covers all of them instead of touching every view.
+        // Skips GET forms (search/filter bars — navigating again is harmless
+        // and sometimes wanted) and the delete-confirmation flow (its
+        // "Yes, Delete" button is guarded directly above, since form.submit()
+        // never fires this 'submit' event at all).
+        //
+        // Reflects the ACTUAL button clicked (event.submitter) rather than a
+        // generic "Loading..." everywhere, per Comfort's ask for proactive,
+        // per-action feedback — "Save Property" becomes "Save Property…"
+        // rather than every button in the CMS saying the same generic thing.
+        // A button can opt out entirely with data-no-submit-guard, or supply
+        // exact wording with data-loading-text.
+        document.addEventListener('submit', (event) => {
+            const form = event.target;
+            if (!(form instanceof HTMLFormElement)) return;
+            if ((form.method || 'get').toLowerCase() !== 'post') return;
+
+            const button = event.submitter
+                ?? form.querySelector('button[type="submit"]:not([type="button"])');
+            if (!button || button.hasAttribute('data-no-submit-guard')) return;
+
+            // A second submit event on an already-disabled button can't
+            // happen (disabled elements don't submit), but guard anyway in
+            // case something re-enables it programmatically mid-flight.
+            if (button.disabled) {
+                event.preventDefault();
+                return;
+            }
+
+            button.disabled = true;
+            button.classList.add('opacity-60', 'cursor-not-allowed');
+            button.dataset.originalHtml = button.innerHTML;
+            button.innerHTML = button.dataset.loadingText || (button.textContent.trim() + '&hellip;');
         });
     </script>
 </body>
