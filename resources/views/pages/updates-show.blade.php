@@ -11,48 +11,98 @@
     2026-09-04: replaces the old news/show.blade.php (dark-hero visual
     language) with Updates' cream/rounded-2rem style, since /news was
     removed and /updates absorbed its functionality.
+
+    2026-09-08: widened the page (4xl → 5xl) — the hero image and header felt
+    cramped — and dropped the bordered/shadowed white "card" the article text
+    used to sit in. Reading text inside a boxed card read as boxy/cramped
+    rather than clean; standard editorial pattern (Medium, most news sites)
+    is a wider page shell with a narrower plain-background reading column for
+    body text specifically (~65-75 characters per line), not a card. Header,
+    hero image, and the end photo strip use the wider shell; only the actual
+    paragraph text is narrowed.
 --}}
 @section('content')
     <section class="px-6 pt-32 pb-10">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-5xl mx-auto">
             <a href="{{ route('updates') }}" class="inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-brand-black/60 hover:text-primary transition-colors mb-8">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Back to Updates
             </a>
 
-            <div class="flex flex-wrap items-center gap-3 mb-6">
-                <span class="inline-flex items-center rounded-full bg-primary/40 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-brand-black">{{ $article->category ?? 'Update' }}</span>
-                @if($article->is_featured)
-                    <span class="inline-flex items-center rounded-full bg-brand-black px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Featured</span>
+            <div class="max-w-3xl">
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <span class="inline-flex items-center rounded-full bg-primary/40 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-brand-black">{{ $article->category ?? 'Update' }}</span>
+                    @if($article->is_featured)
+                        <span class="inline-flex items-center rounded-full bg-brand-black px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Featured</span>
+                    @endif
+                    <span class="text-sm text-brand-black/45">{{ $article->published_at?->format('F d, Y') }}</span>
+                </div>
+
+                <h1 class="font-heading text-5xl md:text-6xl leading-none text-brand-black {{ $article->category === 'Blog' && $article->teamMember ? 'mb-6' : 'mb-10' }}">{{ $article->title }}</h1>
+
+                {{-- Blog byline: "Posted by" a real team member, right under the title --}}
+                @if($article->category === 'Blog' && $article->teamMember)
+                    <div class="flex items-center gap-3 mb-10">
+                        @if($article->teamMember->photo_url)
+                            <img loading="lazy" decoding="async" src="{{ $article->teamMember->photo_url }}" alt="{{ $article->teamMember->name }}" class="w-12 h-12 rounded-full object-cover shrink-0">
+                        @else
+                            <div class="w-12 h-12 rounded-full bg-brand-black text-primary flex items-center justify-center text-sm font-bold shrink-0">
+                                {{ collect(explode(' ', $article->teamMember->name))->map(fn ($p) => mb_substr($p, 0, 1))->join('') }}
+                            </div>
+                        @endif
+                        <div>
+                            <p class="text-sm font-bold text-brand-black leading-tight">Posted by {{ $article->teamMember->name }}</p>
+                            <p class="text-xs text-brand-black/50 uppercase tracking-wider">{{ $article->teamMember->role }}</p>
+                        </div>
+                    </div>
                 @endif
-                <span class="text-sm text-brand-black/45">{{ $article->published_at?->format('F d, Y') }}</span>
             </div>
 
-            <h1 class="font-heading text-5xl md:text-6xl leading-none text-brand-black mb-10">{{ $article->title }}</h1>
-
             @if($article->cover_image)
-                <div class="relative w-full h-[320px] md:h-[440px] rounded-[2rem] overflow-hidden mb-12 border border-[#ece8d4]">
+                <div class="relative w-full h-[360px] md:h-[520px] rounded-[2rem] overflow-hidden mb-12 border border-[#ece8d4]">
                     <img loading="lazy" decoding="async" src="{{ $article->coverImageUrl('large') }}" alt="{{ $article->title }}" class="w-full h-full object-cover">
                 </div>
             @endif
 
-            <div class="rounded-[2rem] border border-[#ece8d4] bg-white p-8 md:p-12 shadow-[0_10px_30px_rgba(30,30,30,0.04)]">
-                <div class="prose prose-lg prose-headings:font-heading prose-headings:text-brand-black prose-p:text-brand-black/75 prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-brand-black max-w-none">
-                    {!! $article->content !!}
-                </div>
-            </div>
-
-            @if($article->images->isNotEmpty())
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
-                    @foreach($article->images as $image)
-                        <a href="{{ $image->url('large') }}" target="_blank" rel="noopener" class="block aspect-square rounded-2xl overflow-hidden border border-[#ece8d4]">
-                            <img loading="lazy" decoding="async" src="{{ $image->url('medium') }}" alt="{{ $article->title }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
-                        </a>
+            @if($article->category === 'Blog')
+                {{-- Gallery photos woven between paragraphs as the reader scrolls
+                     instead of dumped in a grid after all the text — see
+                     Announcement::interleavedContent(). Text blocks stay in a
+                     narrow reading column; photo blocks are allowed to breathe
+                     wider than the text, a common editorial rhythm. --}}
+                <div class="space-y-10">
+                    @foreach($article->interleavedContent() as $block)
+                        @if($block['type'] === 'html')
+                            <div class="max-w-3xl prose prose-xl prose-headings:font-heading prose-headings:text-brand-black prose-p:text-brand-black/80 prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-brand-black">
+                                {!! $block['value'] !!}
+                            </div>
+                        @else
+                            <figure class="max-w-4xl rounded-[2rem] overflow-hidden">
+                                <img loading="lazy" decoding="async" src="{{ $block['value']->url('large') }}" alt="{{ $article->title }}" class="w-full h-[320px] md:h-[440px] object-cover">
+                            </figure>
+                        @endif
                     @endforeach
                 </div>
+            @else
+                <div class="max-w-3xl prose prose-xl prose-headings:font-heading prose-headings:text-brand-black prose-p:text-brand-black/80 prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-brand-black">
+                    {!! $article->content !!}
+                </div>
+
+                {{-- Announcement/News are short-form by design — not enough
+                     reading length to interleave into, so any extra photos
+                     just get a small strip after the content. --}}
+                @if($article->images->isNotEmpty())
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10">
+                        @foreach($article->images as $image)
+                            <a href="{{ $image->url('large') }}" target="_blank" rel="noopener" class="block aspect-square rounded-2xl overflow-hidden border border-[#ece8d4]">
+                                <img loading="lazy" decoding="async" src="{{ $image->url('medium') }}" alt="{{ $article->title }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
             @endif
 
-            <div class="border-t border-[#ece8d4] mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="max-w-3xl border-t border-[#ece8d4] mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p class="font-semibold text-brand-black tracking-wide">Share this update:</p>
                 <div class="flex gap-3">
                     <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($article->title) }}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-[#f4f3ea] hover:bg-primary/40 text-brand-black flex items-center justify-center transition-colors">
@@ -79,14 +129,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     @foreach($recentUpdates as $recent)
-                        <a href="{{ route('updates.show', $recent->id) }}" class="group block rounded-[2rem] border border-[#ece8d4] bg-white p-6 shadow-[0_10px_30px_rgba(30,30,30,0.04)] hover:shadow-lg transition-shadow duration-300">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="inline-flex items-center rounded-full bg-primary/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-black">{{ $recent->category ?? 'Update' }}</span>
-                                <span class="text-xs text-brand-black/45 font-bold uppercase tracking-wider">{{ $recent->published_at?->format('M d, Y') }}</span>
-                            </div>
-                            <h3 class="font-heading text-2xl text-brand-black mt-2 mb-2 group-hover:text-primary transition-colors leading-tight">{{ $recent->title }}</h3>
-                            <p class="text-brand-black/60 text-sm line-clamp-3">{{ $recent->summary }}</p>
-                        </a>
+                        <x-updates.update-card :announcement="$recent" />
                     @endforeach
                 </div>
             </div>

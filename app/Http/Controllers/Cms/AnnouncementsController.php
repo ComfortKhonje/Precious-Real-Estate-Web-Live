@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cms;
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\AnnouncementImage;
+use App\Models\TeamMember;
 use App\Services\MediaService;
 use Illuminate\Http\Request;
 
@@ -29,7 +30,9 @@ class AnnouncementsController extends Controller
 
     public function create()
     {
-        return view('cms.announcements.create');
+        $teamMembers = TeamMember::ordered()->get();
+
+        return view('cms.announcements.create', compact('teamMembers'));
     }
 
     public function store(Request $request)
@@ -37,9 +40,12 @@ class AnnouncementsController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|in:'.implode(',', Announcement::CATEGORIES),
+            'team_member_id' => 'nullable|exists:team_members,id',
             'summary' => 'nullable|string|max:500',
             'content' => 'nullable|string',
-            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
+            // Every post always has at least one image — was nullable, so a
+            // published announcement could carry no cover at all.
+            'cover_image' => 'required|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
             'gallery.*' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
             'status' => 'required|string|in:draft,published,archived',
             'is_featured' => 'nullable|boolean',
@@ -76,7 +82,9 @@ class AnnouncementsController extends Controller
 
     public function edit(Announcement $announcement)
     {
-        return view('cms.announcements.edit', compact('announcement'));
+        $teamMembers = TeamMember::ordered()->get();
+
+        return view('cms.announcements.edit', compact('announcement', 'teamMembers'));
     }
 
     public function update(Request $request, Announcement $announcement)
@@ -84,9 +92,13 @@ class AnnouncementsController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|in:'.implode(',', Announcement::CATEGORIES),
+            'team_member_id' => 'nullable|exists:team_members,id',
             'summary' => 'nullable|string|max:500',
             'content' => 'nullable|string',
-            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
+            // Required only if this record has no cover image yet (old rows
+            // predating the "always has an image" rule shouldn't get forced
+            // to re-upload just to save an unrelated field).
+            'cover_image' => ($announcement->cover_image ? 'nullable' : 'required').'|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
             'gallery.*' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:5120',
             'status' => 'required|string|in:draft,published,archived',
             'is_featured' => 'nullable|boolean',
