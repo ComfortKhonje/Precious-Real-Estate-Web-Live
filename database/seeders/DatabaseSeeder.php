@@ -47,8 +47,11 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
+            ServiceIconSeeder::class,
             ServiceSeeder::class,
             TeamMemberSeeder::class,
+            PropertySeeder::class,
+            AnnouncementSeeder::class,
         ]);
     }
 }
