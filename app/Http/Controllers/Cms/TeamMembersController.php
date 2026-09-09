@@ -18,8 +18,13 @@ class TeamMembersController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('role', 'like', "%{$search}%");
+            // Grouped: an ungrouped orWhere here would escape any other
+            // filter added to this query later — same bug shape already
+            // fixed on Properties/Announcements/Inquiries.
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%");
+            });
         }
 
         $teamMembers = $query->ordered()->paginate(20);
