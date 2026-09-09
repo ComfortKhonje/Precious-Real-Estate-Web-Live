@@ -5,36 +5,13 @@
 @section('page_subtitle', 'Add a new service to your offerings.')
 
 @section('content')
-@if ($errors->any())
-<div class="mb-6 bg-red-50 border border-red-200 rounded-3xl p-6">
-    <h3 class="font-semibold text-red-900 mb-3">Errors:</h3>
-    <ul class="space-y-2 text-sm text-red-800">
-        @foreach ($errors->all() as $error)
-        <li>• {{ $error }}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
-
 <form method="POST" action="{{ route('cms.services.store') }}" enctype="multipart/form-data"
     class="bg-white border border-gray-100 rounded-3xl p-6 space-y-6">
     @csrf
 
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-            <h3 class="font-heading text-3xl leading-none">New Service</h3>
-            <p class="text-sm text-brand-black/60 mt-1">Add a new service to your offerings.</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-            <a href="{{ route('cms.services.index') }}"
-                class="inline-flex items-center px-6 py-3 rounded-full border border-gray-200 font-semibold hover:bg-gray-50 transition">
-                Cancel
-            </a>
-            <button type="submit"
-                class="inline-flex items-center px-6 py-3 rounded-full bg-primary text-brand-black font-semibold hover:bg-primary/90 transition">
-                <i data-lucide="check" class="w-4 h-4 mr-2"></i> Create Service
-            </button>
-        </div>
+    <div class="mb-6">
+        <h3 class="font-heading text-3xl leading-none">New Service</h3>
+        <p class="text-sm text-brand-black/60 mt-1">Add a new service to your offerings.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

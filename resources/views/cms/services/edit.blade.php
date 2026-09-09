@@ -10,23 +10,9 @@
     @csrf
     @method('PUT')
 
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-            <h3 class="font-heading text-3xl leading-none">{{ $service->title }}</h3>
-            <p class="text-sm text-brand-black/60 mt-1">Update service content and visibility for the public site.</p>
-        </div>
-        <div class="flex flex-wrap gap-2 items-center">
-            <button type="submit" class="btn-primary">Save Service</button>
-            <a href="{{ route('cms.services.index') }}" class="btn-secondary">Back to list</a>
-            <div>
-                <form action="{{ route('cms.services.destroy', $service) }}" method="POST"
-                    onsubmit="return confirm('Delete this service? This cannot be undone.');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn-danger">Delete Service</button>
-                </form>
-            </div>
-        </div>
+    <div class="mb-6">
+        <h3 class="font-heading text-3xl leading-none">{{ $service->title }}</h3>
+        <p class="text-sm text-brand-black/60 mt-1">Update service content and visibility for the public site.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
