@@ -50,10 +50,9 @@
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Highlights (Optional)</label>
-                <input type="text" name="features" value="{{ old('features') }}"
-                    placeholder="e.g., Registered valuers, Bank-accepted reports, Same-week turnaround"
-                    class="cms-input">
-                <p class="text-xs text-brand-black/50 mt-1">Comma-separated. Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid.</p>
+                <x-cms.tag-input name="features" :value="old('features', '')"
+                    placeholder="e.g., Registered valuers, Bank-accepted reports..."
+                    help="Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid." />
             </div>
 
             <x-cms.image-upload name="banner_image" label="Banner Image" help="Upload a banner image for this service" />

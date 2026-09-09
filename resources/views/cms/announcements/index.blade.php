@@ -13,7 +13,7 @@
     :create-route="route('cms.announcements.create')"
     create-label="Add Announcement">
     <x-slot:filters>
-        <select name="status" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30 cursor-pointer">
+        <select name="status" onchange="this.form.submit()" class="cms-select bg-white border-gray-200 py-3 px-4 text-sm">
             <option value="">All Status</option>
             <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
             <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>Published</option>

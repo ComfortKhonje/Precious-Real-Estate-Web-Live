@@ -13,19 +13,19 @@
     :create-route="route('cms.properties.create')"
     create-label="Add Property">
     <x-slot:filters>
-        <select name="location" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+        <select name="location" onchange="this.form.submit()" class="cms-select bg-white border-gray-200 py-3 px-4 text-sm">
             <option value="">All Locations</option>
             @foreach($locations as $location)
             <option value="{{ $location }}" {{ request('location') == $location ? 'selected' : '' }}>{{ $location }}</option>
             @endforeach
         </select>
-        <select name="type" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+        <select name="type" onchange="this.form.submit()" class="cms-select bg-white border-gray-200 py-3 px-4 text-sm">
             <option value="">All Types</option>
             @foreach($types as $type)
             <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
             @endforeach
         </select>
-        <select name="status" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30">
+        <select name="status" onchange="this.form.submit()" class="cms-select bg-white border-gray-200 py-3 px-4 text-sm">
             <option value="">All Status</option>
             <option value="For Sale" {{ request('status') == 'For Sale' ? 'selected' : '' }}>For Sale</option>
             <option value="For Rent" {{ request('status') == 'For Rent' ? 'selected' : '' }}>For Rent</option>

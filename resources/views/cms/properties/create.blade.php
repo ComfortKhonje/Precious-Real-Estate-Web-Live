@@ -104,11 +104,11 @@
                 </div>
                 <div class="space-y-2 md:col-span-2 lg:col-span-3">
                     <label class="text-sm font-semibold tracking-wider">Additional Features</label>
-                    <input type="text" name="features" value="{{ old('features') }}" placeholder="e.g., Solar, Water tank, Electric fence (comma-separated)" class="cms-input">
+                    <x-cms.tag-input name="features" :value="old('features', '')" placeholder="e.g., Solar, Water tank, Electric fence" />
                 </div>
                 <div class="space-y-2 md:col-span-2 lg:col-span-3">
                     <label class="text-sm font-semibold tracking-wider">Nearby Amenities</label>
-                    <input type="text" name="nearby_amenities" value="{{ old('nearby_amenities') }}" placeholder="e.g., St. Andrews School, Game Complex, Kamuzu Central Hospital (comma-separated)" class="cms-input">
+                    <x-cms.tag-input name="nearby_amenities" :value="old('nearby_amenities', '')" placeholder="e.g., St. Andrews School, Game Complex, Kamuzu Central Hospital" />
                     <p class="text-xs text-brand-black/50">Shown on the property page's "Location Details" section. Leave blank to hide that section entirely.</p>
                 </div>
             </div>

@@ -16,7 +16,7 @@
                 </div>
             </div>
             <form id="inquiryFilters" method="GET" action="{{ route('cms.inquiries.index') }}" class="flex flex-wrap gap-2 items-center">
-                <select name="type" onchange="this.form.submit()" class="bg-gray-50 border border-gray-100 rounded-2xl py-3 px-4 text-sm font-semibold focus:ring-2 focus:ring-primary focus:border-primary/30 cursor-pointer">
+                <select name="type" onchange="this.form.submit()" class="cms-select bg-gray-50 border-gray-100 py-3 px-4 text-sm">
                     <option value="">All Types</option>
                     @foreach($types as $type)
                         <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>

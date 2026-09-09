@@ -105,11 +105,11 @@
             </div>
             <div class="space-y-2 lg:col-span-2">
                 <label class="text-sm font-semibold tracking-wider">Additional Features</label>
-                <input type="text" name="features" value="{{ old('features', is_array($property->features) ? implode(', ', $property->features) : $property->features) }}" placeholder="e.g., Solar, Water tank, Electric fence" class="cms-input">
+                <x-cms.tag-input name="features" :value="old('features', is_array($property->features) ? implode(', ', $property->features) : $property->features)" placeholder="e.g., Solar, Water tank, Electric fence" />
             </div>
             <div class="space-y-2 lg:col-span-2">
                 <label class="text-sm font-semibold tracking-wider">Nearby Amenities</label>
-                <input type="text" name="nearby_amenities" value="{{ old('nearby_amenities', is_array($property->nearby_amenities) ? implode(', ', $property->nearby_amenities) : $property->nearby_amenities) }}" placeholder="e.g., St. Andrews School, Game Complex, Kamuzu Central Hospital" class="cms-input">
+                <x-cms.tag-input name="nearby_amenities" :value="old('nearby_amenities', is_array($property->nearby_amenities) ? implode(', ', $property->nearby_amenities) : $property->nearby_amenities)" placeholder="e.g., St. Andrews School, Game Complex, Kamuzu Central Hospital" />
                 <p class="text-xs text-brand-black/50">Shown on the property page's "Location Details" section. Leave blank to hide that section entirely.</p>
             </div>
         </div>
