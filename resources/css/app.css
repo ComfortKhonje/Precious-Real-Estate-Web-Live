@@ -94,13 +94,12 @@
      have their own one-off box styling) to get just the popup styling
      without touching that.
 
-     min/max-width on the popup, plus truncating each option's text,
-     stops a single long option (a location name, a "Name — Role" byline)
-     from forcing the popup — and, going by a real bug report, the
-     select's own closed box too — wider than intended; the spec says
-     base-select shouldn't tie the trigger's width to its widest option
-     at all, but pin it explicitly anyway rather than depend on that
-     still being case in whatever the CMS's browser actually renders. */
+     The popup hugs its own content (width: max-content, with a small
+     floor/ceiling) rather than matching the trigger's width — a
+     .cms-select is often w-full to fill half a form row, but "For Sale"
+     or "MWK" don't need a popup that wide just because the closed box
+     is. A max-width still caps a genuinely long option (a location
+     name, a "Name — Role" byline) from stretching it past ~20rem. */
   @supports (appearance: base-select) {
     .cms-select,
     .select-popup {
@@ -124,7 +123,8 @@
       box-shadow: 0 16px 40px rgba(30, 30, 30, 0.12);
       padding: 0.375rem;
       margin-top: 0.5rem;
-      min-width: 100%;
+      width: max-content;
+      min-width: 8rem;
       max-width: min(20rem, 92vw);
     }
 
