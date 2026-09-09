@@ -78,7 +78,7 @@
                                     name="serviceNeeded"
                                     x-model="formData.serviceNeeded"
                                     required
-                                    class="w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none">
+                                    class="select-popup w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none">
                                     <option value="">Select the service you need</option>
                                     <option value="Property Valuation">Property Valuation</option>
                                     <option value="Property Management">Property Management</option>

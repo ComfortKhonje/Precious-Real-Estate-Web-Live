@@ -42,7 +42,7 @@
                             <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Service
                                 Needed</label>
                             <select x-model="formData.service" @change="resetServiceFields"
-                                class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:20px_20px] bg-[right_1.25rem_center] bg-no-repeat"
+                                class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:20px_20px] bg-[right_1.25rem_center] bg-no-repeat"
                                 style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                 <option value="">Select a service</option>
                                 <option value="Property Valuation">Property Valuation</option>
@@ -85,7 +85,7 @@
                             <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Contact
                                 Method</label>
                             <select x-model="formData.contactMethod"
-                                class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
+                                class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
                                 style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                 <option value="Phone">Phone</option>
                                 <option value="Email">Email</option>
@@ -120,7 +120,7 @@
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Property
                                         Type</label>
                                     <select x-model="formData.propertyType"
-                                        class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
+                                        class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
                                         style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select Type</option>
                                         <option value="Residential House">Residential House</option>
@@ -136,7 +136,7 @@
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Purpose of
                                         Valuation</label>
                                     <select x-model="formData.purposeOfValuation"
-                                        class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
+                                        class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
                                         style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select Purpose</option>
                                         <option value="Loan Security">Loan Security</option>
@@ -165,7 +165,7 @@
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Management
                                         Needs</label>
                                     <select x-model="formData.managementNeeds"
-                                        class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
+                                        class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
                                         style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select need</option>
                                         <option value="Rent Collection">Rent Collection</option>
@@ -193,7 +193,7 @@
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Inquiry
                                         Type</label>
                                     <select x-model="formData.inquiryType"
-                                        class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
+                                        class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
                                         style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select type</option>
                                         <option value="Sell">Sell Property</option>
@@ -204,7 +204,7 @@
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs tracking-widest text-gray-400">Property Type</label>
-                                    <select x-model="formData.propertyType" class="w-full bg-gray-100 rounded-lg md:rounded-xl py-4 md:py-5 px-4 md:px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-md appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                                    <select x-model="formData.propertyType" class="select-popup w-full bg-gray-100 rounded-lg md:rounded-xl py-4 md:py-5 px-4 md:px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-md appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select Type</option>
                                         <option value="House">House</option>
                                         <option value="Apartment / Flat">Apartment / Flat</option>
@@ -231,7 +231,7 @@
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Project
                                         Type</label>
                                     <select x-model="formData.projectType"
-                                        class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
+                                        class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
                                         style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select type</option>
                                         <option value="Residential">Residential Development</option>
@@ -243,7 +243,7 @@
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-xs tracking-widest text-gray-400">Service Needed</label>
-                                    <select x-model="formData.serviceNeeded" class="w-full bg-gray-100 rounded-lg md:rounded-xl py-4 md:py-5 px-4 md:px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-md appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
+                                    <select x-model="formData.serviceNeeded" class="select-popup w-full bg-gray-100 rounded-lg md:rounded-xl py-4 md:py-5 px-4 md:px-5 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-md appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select type</option>
                                         <option value="Residential">Site Identification</option>
                                         <option value="Commercial">Feasibility Analysis</option>
@@ -255,7 +255,7 @@
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Project
                                         Stage</label>
                                     <select x-model="formData.projectStage"
-                                        class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
+                                        class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
                                         style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select stage</option>
                                         <option value="Planning">Planning Stage</option>
@@ -293,7 +293,7 @@
                                     <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Preferred
                                         Service</label>
                                     <select x-model="formData.preferredService"
-                                        class="w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
+                                        class="select-popup w-full bg-gray-100 rounded-xl md:rounded-2xl py-4 md:py-5 px-5 md:px-6 text-brand-black font-semibold focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none text-base md:text-lg appearance-none bg-[length:18px_18px] bg-[right_1.25rem_center] bg-no-repeat"
                                         style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23222222%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>');">
                                         <option value="">Select service</option>
                                         <option value="Valuation">Property Valuation</option>

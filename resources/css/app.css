@@ -84,22 +84,39 @@
      base-select + ::picker(select)/::picker-icon; before this there was no
      CSS way to touch that popup at all, which is why it stayed square-
      cornered with the browser's default blue option highlight regardless
-     of anything set on .cms-select above. Gated behind @supports so it's
-     a no-op (falls back to the plain native popup) anywhere it isn't
-     recognized yet — Safari/Firefox as of this writing.
-     https://developer.chrome.com/blog/a-customizable-select */
+     of anything set on the select's own box. Gated behind @supports so
+     it's a no-op (falls back to the plain native popup) anywhere it
+     isn't recognized yet — Safari/Firefox as of this writing.
+     https://developer.chrome.com/blog/a-customizable-select
+
+     .cms-select gets this automatically. Add `select-popup` alongside a
+     select's own classes anywhere else (public-site forms, which each
+     have their own one-off box styling) to get just the popup styling
+     without touching that.
+
+     min/max-width on the popup, plus truncating each option's text,
+     stops a single long option (a location name, a "Name — Role" byline)
+     from forcing the popup — and, going by a real bug report, the
+     select's own closed box too — wider than intended; the spec says
+     base-select shouldn't tie the trigger's width to its widest option
+     at all, but pin it explicitly anyway rather than depend on that
+     still being case in whatever the CMS's browser actually renders. */
   @supports (appearance: base-select) {
-    .cms-select {
+    .cms-select,
+    .select-popup {
       appearance: base-select;
     }
 
-    .cms-select::picker-icon {
-      /* Redundant with the background-image chevron already set above —
-         base-select would otherwise draw its own default arrow too. */
+    .cms-select::picker-icon,
+    .select-popup::picker-icon {
+      /* Redundant with the background-image chevron already set on the
+         select itself — base-select would otherwise draw its own
+         default arrow too. */
       display: none;
     }
 
-    .cms-select::picker(select) {
+    .cms-select::picker(select),
+    .select-popup::picker(select) {
       appearance: base-select;
       border: 1px solid rgb(229 231 235);
       border-radius: 1rem;
@@ -107,21 +124,31 @@
       box-shadow: 0 16px 40px rgba(30, 30, 30, 0.12);
       padding: 0.375rem;
       margin-top: 0.5rem;
+      min-width: 100%;
+      max-width: min(20rem, 92vw);
     }
 
-    .cms-select option {
+    .cms-select option,
+    .select-popup option {
       border-radius: 0.75rem;
       padding: 0.625rem 1rem;
       margin: 0.125rem 0;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .cms-select option:hover,
-    .cms-select option:focus {
+    .cms-select option:focus,
+    .select-popup option:hover,
+    .select-popup option:focus {
       background: rgba(255, 229, 34, 0.2);
       color: #1E1E1E;
     }
 
-    .cms-select option:checked {
+    .cms-select option:checked,
+    .select-popup option:checked {
       background: rgba(255, 229, 34, 0.35);
       font-weight: 600;
     }
