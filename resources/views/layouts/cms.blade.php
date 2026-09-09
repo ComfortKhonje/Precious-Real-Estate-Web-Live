@@ -236,43 +236,9 @@
             lucide.createIcons();
         });
 
-        // Generic double-submit guard for every plain server-rendered CMS
-        // form (create/edit/save-settings/etc.) — this app has no client-side
-        // framework wiring each of those individually, so one delegated
-        // listener covers all of them instead of touching every view.
-        // Skips GET forms (search/filter bars — navigating again is harmless
-        // and sometimes wanted) and the delete-confirmation flow (its
-        // "Yes, Delete" button is guarded directly above, since form.submit()
-        // never fires this 'submit' event at all).
-        //
-        // Reflects the ACTUAL button clicked (event.submitter) rather than a
-        // generic "Loading..." everywhere, per Comfort's ask for proactive,
-        // per-action feedback — "Save Property" becomes "Save Property…"
-        // rather than every button in the CMS saying the same generic thing.
-        // A button can opt out entirely with data-no-submit-guard, or supply
-        // exact wording with data-loading-text.
-        document.addEventListener('submit', (event) => {
-            const form = event.target;
-            if (!(form instanceof HTMLFormElement)) return;
-            if ((form.method || 'get').toLowerCase() !== 'post') return;
-
-            const button = event.submitter
-                ?? form.querySelector('button[type="submit"]:not([type="button"])');
-            if (!button || button.hasAttribute('data-no-submit-guard')) return;
-
-            // A second submit event on an already-disabled button can't
-            // happen (disabled elements don't submit), but guard anyway in
-            // case something re-enables it programmatically mid-flight.
-            if (button.disabled) {
-                event.preventDefault();
-                return;
-            }
-
-            button.disabled = true;
-            button.classList.add('opacity-60', 'cursor-not-allowed');
-            button.dataset.originalHtml = button.innerHTML;
-            button.innerHTML = button.dataset.loadingText || (button.textContent.trim() + '&hellip;');
-        });
+        // Double-submit guard (spinner + disabled state on save/create
+        // buttons) lives in resources/js/app.js now — it used to also be
+        // duplicated here, and the two conflicted (see app.js for why).
     </script>
 </body>
 

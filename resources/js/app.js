@@ -249,25 +249,55 @@ window.storage = {
 
 /**
  * Disables a form's submit button the instant it's submitted, so a fast
- * double-click (or a slow network response) can't fire the same form twice.
- * Scoped to plain server-rendered forms only — an Alpine-driven form
- * (x-data + @submit.prevent) already manages its own isSubmitting/:disabled
- * state, and this would just fight that reactive binding. Applies
- * automatically to every form site-wide (public + CMS): the CMS especially
- * had a lot of plain POST forms (create/edit screens, login) with no
- * guard at all.
+ * double-click (or a slow network response) can't fire the same form twice,
+ * and swaps in a spinner + per-action label so it's obvious the click did
+ * something. Scoped to plain server-rendered forms only — an Alpine-driven
+ * form (x-data + @submit.prevent) already manages its own isSubmitting/
+ * :disabled state, and this would just fight that reactive binding. Applies
+ * automatically to every POST form site-wide (public + CMS) — GET forms
+ * (search/filter bars) are left alone since navigating again there is
+ * harmless and sometimes wanted.
+ *
+ * This used to be two separate, conflicting implementations — this one
+ * (site-wide, registered on the CAPTURE phase) and a near-identical one
+ * inline in layouts/cms.blade.php (CMS-only, bubble phase). Capture always
+ * runs before bubble, so on every single CMS form this one disabled the
+ * button first; the layout's own listener then saw an already-disabled
+ * button, assumed it was a duplicate submit, and called
+ * preventDefault() — cancelling the FIRST and only submit attempt.
+ * Every "click Save, button greys out, nothing happens" report in the CMS
+ * was this. Fixed 2026-09-09 by merging both into this one, deleted the
+ * other.
+ *
+ * A button can opt out entirely with data-no-submit-guard, or supply exact
+ * loading-state wording with data-loading-text (defaults to its own label
+ * + "…", e.g. "Save Property" -> "Save Property…").
  */
+const SUBMIT_SPINNER_SVG = '<svg class="inline w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">'
+    + '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>'
+    + '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>'
+    + '</svg>';
+
 document.addEventListener('submit', (event) => {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
     if (form.hasAttribute('x-data')) return; // Alpine form — has its own guard
+    if ((form.method || 'get').toLowerCase() !== 'post') return;
     if (form.checkValidity && !form.checkValidity()) return; // invalid — browser will block submission, don't lock the button
 
-    const button = form.querySelector('button[type="submit"], input[type="submit"]');
-    if (!button || button.disabled) return;
+    const button = event.submitter
+        ?? form.querySelector('button[type="submit"]:not([type="button"]), input[type="submit"]');
+    if (!button || button.hasAttribute('data-no-submit-guard')) return;
+
+    if (button.disabled) {
+        event.preventDefault();
+        return;
+    }
 
     button.disabled = true;
-    button.classList.add('opacity-50', 'cursor-not-allowed');
+    button.classList.add('opacity-60', 'cursor-not-allowed');
+    const label = button.dataset.loadingText || (button.textContent.trim() + '…');
+    button.innerHTML = `<span class="inline-flex items-center justify-center gap-2">${SUBMIT_SPINNER_SVG}<span>${label}</span></span>`;
 }, true);
 
 // ============================================================================
