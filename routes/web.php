@@ -163,6 +163,7 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('/analytics', [App\Http\Controllers\Cms\AnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'index'])->name('settings.index');
         Route::put('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'update'])->name('settings.update');
+        Route::put('/settings/profile', [App\Http\Controllers\Cms\SettingsController::class, 'updateProfile'])->name('settings.profile');
         Route::put('/settings/password', [App\Http\Controllers\Cms\SettingsController::class, 'updatePassword'])->name('settings.password');
     });
 });

@@ -8,6 +8,32 @@
     {{-- Result now shows as a global toast (bottom-right) — see
          x-shared.toast-container in the CMS layout. --}}
 
+    <form method="POST" action="{{ route('cms.settings.profile') }}" class="space-y-6 mb-6">
+        @csrf
+        @method('PUT')
+
+        <div class="cms-panel p-6">
+            <h3 class="cms-section-title mb-1">Profile Settings</h3>
+            <p class="text-sm text-brand-black/60 mb-6">Your own name and email — shown in the CMS header and used to log in.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Full Name</label>
+                    <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" class="cms-input">
+                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Email Address</label>
+                    <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" class="cms-input">
+                    @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3 justify-end">
+            <button type="submit" class="btn-primary">Save Profile</button>
+        </div>
+    </form>
+
     <form method="POST" action="{{ route('cms.settings.update') }}" class="space-y-6 mb-6">
         @csrf
         @method('PUT')
@@ -39,18 +65,6 @@
                             <option value="{{ $status }}" {{ old('default_property_status', $settings['default_property_status'] ?? 'For Sale') === $status ? 'selected' : '' }}>{{ $status }}</option>
                         @endforeach
                     </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="cms-panel p-6">
-            <h3 class="cms-section-title mb-1">Access & Notifications</h3>
-            <p class="text-sm text-brand-black/60 mb-6">Keep the login surface small and easy to manage.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Session Timeout (minutes)</label>
-                    <input type="number" name="session_timeout_minutes" min="5" max="1440" value="{{ old('session_timeout_minutes', $settings['session_timeout_minutes'] ?? 120) }}" class="cms-input">
-                    <p class="text-xs text-brand-black/40">Stored for reference — actually changing session behavior needs a code change to `config/session.php` (`SESSION_LIFETIME`), not wired to this value automatically.</p>
                 </div>
             </div>
         </div>

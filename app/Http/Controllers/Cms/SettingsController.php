@@ -24,7 +24,6 @@ class SettingsController extends Controller
         'timezone',
         'inquiry_email_destination',
         'default_property_status',
-        'session_timeout_minutes',
     ];
 
     public function index(Request $request)
@@ -41,7 +40,6 @@ class SettingsController extends Controller
             'timezone' => 'nullable|string|max:64',
             'inquiry_email_destination' => 'nullable|email',
             'default_property_status' => 'nullable|string|in:'.implode(',', \App\Models\Property::STATUSES),
-            'session_timeout_minutes' => 'nullable|integer|min:5|max:1440',
         ]);
 
         foreach ($data as $key => $value) {
@@ -49,6 +47,23 @@ class SettingsController extends Controller
         }
 
         return back()->with('status', 'Settings saved.');
+    }
+
+    /**
+     * Update the logged-in staff member's own name/email. There was no way
+     * to do this anywhere in the CMS — Settings only ever covered app-wide
+     * preferences and this user's password, never their own profile.
+     */
+    public function updateProfile(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$request->user()->id],
+        ]);
+
+        $request->user()->update($data);
+
+        return back()->with('status', 'Profile updated.');
     }
 
     public function updatePassword(Request $request)
