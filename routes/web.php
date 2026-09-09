@@ -160,7 +160,7 @@ Route::prefix('cms')->name('cms.')->group(function () {
 
         Route::get('/contact', [App\Http\Controllers\Cms\ContactController::class, 'index'])->name('contact.index');
         Route::put('/contact', [App\Http\Controllers\Cms\ContactController::class, 'update'])->name('contact.update');
-        Route::get('/analytics', fn() => view('cms.analytics.index'))->name('analytics.index');
+        Route::get('/analytics', [App\Http\Controllers\Cms\AnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'index'])->name('settings.index');
         Route::put('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'update'])->name('settings.update');
         Route::put('/settings/password', [App\Http\Controllers\Cms\SettingsController::class, 'updatePassword'])->name('settings.password');
