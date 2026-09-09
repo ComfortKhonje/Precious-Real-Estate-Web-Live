@@ -17,11 +17,11 @@
                     <label class="text-sm font-semibold tracking-wider">Title</label>
                     <input type="text" name="title" value="{{ old('title') }}" required
                         placeholder="Announcement title"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                        class="cms-input">
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Category</label>
-                    <select name="category" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="category" class="cms-select">
                         <option value="">No category</option>
                         @foreach(\App\Models\Announcement::CATEGORIES as $cat)
                             <option value="{{ $cat }}" {{ old('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
@@ -30,7 +30,7 @@
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Posted By (Optional)</label>
-                    <select name="team_member_id" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="team_member_id" class="cms-select">
                         <option value="">No byline</option>
                         @foreach ($teamMembers as $member)
                             <option value="{{ $member->id }}" {{ (string) old('team_member_id') === (string) $member->id ? 'selected' : '' }}>{{ $member->name }} — {{ $member->role }}</option>
@@ -41,7 +41,7 @@
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Short Summary</label>
                     <textarea name="summary" rows="3" placeholder="Short summary..."
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('summary') }}</textarea>
+                        class="cms-input">{{ old('summary') }}</textarea>
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Full Content</label>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Publish Status</label>
-                    <select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="status" class="cms-select">
                         <option value="draft" {{ old('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                         <option value="published" {{ old('status') === 'published' ? 'selected' : '' }}>Published</option>
                         <option value="archived" {{ old('status') === 'archived' ? 'selected' : '' }}>Archived</option>
@@ -64,7 +64,7 @@
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Publish At</label>
                     <input type="datetime-local" name="published_at" value="{{ old('published_at') }}"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                        class="cms-input">
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <x-cms.image-upload name="cover_image" label="Select Cover Image" :required="true" help="Every post needs at least one image" />

@@ -14,13 +14,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Property Title</label>
-                    <input type="text" name="title" value="{{ old('title') }}" required placeholder="e.g., 3 Bedroom House in Area 10" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="text" name="title" value="{{ old('title') }}" required placeholder="e.g., 3 Bedroom House in Area 10" class="cms-input">
                     @error('title') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Category</label>
-                    <select name="category" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="category" class="cms-select">
                         <option value="">Select category</option>
                         @foreach(\App\Models\Property::CATEGORIES as $option)
                             <option value="{{ $option }}" {{ old('category') === $option ? 'selected' : '' }}>{{ $option }}</option>
@@ -31,7 +31,7 @@
 
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Property Type</label>
-                    <select name="type" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="type" class="cms-select">
                         <option value="">Select type</option>
                         @foreach(\App\Models\Property::TYPES as $option)
                             <option value="{{ $option }}" {{ old('type') === $option ? 'selected' : '' }}>{{ $option }}</option>
@@ -42,7 +42,7 @@
 
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Listing Status</label>
-                    <select name="status" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="status" class="cms-select">
                         @foreach(\App\Models\Property::STATUSES as $option)
                             <option value="{{ $option }}" {{ old('status') === $option ? 'selected' : '' }}>{{ $option }}</option>
                         @endforeach
@@ -53,13 +53,13 @@
 
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Price (Numerical)</label>
-                    <input type="number" step="0.01" name="price" value="{{ old('price') }}" required placeholder="e.g., 120000000" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="number" step="0.01" name="price" value="{{ old('price') }}" required placeholder="e.g., 120000000" class="cms-input">
                     @error('price') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Currency</label>
-                    <select name="currency" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                    <select name="currency" class="cms-select">
                         @foreach(\App\Models\Property::CURRENCIES as $option)
                             <option value="{{ $option }}" {{ old('currency', 'MWK') === $option ? 'selected' : '' }}>{{ $option }}</option>
                         @endforeach
@@ -69,13 +69,13 @@
 
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Location</label>
-                    <input type="text" name="location" value="{{ old('location') }}" required placeholder="e.g., Lilongwe, Area 10" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="text" name="location" value="{{ old('location') }}" required placeholder="e.g., Lilongwe, Area 10" class="cms-input">
                     @error('location') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Property Description</label>
-                    <textarea name="description" rows="5" required placeholder="Write a clear description of the property..." class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('description') }}</textarea>
+                    <textarea name="description" rows="5" required placeholder="Write a clear description of the property..." class="cms-input">{{ old('description') }}</textarea>
                     @error('description') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -88,27 +88,27 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Bedrooms</label>
-                    <input type="number" name="bedrooms" value="{{ old('bedrooms') }}" min="0" placeholder="0" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="number" name="bedrooms" value="{{ old('bedrooms') }}" min="0" placeholder="0" class="cms-input">
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Bathrooms</label>
-                    <input type="number" name="bathrooms" value="{{ old('bathrooms') }}" min="0" placeholder="0" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="number" name="bathrooms" value="{{ old('bathrooms') }}" min="0" placeholder="0" class="cms-input">
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Land Size</label>
-                    <input type="text" name="land_size" value="{{ old('land_size') }}" placeholder="e.g., 500 sqm, 0.25 acre" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="text" name="land_size" value="{{ old('land_size') }}" placeholder="e.g., 500 sqm, 0.25 acre" class="cms-input">
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Parking Spaces</label>
-                    <input type="number" name="parking_spaces" value="{{ old('parking_spaces') }}" min="0" placeholder="0" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="number" name="parking_spaces" value="{{ old('parking_spaces') }}" min="0" placeholder="0" class="cms-input">
                 </div>
                 <div class="space-y-2 md:col-span-2 lg:col-span-3">
                     <label class="text-sm font-semibold tracking-wider">Additional Features</label>
-                    <input type="text" name="features" value="{{ old('features') }}" placeholder="e.g., Solar, Water tank, Electric fence (comma-separated)" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="text" name="features" value="{{ old('features') }}" placeholder="e.g., Solar, Water tank, Electric fence (comma-separated)" class="cms-input">
                 </div>
                 <div class="space-y-2 md:col-span-2 lg:col-span-3">
                     <label class="text-sm font-semibold tracking-wider">Nearby Amenities</label>
-                    <input type="text" name="nearby_amenities" value="{{ old('nearby_amenities') }}" placeholder="e.g., St. Andrews School, Game Complex, Kamuzu Central Hospital (comma-separated)" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    <input type="text" name="nearby_amenities" value="{{ old('nearby_amenities') }}" placeholder="e.g., St. Andrews School, Game Complex, Kamuzu Central Hospital (comma-separated)" class="cms-input">
                     <p class="text-xs text-brand-black/50">Shown on the property page's "Location Details" section. Leave blank to hide that section entirely.</p>
                 </div>
             </div>

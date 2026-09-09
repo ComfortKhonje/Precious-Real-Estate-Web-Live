@@ -43,7 +43,7 @@
                 <label class="text-sm font-semibold tracking-wider">Service Title *</label>
                 <input type="text" name="title" value="{{ old('title') }}" required
                     placeholder="e.g., Property Management"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 @error('title') ring-2 ring-red-500 @enderror">
+                    class="cms-input @error('title') ring-2 ring-red-500 @enderror">
                 @error('title')
                 <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                 @enderror
@@ -53,21 +53,21 @@
                 <label class="text-sm font-semibold tracking-wider">Heading / Tagline</label>
                 <input type="text" name="tagline" value="{{ old('tagline') }}"
                     placeholder="e.g., Accurate Valuations You Can Trust"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    class="cms-input">
                 <p class="text-xs text-brand-black/50 mt-1">Large headline on the services page. Falls back to the service title if left blank.</p>
             </div>
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Short Description</label>
                 <textarea name="short_description" rows="3" placeholder="Brief summary of the service..."
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('short_description') }}</textarea>
+                    class="cms-input">{{ old('short_description') }}</textarea>
                 <p class="text-xs text-brand-black/50 mt-1">Max 500 characters</p>
             </div>
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Long Description (Services Page)</label>
                 <textarea name="content" rows="7" placeholder="Longer, more detailed description shown on the services page..."
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('content') }}</textarea>
+                    class="cms-input">{{ old('content') }}</textarea>
                 <p class="text-xs text-brand-black/50 mt-1">Used on the services page instead of the short description above. Falls back to the short description if left blank. The home page always uses the short description.</p>
             </div>
 
@@ -75,7 +75,7 @@
                 <label class="text-sm font-semibold tracking-wider">Highlights (Optional)</label>
                 <input type="text" name="features" value="{{ old('features') }}"
                     placeholder="e.g., Registered valuers, Bank-accepted reports, Same-week turnaround"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    class="cms-input">
                 <p class="text-xs text-brand-black/50 mt-1">Comma-separated. Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid.</p>
             </div>
 

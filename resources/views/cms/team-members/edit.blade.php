@@ -46,7 +46,7 @@
                     <label class="text-sm font-semibold tracking-wider">Full Name *</label>
                     <input type="text" name="name" value="{{ old('name', $teamMember->name) }}" required
                         placeholder="e.g., John Smith"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 @error('name') ring-2 ring-red-500 @enderror">
+                        class="cms-input @error('name') ring-2 ring-red-500 @enderror">
                     @error('name')
                         <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -57,7 +57,7 @@
                     <label class="text-sm font-semibold tracking-wider">Job Title/Role *</label>
                     <input type="text" name="role" value="{{ old('role', $teamMember->role) }}" required
                         placeholder="e.g., Property Manager"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 @error('role') ring-2 ring-red-500 @enderror">
+                        class="cms-input @error('role') ring-2 ring-red-500 @enderror">
                     @error('role')
                         <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -69,13 +69,13 @@
                         <label class="text-sm font-semibold tracking-wider">Qualifications</label>
                         <input type="text" name="qualifications" value="{{ old('qualifications', $teamMember->qualifications) }}"
                             placeholder="e.g., MSc Real Estate, MIS(SA)"
-                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                            class="cms-input">
                     </div>
                     <div class="space-y-2">
                         <label class="text-sm font-semibold tracking-wider">Years of Experience</label>
                         <input type="number" name="years_experience" value="{{ old('years_experience', $teamMember->years_experience) }}" min="0" max="100"
                             placeholder="e.g., 12"
-                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                            class="cms-input">
                     </div>
                 </div>
 
@@ -83,7 +83,7 @@
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Biography</label>
                     <textarea name="bio" rows="4" placeholder="Brief biography or professional description..."
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('bio', $teamMember->bio) }}</textarea>
+                        class="cms-input">{{ old('bio', $teamMember->bio) }}</textarea>
                     <p class="text-xs text-brand-black/50 mt-1">Max 1000 characters</p>
                 </div>
 
@@ -101,7 +101,7 @@
                         <label class="text-sm font-semibold tracking-wider">Display Order</label>
                         <input type="number" name="order" value="{{ old('order', $teamMember->order) }}" min="0"
                             placeholder="0"
-                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                            class="cms-input">
                         <p class="text-xs text-brand-black/50 mt-1">Lower numbers appear first</p>
                     </div>
 
