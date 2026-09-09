@@ -5,6 +5,37 @@
 @section('page_subtitle', 'Review and manage the selected inquiry.')
 
 @section('content')
+    @php
+        // Structured inquiries (from the /inquiry multi-step form or the property
+        // page's quick form) store their message as JSON — see
+        // Api\InquiriesController::storePublic(). Field names read here now match
+        // what that method actually writes (fixed 2026-09-02 — the old version here
+        // switched on values like 'valuation'/'sales-letting' and read fields like
+        // 'valuationDate'/'concerns' that were never what got stored, so every real
+        // inquiry silently fell through to the generic fallback regardless of
+        // service type). Decoded once up top since both the sidebar (preferred
+        // contact method) and the main panel (everything else) need it.
+        $messageData = json_decode($inquiry->message ?? '', true);
+        $isJsonMessage = is_array($messageData) && isset($messageData['service']);
+        $serviceFields = $isJsonMessage ? array_filter($messageData['serviceFields'] ?? []) : [];
+        $preferredContact = $isJsonMessage ? ($messageData['contactMethod'] ?? null) : null;
+
+        $fieldLabels = [
+            'propertyType' => 'Property Type',
+            'purposeOfValuation' => 'Purpose of Valuation',
+            'estimatedPropertySize' => 'Estimated Size',
+            'managementNeeds' => 'Management Needs',
+            'numberOfProperties' => 'Number of Properties',
+            'inquiryType' => 'Inquiry Type',
+            'budgetAskingPrice' => 'Budget / Asking Price',
+            'projectType' => 'Project Type',
+            'projectStage' => 'Project Stage',
+            'currentStatus' => 'Current Status',
+            'inquiryTopic' => 'Inquiry Topic',
+            'preferredService' => 'Preferred Service',
+        ];
+    @endphp
+
     <div class="grid grid-cols-1 xl:grid-cols-[350px_1fr] gap-6">
         <!-- Left Sidebar -->
         <div class="space-y-6">
@@ -24,10 +55,16 @@
                     <div class="flex items-center gap-2 text-brand-black/80">
                         <i data-lucide="mail" class="w-5 h-5 shrink-0"></i>
                         <a href="mailto:{{ $inquiry->email }}" class="text-yellow-900 hover:underline truncate">{{ $inquiry->email }}</a>
+                        @if($preferredContact === 'Email')
+                            <span class="ml-auto px-2 py-0.5 rounded-full bg-primary/20 text-brand-black text-[10px] font-bold uppercase tracking-wide shrink-0">Preferred</span>
+                        @endif
                     </div>
                     <div class="flex items-center gap-2 text-brand-black/80">
                         <i data-lucide="phone" class="w-5 h-5 shrink-0"></i>
                         <a href="tel:{{ $inquiry->phone }}" class="text-yellow-900 hover:underline">{{ $inquiry->phone ?? '—' }}</a>
+                        @if(in_array($preferredContact, ['Phone', 'WhatsApp'], true))
+                            <span class="ml-auto px-2 py-0.5 rounded-full bg-primary/20 text-brand-black text-[10px] font-bold uppercase tracking-wide shrink-0">{{ $preferredContact === 'WhatsApp' ? 'Prefers WhatsApp' : 'Preferred' }}</span>
+                        @endif
                     </div>
                     @if ($inquiry->property_id)
                         <div class="flex items-start gap-2 text-brand-black/80">
@@ -60,7 +97,7 @@
                     </a>
                     @if ($inquiry->property_id && $inquiry->property)
                         <a href="{{ route('cms.properties.edit', $inquiry->property) }}" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-100 text-blue-700 hover:bg-blue-200 transition text-sm font-semibold">
-                            <i data-lucide="home" class="w-4 h-4"></i> View Property
+                            <i data-lucide="home" class="w-4 h-4"></i> Edit Property
                         </a>
                     @endif
                     <form id="delete-inquiry-form-{{ $inquiry->id }}" method="POST" action="{{ route('cms.inquiries.destroy', $inquiry) }}" class="pt-2 border-t border-gray-100">
@@ -78,40 +115,12 @@
 
         <!-- Main Content -->
         <div class="bg-white border border-gray-100 rounded-3xl p-6">
-            <h4 class="font-heading text-2xl mb-4">Message</h4>
-
-            @php
-                // Structured inquiries (from the /inquiry multi-step form or the property
-                // page's quick form) store their message as JSON — see
-                // Api\InquiriesController::storePublic(). Field names read here now match
-                // what that method actually writes (fixed 2026-09-02 — the old version here
-                // switched on values like 'valuation'/'sales-letting' and read fields like
-                // 'valuationDate'/'concerns' that were never what got stored, so every real
-                // inquiry silently fell through to the generic fallback regardless of
-                // service type).
-                $messageData = json_decode($inquiry->message ?? '', true);
-                $isJsonMessage = is_array($messageData) && isset($messageData['service']);
-                $serviceFields = $isJsonMessage ? array_filter($messageData['serviceFields'] ?? []) : [];
-
-                $fieldLabels = [
-                    'propertyType' => 'Property Type',
-                    'purposeOfValuation' => 'Purpose of Valuation',
-                    'estimatedPropertySize' => 'Estimated Size',
-                    'managementNeeds' => 'Management Needs',
-                    'numberOfProperties' => 'Number of Properties',
-                    'inquiryType' => 'Inquiry Type',
-                    'budgetAskingPrice' => 'Budget / Asking Price',
-                    'projectType' => 'Project Type',
-                    'projectStage' => 'Project Stage',
-                    'currentStatus' => 'Current Status',
-                    'inquiryTopic' => 'Inquiry Topic',
-                    'preferredService' => 'Preferred Service',
-                ];
-            @endphp
+            <h4 class="font-heading text-2xl mb-4">Inquiry Details</h4>
 
             @if ($isJsonMessage)
-                {{-- Service Type is already shown as the badge in the sidebar —
-                     no need to repeat it here. --}}
+                {{-- Service type is already the badge in the sidebar, and preferred
+                     contact method is now flagged directly on the matching email/
+                     phone row above — neither needs repeating here. --}}
                 <div class="space-y-5">
                     @if ($messageData['location'] ?? null)
                         <div class="pb-5 border-b border-gray-100">
@@ -135,13 +144,6 @@
                         <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Additional Details</h5>
                         <p class="text-brand-black/80 whitespace-pre-line">{{ $messageData['additionalDetails'] ?? '—' }}</p>
                     </div>
-
-                    @if ($messageData['contactMethod'] ?? null)
-                        <div class="pt-5 border-t border-gray-100">
-                            <h5 class="text-xs uppercase tracking-widest text-brand-black/50 mb-2">Preferred Contact Method</h5>
-                            <p class="font-semibold text-brand-black">{{ $messageData['contactMethod'] }}</p>
-                        </div>
-                    @endif
                 </div>
             @else
                 <!-- Plain Text Message -->
