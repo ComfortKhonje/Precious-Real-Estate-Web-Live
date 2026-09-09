@@ -1,7 +1,7 @@
 @props([
     'title',
     'description',
-    'icon',
+    'serviceIcon' => null,
     'bgImage' => 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     'theme' => 'light'
 ])
@@ -14,6 +14,10 @@
     $iconBg = $isDark ? 'bg-primary' : 'bg-brand-black';
     $cardBorder = $isDark ? 'border border-gray-800' : 'border border-gray-200';
     $cardShadow = $isDark ? 'shadow-xl shadow-brand-black/20' : 'shadow-sm';
+    // Icon box background is primary(yellow) on dark cards, brand-black on
+    // light cards — so the icon itself needs the opposite color to stay
+    // readable, regardless of anything picked in the CMS.
+    $iconUrl = $serviceIcon ? ($isDark ? $serviceIcon->blackUrl() : $serviceIcon->yellowUrl()) : null;
 @endphp
 
 <div class="relative rounded-3xl overflow-hidden h-full group transition duration-300 hover:-translate-y-2 flex flex-col {{ $cardBorder }} {{ $cardShadow }}">
@@ -26,8 +30,9 @@
     {{-- Content --}}
     <div class="relative z-20 p-6 md:p-10 flex flex-col h-full">
         <div class="w-16 h-16 rounded-xl {{ $iconBg }} flex items-center justify-center mb-16">
-            {{-- Assuming the SVGs have currentColor, but if they are fixed colors we just load them --}}
-            <img loading="lazy" decoding="async" src="{{ asset('brand-assets/services-icons/' . $icon) }}" class="w-10 h-10" alt="{{ $title }} Icon">
+            @if ($iconUrl)
+                <img loading="lazy" decoding="async" src="{{ $iconUrl }}" class="w-10 h-10" alt="{{ $title }} Icon">
+            @endif
         </div>
 
         <div class="mt-auto">

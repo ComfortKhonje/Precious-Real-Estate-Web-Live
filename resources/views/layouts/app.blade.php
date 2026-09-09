@@ -70,6 +70,8 @@
     {{-- Shared footer --}}
     <x-shared.footer />
 
+    <x-shared.toast-container />
+
     @stack('scripts')
 </body>
 

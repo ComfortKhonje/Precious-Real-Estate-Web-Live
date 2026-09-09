@@ -13,10 +13,14 @@ class Announcement extends Model
     /**
      * Real category vocabulary, replacing the fake per-item badges the old
      * hardcoded Updates page used to show. Added 2026-09-04.
+     *
+     * Replaced Market Update/Notice with News/Blog 2026-09-08 — Blog is for
+     * the team's own project write-ups (has a byline via $teamMember),
+     * News/Announcement share a shorter-form detail template.
      */
-    public const CATEGORIES = ['Announcement', 'Market Update', 'Notice'];
+    public const CATEGORIES = ['Announcement', 'News', 'Blog'];
 
-    protected $fillable = ['title', 'category', 'summary', 'content', 'cover_image', 'status', 'published_at', 'is_featured'];
+    protected $fillable = ['title', 'category', 'team_member_id', 'summary', 'content', 'cover_image', 'status', 'published_at', 'is_featured'];
 
     protected $casts = [
         'published_at' => 'datetime',
@@ -48,6 +52,14 @@ class Announcement extends Model
     }
 
     /**
+     * Byline for Blog-category posts ("Posted by").
+     */
+    public function teamMember()
+    {
+        return $this->belongsTo(TeamMember::class);
+    }
+
+    /**
      * URL of the cover image at a given MediaService size
      * ('thumbnail', 'medium', 'large'). Handles the legacy case where
      * cover_image was stored as a full URL rather than a MediaService
@@ -64,6 +76,63 @@ class Announcement extends Model
         }
 
         return asset("storage/{$this->cover_image}/{$size}.webp");
+    }
+
+    /**
+     * Splits `content` on `</p>` boundaries and weaves gallery images
+     * (`$this->images`) in between — every 2nd paragraph, one unused image —
+     * so a Blog post's photos appear through the reading flow instead of
+     * dumped in a grid after all the text. Returns an ordered list of
+     * `['type' => 'html'|'image', 'value' => string|AnnouncementImage]`.
+     * `content` is already sanitized (see sanitizeContent()) before it's
+     * ever saved, so re-splitting it here doesn't reopen any XSS surface —
+     * the html chunks are exactly the same trusted markup, just cut into
+     * pieces.
+     */
+    public function interleavedContent(): array
+    {
+        $html = (string) $this->content;
+        $images = $this->images;
+
+        if ($images->isEmpty() || trim($html) === '') {
+            return [['type' => 'html', 'value' => $html]];
+        }
+
+        $parts = preg_split('/(<\/p>)/i', $html, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        // Re-glue each "</p>" delimiter onto the chunk before it, so every
+        // paragraph stays one complete "<p>...</p>" block.
+        $paragraphs = [];
+        $buffer = '';
+        foreach ($parts as $part) {
+            $buffer .= $part;
+            if (strcasecmp($part, '</p>') === 0) {
+                $paragraphs[] = $buffer;
+                $buffer = '';
+            }
+        }
+        if (trim($buffer) !== '') {
+            $paragraphs[] = $buffer;
+        }
+
+        if (count($paragraphs) <= 1) {
+            return [['type' => 'html', 'value' => $html]];
+        }
+
+        $blocks = [];
+        $imageIndex = 0;
+        $orderedImages = $images->values();
+
+        foreach ($paragraphs as $i => $paragraph) {
+            $blocks[] = ['type' => 'html', 'value' => $paragraph];
+
+            if (($i + 1) % 2 === 0 && $imageIndex < $orderedImages->count()) {
+                $blocks[] = ['type' => 'image', 'value' => $orderedImages[$imageIndex]];
+                $imageIndex++;
+            }
+        }
+
+        return $blocks;
     }
 
     /**

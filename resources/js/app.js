@@ -234,63 +234,41 @@ window.storage = {
 };
 
 // ============================================================================
-// Notification Utilities
+// Notifications
+// ============================================================================
+// 2026-09-08: removed a second, unused, ad-hoc toast implementation that
+// lived here (window.notify — top-right, DOM-built on every call, zero call
+// sites anywhere in the app). The one real toast system is
+// window.showToast(), defined by <x-shared.toast-container> (bottom-right,
+// Alpine-driven, included once in both layouts/app.blade.php and
+// layouts/cms.blade.php) — use that instead.
+
+// ============================================================================
+// Double-Submit Guard
 // ============================================================================
 
 /**
- * Global notification utilities
+ * Disables a form's submit button the instant it's submitted, so a fast
+ * double-click (or a slow network response) can't fire the same form twice.
+ * Scoped to plain server-rendered forms only — an Alpine-driven form
+ * (x-data + @submit.prevent) already manages its own isSubmitting/:disabled
+ * state, and this would just fight that reactive binding. Applies
+ * automatically to every form site-wide (public + CMS): the CMS especially
+ * had a lot of plain POST forms (create/edit screens, login) with no
+ * guard at all.
  */
-window.notify = {
-    /**
-     * Show success notification
-     */
-    success(message, duration = 3000) {
-        this._show(message, 'success', duration);
-    },
+document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement)) return;
+    if (form.hasAttribute('x-data')) return; // Alpine form — has its own guard
+    if (form.checkValidity && !form.checkValidity()) return; // invalid — browser will block submission, don't lock the button
 
-    /**
-     * Show error notification
-     */
-    error(message, duration = 5000) {
-        this._show(message, 'error', duration);
-    },
+    const button = form.querySelector('button[type="submit"], input[type="submit"]');
+    if (!button || button.disabled) return;
 
-    /**
-     * Show info notification
-     */
-    info(message, duration = 3000) {
-        this._show(message, 'info', duration);
-    },
-
-    /**
-     * Show warning notification
-     */
-    warning(message, duration = 4000) {
-        this._show(message, 'warning', duration);
-    },
-
-    /**
-     * Internal method to show notification
-     */
-    _show(message, type, duration) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 animate-fadeIn ${
-            type === 'success' ? 'bg-green-500' :
-            type === 'error' ? 'bg-red-500' :
-            type === 'warning' ? 'bg-yellow-500' :
-            'bg-blue-500'
-        }`;
-        notification.textContent = message;
-
-        document.body.appendChild(notification);
-
-        // Remove after duration
-        setTimeout(() => {
-            notification.remove();
-        }, duration);
-    }
-};
+    button.disabled = true;
+    button.classList.add('opacity-50', 'cursor-not-allowed');
+}, true);
 
 // ============================================================================
 // Array & Object Utilities

@@ -86,6 +86,25 @@ class MediaService
     }
 
     /**
+     * Store a black/yellow SVG icon pair as-is (no raster processing — these
+     * are vector files, and Intervention's decode() only handles raster
+     * formats). Returns the shared directory, mirroring upload()'s
+     * directory-per-asset convention but with a color suffix instead of a
+     * size suffix.
+     */
+    public function uploadIconPair(UploadedFile $black, UploadedFile $yellow, string $folder): string
+    {
+        $uuid = Str::uuid()->toString();
+        $directory = "{$this->basePath}/{$folder}/{$uuid}";
+
+        Storage::disk($this->disk)->makeDirectory($directory);
+        Storage::disk($this->disk)->put("{$directory}/black.svg", file_get_contents($black->getRealPath()));
+        Storage::disk($this->disk)->put("{$directory}/yellow.svg", file_get_contents($yellow->getRealPath()));
+
+        return $directory;
+    }
+
+    /**
      * Delete an entire media directory
      */
     public function delete(?string $directory): void

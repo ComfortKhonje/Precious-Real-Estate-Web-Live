@@ -41,27 +41,26 @@
                         <div class="flex flex-col">
                             <div class="badge-yellow mb-2 w-fit px-4 py-1.5 text-xs uppercase tracking-wider">
                                 {{ $service->title }}</div>
-                            <h2 class="text-3xl font-heading text-brand-black mb-2 leading-tight">{{ $service->title }}
+                            <h2 class="text-3xl font-heading text-brand-black mb-2 leading-tight">
+                                {{ $service->tagline ?: $service->title }}
                             </h2>
                             <p class="text-gray-600 mb-8 leading-relaxed">
-                                {{ $service->short_description ?: $service->content }}</p>
+                                {{ $service->content ?: $service->short_description }}</p>
 
-                            @if ($service->content)
-                                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6">
-                                    @foreach (explode("\n", strip_tags($service->content)) as $feature)
-                                        @if (trim($feature))
-                                            <li class="flex gap-2 text-md text-gray-700 font-medium items-center">
-                                                <div
-                                                    class="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-brand-black flex items-center justify-center">
-                                                    <svg class="w-3 h-3 text-primary" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="3" d="M5 13l4 4L19 7"></path>
-                                                    </svg>
-                                                </div>
-                                                <span>{{ trim($feature) }}</span>
-                                            </li>
-                                        @endif
+                            @if (!empty($service->features))
+                                <ul class="grid {{ count($service->features) > 4 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1' }} gap-y-3 gap-x-6">
+                                    @foreach ($service->features as $feature)
+                                        <li class="flex gap-2 text-md text-gray-700 font-medium items-center">
+                                            <div
+                                                class="flex-shrink-0 w-5 h-5 rounded-full bg-brand-black flex items-center justify-center">
+                                                <svg class="w-3 h-3 text-primary" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </div>
+                                            <span>{{ $feature }}</span>
+                                        </li>
                                     @endforeach
                                 </ul>
                             @endif

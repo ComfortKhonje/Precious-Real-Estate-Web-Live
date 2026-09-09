@@ -29,6 +29,16 @@
                     </select>
                 </div>
                 <div class="space-y-2 md:col-span-2">
+                    <label class="text-sm font-semibold tracking-wider">Posted By (Optional)</label>
+                    <select name="team_member_id" class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 cursor-pointer">
+                        <option value="">No byline</option>
+                        @foreach ($teamMembers as $member)
+                            <option value="{{ $member->id }}" {{ (string) old('team_member_id') === (string) $member->id ? 'selected' : '' }}>{{ $member->name }} — {{ $member->role }}</option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-brand-black/50 mt-1">Shown as "Posted by" on Blog posts.</p>
+                </div>
+                <div class="space-y-2 md:col-span-2">
                     <label class="text-sm font-semibold tracking-wider">Short Summary</label>
                     <textarea name="summary" rows="3" placeholder="Short summary..."
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('summary') }}</textarea>
@@ -62,7 +72,7 @@
                         class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 </div>
                 <div class="space-y-2 md:col-span-2">
-                    <x-cms.image-upload name="cover_image" label="Select Cover Image" />
+                    <x-cms.image-upload name="cover_image" label="Select Cover Image" :required="true" help="Every post needs at least one image" />
                 </div>
                 <div class="space-y-2 md:col-span-2">
                     <x-cms.image-upload name="gallery[]" label="Upload Additional Gallery Images" :multiple="true" />

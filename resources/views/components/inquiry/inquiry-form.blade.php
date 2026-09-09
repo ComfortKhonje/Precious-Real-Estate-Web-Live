@@ -28,6 +28,7 @@
             </template>
 
             <form @submit.prevent="submitForm" class="flex flex-col min-h-full">
+                <x-shared.honeypot />
 
                 {{-- Step 1: How Can We Assist You? --}}
                 <div x-show="step === 1" x-transition:enter="transition ease-out duration-300"
@@ -394,6 +395,75 @@
                                         </div>
                                     </div>
                                 </template>
+                                {{-- 2026-09-08 fix: this review step only ever showed
+                                     service-specific fields for Property Valuation and
+                                     Property Management — the other 4 service types'
+                                     entered details (Sales & Letting, Property
+                                     Development, Title Deed Processing, General
+                                     Consultation) were captured in step 3 but silently
+                                     never shown back to the user here before they hit
+                                     submit. --}}
+                                <template x-if="formData.service === 'Sales & Letting'">
+                                    <div class="contents">
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Inquiry Type</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.inquiryType"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Property Type</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.propertyType"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Budget / Price</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.budgetAskingPrice"></p>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template x-if="formData.service === 'Property Development'">
+                                    <div class="contents">
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Project Type</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.projectType"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Service Needed</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.serviceNeeded"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Project Stage</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.projectStage"></p>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template x-if="formData.service === 'Title Deed Processing'">
+                                    <div class="contents">
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Current Status</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.currentStatus"></p>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template x-if="formData.service === 'General Consultation'">
+                                    <div class="contents">
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Inquiry Topic</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.inquiryTopic"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase">Preferred Service</p>
+                                            <p class="font-bold text-brand-black text-sm md:text-base"
+                                                x-text="formData.preferredService"></p>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                             <div>
                                 <p class="text-[10px] text-gray-400 uppercase" x-text="getServiceSpecificLabel()"></p>
@@ -458,8 +528,11 @@
                 {{-- Final Submit Button (Step 4) --}}
                 <div x-show="step === 4" class="flex justify-center mt-10 md:mt-12">
                     <button type="submit"
-                        class="w-full md:w-auto px-16 py-5 bg-brand-black text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 active:scale-98 transition-all duration-300 shadow-xl text-xs md:text-sm">
-                        SUBMIT INQUIRY
+                        :disabled="isSubmitting"
+                        :class="isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-98'"
+                        class="w-full md:w-auto px-16 py-5 bg-brand-black text-white rounded-full font-bold uppercase tracking-widest transition-all duration-300 shadow-xl text-xs md:text-sm">
+                        <span x-show="!isSubmitting">SUBMIT INQUIRY</span>
+                        <span x-show="isSubmitting">SUBMITTING...</span>
                     </button>
                 </div>
 
@@ -586,13 +659,17 @@
             },
 
             async submitForm() {
+                if (this.isSubmitting) return; // guards a fast double-click, not just the disabled attribute
+
                 try {
-                    // Show loading state
                     this.isSubmitting = true;
                     this.error = null;
 
                     // Get CSRF token
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+                    // Spam honeypot — see x-shared.honeypot.
+                    const website = document.querySelector('input[name="website"]')?.value || '';
 
                     // Submit to API
                     const response = await fetch('/api/inquiries/public', {
@@ -602,7 +679,7 @@
                             'X-Requested-With': 'XMLHttpRequest',
                             'X-CSRF-TOKEN': csrfToken
                         },
-                        body: JSON.stringify(this.formData)
+                        body: JSON.stringify({ ...this.formData, website })
                     });
 
                     if (!response.ok) {
@@ -628,8 +705,7 @@
                 } catch (error) {
                     this.error = error.message;
                     console.error('Inquiry submission error:', error);
-                    // Show error alert
-                    alert('Error submitting inquiry: ' + error.message);
+                    window.showToast('error', error.message);
                 } finally {
                     this.isSubmitting = false;
                 }

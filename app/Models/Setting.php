@@ -12,4 +12,10 @@ class Setting extends Model
     protected $fillable = ['key', 'value'];
 
     public $timestamps = false;
+
+    protected $primaryKey = 'key';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
 }

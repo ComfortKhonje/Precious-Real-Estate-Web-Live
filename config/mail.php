@@ -115,4 +115,30 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Inquiry/Contact Notification Address
+    |--------------------------------------------------------------------------
+    |
+    | Fallback recipient for the inquiry and contact form emails when the
+    | CMS's own "inquiry_email_destination" setting (Settings tab) hasn't
+    | been set. Env-only fallback, matching config/site.php's default.
+    |
+    */
+
+    'to_address' => env('MAIL_TO_ADDRESS', 'info@preciousrealestate.mw'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notification Email Signature
+    |--------------------------------------------------------------------------
+    |
+    | Optional HTML sign-off appended to the bottom of inquiry/contact
+    | notification emails. Empty by default — the templates skip the
+    | signature block entirely when this is blank.
+    |
+    */
+
+    'signature' => env('MAIL_SIGNATURE', ''),
+
 ];

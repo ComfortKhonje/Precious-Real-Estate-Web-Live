@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-body text-brand-black bg-brand-white bg-grid min-h-screen flex items-center justify-center px-6 py-16">
@@ -24,12 +25,6 @@
                 <div class="text-sm text-brand-black/60">Staff login</div>
             </div>
         </div>
-
-        @if (session('status'))
-            <div class="mb-5 p-4 rounded-2xl bg-primary/30 border border-primary/40 text-sm font-medium">
-                {{ session('status') }}
-            </div>
-        @endif
 
         @if ($errors->any())
             <div class="mb-5 p-4 rounded-2xl bg-red-50 border border-red-100 text-sm text-red-700">
@@ -67,6 +62,8 @@
             For security, access is limited to authorized PREC staff.
         </p>
     </div>
+
+    <x-shared.toast-container />
 </body>
 </html>
 

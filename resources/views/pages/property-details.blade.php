@@ -93,8 +93,8 @@
                 <div class="lg:col-span-8">
                     {{-- Title & Badges --}}
                     <div>
-                        <span class="inline-block bg-primary text-brand-black px-4 py-1.5 rounded-full text-[1rem] tracking-widest mb-2">
-                            For {{ $property->status === 'For Sale' ? 'Sale' : 'Rent' }}
+                        <span class="inline-block {{ $property->status === 'For Sale' ? 'bg-brand-black text-white' : 'bg-primary text-brand-black' }} px-4 py-1.5 rounded-full text-[1rem] tracking-widest mb-2">
+                            {{ $property->status }}
                         </span>
                         <h1 class="text-4xl md:text-5xl font-heading text-brand-black mb-4 uppercase tracking-tight">{{ $property->title }}</h1>
 
@@ -104,11 +104,28 @@
                                 {{ $property->location }}
                             </div>
                             <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-xs font-bold text-brand-black uppercase tracking-wider">
-                                <svg class="w-4 h-4 text-brand-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8M8 12h8m-8 5h8"></path></svg>
+                                <svg class="w-4 h-4 text-brand-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                                 {{ $property->type }}
                             </div>
+                            {{-- Category (Residential/Commercial) was collected in the CMS's
+                                 property form but never shown anywhere on this page. Added
+                                 2026-09-08. --}}
+                            @if ($property->category)
+                                <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-xs font-bold text-brand-black uppercase tracking-wider">
+                                    <svg class="w-4 h-4 text-brand-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M19 21H5m0 0H3m4-14h2m-2 4h2m4-4h2m-2 4h2m-6 8v-4a1 1 0 011-1h0a1 1 0 011 1v4"></path></svg>
+                                    {{ $property->category }}
+                                </div>
+                            @endif
+                            {{-- The checkmark icon here used to be hardcoded regardless of
+                                 $property->is_available — an unavailable listing showed a
+                                 green-style checkmark next to the word "Unavailable". Now
+                                 swaps to an X to match. Fixed 2026-09-08. --}}
                             <div class="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-xs font-bold text-brand-black uppercase tracking-wider">
-                                <svg class="w-4 h-4 text-brand-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                @if ($property->is_available)
+                                    <svg class="w-4 h-4 text-brand-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                @else
+                                    <svg class="w-4 h-4 text-brand-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                @endif
                                 {{ $property->is_available ? 'Available' : 'Unavailable' }}
                             </div>
                         </div>
@@ -123,21 +140,18 @@
                         </p>
                     </div>
 
-                    {{-- Property Features --}}
+                    {{-- Property Highlights --}}
+                    {{-- Used to re-list bedrooms/bathrooms/land/parking/status/type here —
+                         all of which the sidebar already shows, so this section added zero
+                         new information. $property->features (a real CMS field — "Solar
+                         backup", "Borehole", "Servant quarters", etc.) was collected on
+                         every listing and never displayed anywhere. Now shows that instead.
+                         Fixed 2026-09-08. --}}
+                    @if (!empty($property->features))
                     <div class="mb-8">
                         <h3 class="text-3xl font-heading text-brand-black mb-2 tracking-tight">Property Highlights</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            @php
-                                $features = [
-                                    ($property->bedrooms !== null ? $property->bedrooms . ' Bedrooms' : 'Bedrooms not listed'),
-                                    ($property->bathrooms !== null ? $property->bathrooms . ' Bathrooms' : 'Bathrooms not listed'),
-                                    $property->land_size ? $property->land_size : 'Land size not listed',
-                                    ($property->parking_spaces !== null ? $property->parking_spaces . ' Parking spaces' : 'Parking spaces not listed'),
-                                    $property->status,
-                                    $property->type,
-                                ];
-                            @endphp
-                            @foreach($features as $feature)
+                            @foreach($property->features as $feature)
                                 <div class="flex items-center gap-3 px-6 py-4 bg-gray-50 rounded-xl border border-gray-100 group hover:border-primary/30 transition-colors">
                                     <div class="w-6 h-6 rounded-full bg-brand-black flex items-center justify-center shrink-0">
                                         <svg class="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
@@ -147,6 +161,7 @@
                             @endforeach
                         </div>
                     </div>
+                    @endif
 
                     {{-- Location Details --}}
                     {{-- 2026-09-04: was 100% hardcoded — every property showed the same
@@ -212,12 +227,34 @@
                             <div>
                                 <h4 class="text-xl font-bold text-brand-black mb-6">Property Details:</h4>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->bedrooms ?? 0 }} Bedrooms</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->bathrooms ?? 0 }} Bathrooms</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->type }}</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->land_size ?? 'Land size N/A' }}</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->parking_spaces ?? 0 }} Parking</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->is_available ? 'Available' : 'Unavailable' }}</div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 4v16"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 8h18a2 2 0 0 1 2 2v10"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 17h20"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 8v9"></path></svg>
+                                        {{ $property->bedrooms ?? 0 }} Bedrooms
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 4 8 6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 19v2"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12h20"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 19v2"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 7.621 3.621A2.121 2.121 0 0 0 4 5v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"></path></svg>
+                                        {{ $property->bathrooms ?? 0 }} Bathrooms
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                                        {{ $property->type }}
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3H5a2 2 0 0 0-2 2v3"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 8V5a2 2 0 0 0-2-2h-3"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16v3a2 2 0 0 0 2 2h3"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg>
+                                        {{ $property->land_size ?? 'Land size N/A' }}
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
+                                        {{ $property->parking_spaces ?? 0 }} Parking
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        @if ($property->is_available)
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        @else
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        @endif
+                                        {{ $property->is_available ? 'Available' : 'Unavailable' }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -236,9 +273,16 @@
                                 error: null,
                                 form: { name: '', phone: '', email: '', message: '' },
                                 async submit() {
+                                    if (this.submitting) return; // guards a fast double-click, not just the disabled attribute
                                     this.submitting = true;
                                     this.error = null;
                                     try {
+                                        {{-- Unquoted attribute selector — this whole x-data object is
+                                             itself inlined into a double-quoted HTML attribute, so a
+                                             literal `"` in here (as in `name="website"`) closes that
+                                             attribute early and dumps the rest of this script as
+                                             visible page text. Matches the csrf-token selector below. --}}
+                                        const website = document.querySelector('input[name=website]')?.value || '';
                                         const res = await fetch('/api/inquiries/public', {
                                             method: 'POST',
                                             headers: {
@@ -254,6 +298,7 @@
                                                 phone: this.form.phone,
                                                 email: this.form.email,
                                                 additionalDetails: this.form.message,
+                                                website,
                                             }),
                                         });
                                         if (!res.ok) {
@@ -263,6 +308,7 @@
                                         this.sent = true;
                                     } catch (e) {
                                         this.error = e.message;
+                                        window.showToast('error', e.message);
                                     } finally {
                                         this.submitting = false;
                                     }
@@ -274,6 +320,7 @@
                                     <h4 class="text-2xl font-heading text-brand-black mb-4 uppercase tracking-tight">Request More Information</h4>
 
                                     <form @submit.prevent="submit" class="space-y-2">
+                                        <x-shared.honeypot />
                                         <div class="space-y-1">
                                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Full Name</label>
                                             <input type="text" x-model="form.name" required placeholder="e.g., John Doe" class="w-full bg-gray-50 border-none rounded-xl py-4 px-5 text-sm font-semibold focus:ring-2 focus:ring-primary focus:bg-white transition-all">

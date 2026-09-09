@@ -28,18 +28,13 @@
                 {{-- Right Side: The Form --}}
                 <div class="lg:col-span-7 px-4 pb-12">
                     <div x-data="contactFormHandler()" class="space-y-4">
-                        {{-- Error Message --}}
-                        <div x-show="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
-                            <p x-text="error"></p>
-                        </div>
-
-                        {{-- Success Message --}}
-                        <div x-show="showSuccess" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl">
-                            <p>Thank you! Your message has been received. We'll get back to you within 24 hours.</p>
-                        </div>
-
                         {{-- Form --}}
-                        <form @submit.prevent="submitForm" class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6" x-show="!showSuccess">
+                        {{-- Result now shows as a global toast (bottom-right) instead of
+                             an inline banner here — see x-shared.toast-container, included
+                             once in the layout. Keeps every form on the site consistent
+                             instead of each one building its own success/error UI. --}}
+                        <form @submit.prevent="submitForm" class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
+                            <x-shared.honeypot />
                             {{-- Full Name --}}
                             <div class="space-y-2">
                                 <label class="text-sm font-md text-brand-white tracking-widest pl-2">Full Name</label>
@@ -130,8 +125,6 @@
     function contactFormHandler() {
         return {
             isSubmitting: false,
-            showSuccess: false,
-            error: null,
             formData: {
                 name: '',
                 email: '',
@@ -141,20 +134,24 @@
             },
 
             async submitForm() {
+                if (this.isSubmitting) return; // guards a fast double-click, not just the disabled attribute
+
                 try {
                     this.isSubmitting = true;
-                    this.error = null;
 
-                    // Validate form
                     if (!this.formData.name || !this.formData.email || !this.formData.phone ||
                         !this.formData.serviceNeeded || !this.formData.message) {
                         throw new Error('Please fill in all fields');
                     }
 
-                    // Get CSRF token
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-                    // Submit to API
+                    // Spam honeypot — see x-shared.honeypot. Read straight off
+                    // the DOM rather than tracked in formData, since a bot
+                    // filling every visible-ish field is exactly what this
+                    // catches; a real user never sees or touches it.
+                    const website = document.querySelector('input[name="website"]')?.value || '';
+
                     const response = await fetch('/api/contact', {
                         method: 'POST',
                         headers: {
@@ -162,7 +159,7 @@
                             'X-Requested-With': 'XMLHttpRequest',
                             'X-CSRF-TOKEN': csrfToken
                         },
-                        body: JSON.stringify(this.formData)
+                        body: JSON.stringify({ ...this.formData, website })
                     });
 
                     if (!response.ok) {
@@ -170,23 +167,12 @@
                         throw new Error(errorData.message || 'Failed to submit message');
                     }
 
-                    // Success
-                    this.showSuccess = true;
+                    window.showToast('success', "Thank you! Your message has been received. We'll get back to you within 24 hours.");
 
-                    // Reset form after delay
-                    setTimeout(() => {
-                        this.formData = {
-                            name: '',
-                            email: '',
-                            phone: '',
-                            serviceNeeded: '',
-                            message: ''
-                        };
-                        this.showSuccess = false;
-                    }, 5000);
+                    this.formData = { name: '', email: '', phone: '', serviceNeeded: '', message: '' };
 
                 } catch (error) {
-                    this.error = error.message;
+                    window.showToast('error', error.message);
                     console.error('Contact form error:', error);
                 } finally {
                     this.isSubmitting = false;

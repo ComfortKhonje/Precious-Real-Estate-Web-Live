@@ -60,6 +60,22 @@
                     @enderror
                 </div>
 
+                <!-- Qualifications & Experience -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold tracking-wider">Qualifications</label>
+                        <input type="text" name="qualifications" value="{{ old('qualifications') }}"
+                            placeholder="e.g., MSc Real Estate, MIS(SA)"
+                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold tracking-wider">Years of Experience</label>
+                        <input type="number" name="years_experience" value="{{ old('years_experience') }}" min="0" max="100"
+                            placeholder="e.g., 12"
+                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    </div>
+                </div>
+
                 <!-- Bio -->
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Biography</label>
@@ -70,14 +86,7 @@
 
                 <!-- Photo -->
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Photo</label>
-                    <input type="file" name="photo_url" accept="image/*"
-                        class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 @error('photo_url') ring-2 ring-red-500 @enderror">
-                    @error('photo_url')
-                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                    @enderror
-                    <p id="photoSizeError" class="text-xs text-amber-600 mt-1 hidden"></p>
-                    <p class="text-xs text-brand-black/50 mt-1">Upload a professional photo. Max 5MB.</p>
+                    <x-cms.image-upload name="photo_url" label="Upload Photo" help="Professional headshot recommended" />
                 </div>
 
                 <!-- Order -->
@@ -114,10 +123,11 @@
                 <div class="bg-gray-50 border border-gray-100 rounded-3xl p-6 sticky top-4">
                     <h4 class="font-heading text-lg mb-4">Preview</h4>
 
-                    <!-- Photo Preview -->
+                    {{-- Photo preview lives inline under the Photo field itself now
+                         (x-cms.image-upload shows its own thumbnail immediately on
+                         selection) — this sidebar mirror is just a static icon. --}}
                     <div class="mb-4 h-48 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center overflow-hidden">
-                        <img loading="lazy" decoding="async" id="photoPreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
-                        <i data-lucide="user" class="w-16 h-16 text-brand-black/40" id="photoPlaceholder"></i>
+                        <i data-lucide="user" class="w-16 h-16 text-brand-black/40"></i>
                     </div>
 
                     <!-- Info Preview -->
@@ -163,8 +173,9 @@
     </form>
 
     <script>
-        // Update preview as user types
-        document.querySelectorAll('input[name="name"], input[name="role"], textarea[name="bio"], input[name="photo_url"]').forEach(el => {
+        // Update preview as user types. Photo preview lives inline under the
+        // Photo field itself (x-cms.image-upload) — not mirrored here.
+        document.querySelectorAll('input[name="name"], input[name="role"], textarea[name="bio"]').forEach(el => {
             el.addEventListener('input', function() {
                 if (this.name === 'name') {
                     document.getElementById('previewName').textContent = this.value || 'John Smith';
@@ -172,48 +183,6 @@
                     document.getElementById('previewRole').textContent = this.value || 'Property Manager';
                 } else if (this.name === 'bio') {
                     document.getElementById('previewBio').textContent = this.value || 'Brief biography...';
-                } else if (this.name === 'photo_url') {
-                    // 2026-09-04: this used to do `preview.src = this.value`
-                    // — for a file input, `.value` is the browser's fake
-                    // "C:\fakepath\..." placeholder string, never a loadable
-                    // URL, so this preview never actually worked for a real
-                    // selected photo. FileReader reads the real file instead.
-                    //
-                    // Also rejects anything over 5MB (matches the server's
-                    // own `max:5120` rule) before it's attached to the form
-                    // at all — a real upload here once slipped past PHP's
-                    // upload_max_filesize/post_max_size and surfaced as a
-                    // raw PostTooLargeException page instead of a normal
-                    // validation message.
-                    const preview = document.getElementById('photoPreview');
-                    const placeholder = document.getElementById('photoPlaceholder');
-                    const sizeError = document.getElementById('photoSizeError');
-                    const file = this.files && this.files[0];
-                    const maxBytes = 5 * 1024 * 1024;
-
-                    sizeError.classList.add('hidden');
-
-                    if (file && file.size > maxBytes) {
-                        sizeError.textContent = `"${file.name}" is over the 5MB limit and wasn't added.`;
-                        sizeError.classList.remove('hidden');
-                        this.value = '';
-                        preview.classList.add('hidden');
-                        placeholder.classList.remove('hidden');
-                        return;
-                    }
-
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            preview.src = e.target.result;
-                            preview.classList.remove('hidden');
-                            placeholder.classList.add('hidden');
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        preview.classList.add('hidden');
-                        placeholder.classList.remove('hidden');
-                    }
                 }
             });
         });

@@ -135,6 +135,9 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::put('/services/{slug}', [App\Http\Controllers\Cms\ServicesController::class, 'update'])->name('services.update');
         Route::delete('/services/{service}', [App\Http\Controllers\Cms\ServicesController::class, 'destroy'])->name('services.destroy');
 
+        Route::post('/service-icons', [App\Http\Controllers\Cms\ServiceIconsController::class, 'store'])->name('service-icons.store');
+        Route::delete('/service-icons/{serviceIcon}', [App\Http\Controllers\Cms\ServiceIconsController::class, 'destroy'])->name('service-icons.destroy');
+
         Route::get('/inquiries', [InquiriesController::class, 'index'])->name('inquiries.index');
         Route::get('/inquiries/{inquiry}', [InquiriesController::class, 'show'])->name('inquiries.show');
         Route::delete('/inquiries/{inquiry}', [InquiriesController::class, 'destroy'])->name('inquiries.destroy');
