@@ -227,12 +227,34 @@
                             <div>
                                 <h4 class="text-xl font-bold text-brand-black mb-6">Property Details:</h4>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->bedrooms ?? 0 }} Bedrooms</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->bathrooms ?? 0 }} Bathrooms</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->type }}</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->land_size ?? 'Land size N/A' }}</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->parking_spaces ?? 0 }} Parking</div>
-                                    <div class="px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 text-center tracking-widest">{{ $property->is_available ? 'Available' : 'Unavailable' }}</div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 4v16"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 8h18a2 2 0 0 1 2 2v10"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 17h20"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 8v9"></path></svg>
+                                        {{ $property->bedrooms ?? 0 }} Bedrooms
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 4 8 6"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 19v2"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12h20"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 19v2"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 7.621 3.621A2.121 2.121 0 0 0 4 5v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"></path></svg>
+                                        {{ $property->bathrooms ?? 0 }} Bathrooms
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                                        {{ $property->type }}
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3H5a2 2 0 0 0-2 2v3"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 8V5a2 2 0 0 0-2-2h-3"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16v3a2 2 0 0 0 2 2h3"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg>
+                                        {{ $property->land_size ?? 'Land size N/A' }}
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
+                                        {{ $property->parking_spaces ?? 0 }} Parking
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg text-sm font-bold text-gray-400 tracking-widest">
+                                        @if ($property->is_available)
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        @else
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        @endif
+                                        {{ $property->is_available ? 'Available' : 'Unavailable' }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -255,7 +277,12 @@
                                     this.submitting = true;
                                     this.error = null;
                                     try {
-                                        const website = document.querySelector('input[name="website"]')?.value || '';
+                                        {{-- Unquoted attribute selector — this whole x-data object is
+                                             itself inlined into a double-quoted HTML attribute, so a
+                                             literal `"` in here (as in `name="website"`) closes that
+                                             attribute early and dumps the rest of this script as
+                                             visible page text. Matches the csrf-token selector below. --}}
+                                        const website = document.querySelector('input[name=website]')?.value || '';
                                         const res = await fetch('/api/inquiries/public', {
                                             method: 'POST',
                                             headers: {
