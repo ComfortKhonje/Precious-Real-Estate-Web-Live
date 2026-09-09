@@ -79,12 +79,7 @@
                 <p class="text-xs text-brand-black/50 mt-1">Comma-separated. Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid.</p>
             </div>
 
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Banner Image</label>
-                <input type="file" name="banner_image" accept="image/*"
-                    class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
-                <p class="text-xs text-brand-black/50 mt-1">Upload banner image for this service</p>
-            </div>
+            <x-cms.image-upload name="banner_image" label="Banner Image" help="Upload a banner image for this service" />
 
             <div class="space-y-2" x-data="serviceIconPicker({{ Js::from($icons->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'black_url' => $i->blackUrl(), 'yellow_url' => $i->yellowUrl()])) }}, {{ old('service_icon_id') ? (int) old('service_icon_id') : 'null' }})">
                 <label class="text-sm font-semibold tracking-wider">Icon (Optional)</label>

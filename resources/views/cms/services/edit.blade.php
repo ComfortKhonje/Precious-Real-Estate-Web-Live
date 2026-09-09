@@ -61,11 +61,7 @@
                     class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
                 <p class="text-xs text-brand-black/50 mt-1">Comma-separated. Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid.</p>
             </div>
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Banner Image</label>
-                <input type="file" name="banner_image" accept="image/*"
-                    class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
-            </div>
+            <x-cms.image-upload name="banner_image" label="Click to replace banner image" help="Leave empty to keep the current one" />
 
             <div class="space-y-2" x-data="serviceIconPicker({{ Js::from($icons->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'black_url' => $i->blackUrl(), 'yellow_url' => $i->yellowUrl()])) }}, {{ old('service_icon_id') ? (int) old('service_icon_id') : ($service->service_icon_id ?? 'null') }})">
                 <label class="text-sm font-semibold tracking-wider">Icon</label>
@@ -149,7 +145,7 @@
                 </p>
                 <div class="border-2 border-dashed border-gray-200 rounded-3xl p-10 text-center bg-white">
                     @if ($service->banner_image)
-                    <img loading="lazy" decoding="async" src="{{ str_starts_with($service->banner_image, 'http') ? $service->banner_image : asset('storage/' . $service->banner_image . '/medium.webp') }}" alt="{{ $service->title }} banner"
+                    <img loading="lazy" decoding="async" src="{{ $service->bannerImageUrl('medium') }}" alt="{{ $service->title }} banner"
                         class="mx-auto h-40 object-cover rounded-3xl">
                     @else
                     <p class="font-semibold">No banner image configured yet</p>
