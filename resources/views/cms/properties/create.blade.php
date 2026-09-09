@@ -129,20 +129,11 @@
             <p class="text-sm text-brand-black/60 mb-6">Visibility and promotion settings.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <label class="flex items-center justify-between gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100 cursor-pointer hover:bg-gray-100 transition">
-                    <div>
-                        <div class="font-semibold">Featured Listing</div>
-                        <div class="text-sm text-brand-black/60">Show this property in featured sections.</div>
-                    </div>
-                    <input type="checkbox" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }} class="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary">
-                </label>
-                <label class="flex items-center justify-between gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100 cursor-pointer hover:bg-gray-100 transition">
-                    <div>
-                        <div class="font-semibold">Available</div>
-                        <div class="text-sm text-brand-black/60">Listing is currently active and visible on the site.</div>
-                    </div>
-                    <input type="checkbox" name="is_available" value="1" {{ old('is_available', true) ? 'checked' : '' }} class="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary">
-                </label>
+                <x-cms.toggle name="is_featured" :checked="old('is_featured')"
+                    label="Featured Listing" description="Show this property in featured sections." />
+
+                <x-cms.toggle name="is_available" :checked="old('is_available', true)"
+                    label="Available" description="Listing is currently active and visible on the site." />
             </div>
         </div>
 

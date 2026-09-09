@@ -138,23 +138,8 @@
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Visibility</label>
-                <div class="flex items-center gap-4">
-                    <label class="inline-flex items-center gap-2">
-                        <input type="radio" name="visible" value="1"
-                            {{ old('visible', $service->visible) == 1 ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span>Visible</span>
-                    </label>
-                    <label class="inline-flex items-center gap-2">
-                        <input type="radio" name="visible" value="0"
-                            {{ old('visible', $service->visible) == 0 ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span>Hidden</span>
-                    </label>
-                </div>
-            </div>
+            <x-cms.toggle name="visible" :checked="old('visible', $service->visible)"
+                label="Visible" description="Shown on the public site." />
         </div>
 
         <div class="space-y-5">

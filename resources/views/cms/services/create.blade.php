@@ -157,24 +157,9 @@
                 </div>
             </div>
 
-            <div class="space-y-3 pt-4 border-t border-gray-100">
-                <label class="text-sm font-semibold tracking-wider">Visibility</label>
-                <div class="space-y-2">
-                    <label
-                        class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer transition">
-                        <input type="radio" name="visible" value="1" checked
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span class="font-semibold">Visible</span>
-                        <span class="text-xs text-brand-black/50 ml-auto">Shown on frontend</span>
-                    </label>
-                    <label
-                        class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer transition">
-                        <input type="radio" name="visible" value="0"
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span class="font-semibold">Hidden</span>
-                        <span class="text-xs text-brand-black/50 ml-auto">Not shown on frontend</span>
-                    </label>
-                </div>
+            <div class="pt-4 border-t border-gray-100">
+                <x-cms.toggle name="visible" :checked="old('visible', true)"
+                    label="Visible" description="Shown on the public site." />
             </div>
         </div>
 

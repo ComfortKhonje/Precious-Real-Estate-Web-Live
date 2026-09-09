@@ -101,19 +101,8 @@
 
                     <!-- Visibility -->
                     <div class="space-y-2">
-                        <label class="text-sm font-semibold tracking-wider">Visibility</label>
-                        <div class="flex items-center gap-4 mt-4">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="visible" value="1" checked
-                                    class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                                <span class="text-sm">Visible</span>
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="visible" value="0"
-                                    class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                                <span class="text-sm">Hidden</span>
-                            </label>
-                        </div>
+                        <x-cms.toggle name="visible" :checked="old('visible', true)"
+                            label="Visible" description="Shown on the team page." />
                     </div>
                 </div>
             </div>

@@ -63,13 +63,7 @@
                     </select>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Featured</label>
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" name="is_featured" value="1"
-                            {{ old('is_featured', $announcement->is_featured) ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span class="text-sm text-brand-black/70">Mark as featured</span>
-                    </div>
+                    <x-cms.toggle name="is_featured" :checked="old('is_featured', $announcement->is_featured)" label="Featured" />
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Publish Date</label>

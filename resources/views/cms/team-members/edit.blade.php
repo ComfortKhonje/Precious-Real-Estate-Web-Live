@@ -107,21 +107,8 @@
 
                     <!-- Visibility -->
                     <div class="space-y-2">
-                        <label class="text-sm font-semibold tracking-wider">Visibility</label>
-                        <div class="flex items-center gap-4 mt-4">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="visible" value="1"
-                                    {{ old('visible', $teamMember->visible) ? 'checked' : '' }}
-                                    class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                                <span class="text-sm">Visible</span>
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="visible" value="0"
-                                    {{ !old('visible', $teamMember->visible) ? 'checked' : '' }}
-                                    class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                                <span class="text-sm">Hidden</span>
-                            </label>
-                        </div>
+                        <x-cms.toggle name="visible" :checked="old('visible', $teamMember->visible)"
+                            label="Visible" description="Shown on the team page." />
                     </div>
                 </div>
             </div>
@@ -218,7 +205,7 @@
                     document.getElementById('previewBio').textContent = this.value || 'Brief biography...';
                 } else if (this.name === 'visible') {
                     const visibility = document.getElementById('previewVisibility');
-                    if (this.value === '1') {
+                    if (this.checked) {
                         visibility.innerHTML = '<i data-lucide="eye" class="w-3.5 h-3.5"></i> Visible';
                         visibility.className =
                             'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 text-brand-black';
