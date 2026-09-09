@@ -28,6 +28,12 @@ return Application::configure(basePath: dirname(__DIR__))
             SecurityHeaders::class,
             TrackPageView::class,
         ]);
+
+        // 2026-09-09: for the CMS's own maintenance-mode toggle (Settings >
+        // Site Status) — without this, putting the public site into
+        // maintenance mode would also lock staff out of /cms itself, with
+        // no way back in except SSH/Terminal access to run `php artisan up`.
+        $middleware->preventRequestsDuringMaintenance(['cms/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // 2026-09-04: a CMS photo/gallery upload exceeding PHP's own

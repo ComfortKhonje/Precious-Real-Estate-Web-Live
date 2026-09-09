@@ -74,6 +74,35 @@
         </div>
     </form>
 
+    <div class="cms-panel p-6 mb-6">
+        <div class="flex items-center justify-between gap-4 mb-1">
+            <h3 class="cms-section-title">Site Status</h3>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $isDownForMaintenance ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
+                <span class="w-2 h-2 rounded-full {{ $isDownForMaintenance ? 'bg-red-500' : 'bg-green-500' }}"></span>
+                {{ $isDownForMaintenance ? 'Under Maintenance' : 'Live' }}
+            </span>
+        </div>
+        <p class="text-sm text-brand-black/60 mb-6">
+            @if($isDownForMaintenance)
+                Visitors see a "We'll be right back" page. The CMS stays reachable so you can keep working and switch it back.
+            @else
+                The public site is visible to everyone. Turn this on before major changes you don't want visitors to see mid-edit.
+            @endif
+        </p>
+
+        <form id="maintenance-toggle-form" method="POST" action="{{ route('cms.settings.maintenance') }}">
+            @csrf
+            @if($isDownForMaintenance)
+                <button type="submit" class="btn-primary">Bring Site Back Online</button>
+            @else
+                <button type="button" class="btn-danger"
+                    @click="confirmFormId = 'maintenance-toggle-form'; confirmTitle = 'Enable Maintenance Mode?'; confirmMessage = 'This takes the public website offline for every visitor immediately. The CMS stays reachable so you can switch it back here. Continue?'; confirmActionLabel = 'Yes, Enable'; confirmLoadingLabel = 'Enabling&hellip;'; confirmModalOpen = true">
+                    Enable Maintenance Mode
+                </button>
+            @endif
+        </form>
+    </div>
+
     <form method="POST" action="{{ route('cms.settings.password') }}" class="space-y-6">
         @csrf
         @method('PUT')

@@ -22,7 +22,7 @@
 </head>
 
 <body class="font-body text-brand-black bg-brand-white antialiased min-h-screen"
-    x-data="{ sidebarOpen: false, userMenuOpen: false, confirmModalOpen: false, confirmFormId: null, confirmMessage: 'Are you sure?', confirmDeleting: false }"
+    x-data="{ sidebarOpen: false, userMenuOpen: false, confirmModalOpen: false, confirmFormId: null, confirmTitle: 'Confirm Deletion', confirmMessage: 'Are you sure?', confirmActionLabel: 'Yes, Delete', confirmLoadingLabel: 'Deleting&hellip;', confirmDeleting: false }"
     x-init="$watch('confirmModalOpen', (open) => { if (open) confirmDeleting = false })">
     <div class="min-h-screen flex">
         {{-- Mobile overlay --}}
@@ -204,7 +204,7 @@
                     <i data-lucide="alert-triangle" class="w-6 h-6"></i>
                 </div>
                 <div class="flex-1 mt-1">
-                    <h3 class="font-heading text-2xl leading-tight mb-2">Confirm Deletion</h3>
+                    <h3 class="font-heading text-2xl leading-tight mb-2" x-text="confirmTitle"></h3>
                     <p class="text-brand-black/70 text-sm leading-relaxed" x-text="confirmMessage"></p>
                 </div>
             </div>
@@ -216,12 +216,17 @@
                 </button>
                 {{-- form.submit() (as opposed to a real submit-button click) never
                      fires the form's 'submit' event, so the generic double-submit
-                     guard below can't catch this one — guarded here directly instead. --}}
+                     guard below can't catch this one — guarded here directly instead.
+                     Generalized beyond delete (2026-09-09, for the maintenance-mode
+                     toggle) via confirmTitle/confirmActionLabel/confirmLoadingLabel —
+                     every existing call site only ever set confirmFormId/
+                     confirmMessage, so they fall through to the same "Confirm
+                     Deletion" / "Yes, Delete" defaults as before. --}}
                 <button type="button" @click="confirmDeleting = true; document.getElementById(confirmFormId).submit()"
                     :disabled="confirmDeleting"
                     class="px-6 py-3 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition text-sm shadow-sm shadow-red-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span x-show="!confirmDeleting">Yes, Delete</span>
-                    <span x-show="confirmDeleting">Deleting&hellip;</span>
+                    <span x-show="!confirmDeleting" x-text="confirmActionLabel"></span>
+                    <span x-show="confirmDeleting" x-text="confirmLoadingLabel"></span>
                 </button>
             </div>
         </div>

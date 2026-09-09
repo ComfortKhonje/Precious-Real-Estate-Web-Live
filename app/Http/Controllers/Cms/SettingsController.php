@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cms;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -29,8 +30,9 @@ class SettingsController extends Controller
     public function index(Request $request)
     {
         $settings = Setting::whereIn('key', self::KEYS)->pluck('value', 'key');
+        $isDownForMaintenance = app()->isDownForMaintenance();
 
-        return view('cms.settings.index', compact('settings'));
+        return view('cms.settings.index', compact('settings', 'isDownForMaintenance'));
     }
 
     public function update(Request $request)
@@ -76,5 +78,29 @@ class SettingsController extends Controller
         $request->user()->update(['password' => $request->input('password')]);
 
         return back()->with('status', 'Password updated.');
+    }
+
+    /**
+     * Flip the public site between live and maintenance mode.
+     *
+     * `down` itself has no "except" option — the CMS staying reachable
+     * comes from bootstrap/app.php's
+     * $middleware->preventRequestsDuringMaintenance(['cms/*']). Without
+     * that, the very first request after enabling maintenance mode
+     * (loading this page again, or even /cms/login) would 503 too, and
+     * there'd be no way back in except SSH/Terminal access to run
+     * `php artisan up` directly.
+     */
+    public function toggleMaintenance(Request $request)
+    {
+        if (app()->isDownForMaintenance()) {
+            Artisan::call('up');
+
+            return back()->with('status', 'Site is back online.');
+        }
+
+        Artisan::call('down', ['--retry' => 60]);
+
+        return back()->with('status', 'Site is now in maintenance mode. The CMS stays reachable.');
     }
 }

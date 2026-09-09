@@ -165,5 +165,6 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::put('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'update'])->name('settings.update');
         Route::put('/settings/profile', [App\Http\Controllers\Cms\SettingsController::class, 'updateProfile'])->name('settings.profile');
         Route::put('/settings/password', [App\Http\Controllers\Cms\SettingsController::class, 'updatePassword'])->name('settings.password');
+        Route::post('/settings/maintenance', [App\Http\Controllers\Cms\SettingsController::class, 'toggleMaintenance'])->name('settings.maintenance');
     });
 });

@@ -201,6 +201,26 @@ exact cause of one of the bugs found in the 2026-09-03 audit.
 
 ## 4. Taking the site down for maintenance
 
+Superseded 2026-09-09 — the `.htaccess` approach below required editing raw
+Apache config on the live server by hand every time and was easy to forget to
+revert. Use the CMS instead: **Settings → Site Status → Enable Maintenance
+Mode**. It calls `php artisan down` under the hood, which already returns a
+real `503` with `Retry-After` (no redirect, no SEO risk — the exact problem
+the `.htaccess` rule below was working around), and the CMS itself
+(`/cms/*`, configured in `bootstrap/app.php`) stays reachable so whoever
+turned it on can always turn it back off from the same screen — no SSH
+needed, and no way to lock yourself out.
+
+Only reach for the terminal if the CMS itself is unreachable:
+
+```bash
+php artisan down --retry=60   # take the public site down
+php artisan up                # bring it back
+```
+
+<details>
+<summary>Old method (kept for reference only — don't use)</summary>
+
 The correct way is a real `503` with `Retry-After`, not a redirect — a redirect
 risks Google indexing the maintenance page in place of real URLs. Put this at
 the very top of `public_html/.htaccess`:
@@ -217,6 +237,8 @@ Header always set Retry-After "7200"
 ```
 
 Remove those lines to bring the site back. Nothing in the app is touched.
+
+</details>
 
 ---
 
