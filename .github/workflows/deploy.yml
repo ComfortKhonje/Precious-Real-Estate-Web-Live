@@ -100,7 +100,26 @@ jobs:
 
           echo "${GITHUB_SHA}" > bundle/release/RELEASE
 
+      # Each upload retries once: the host occasionally drops a long FTPS
+      # session mid-transfer ("Server sent FIN packet unexpectedly"). The
+      # retry only resends what the first attempt didn't finish.
       - name: Upload app code
+        id: app_upload
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
+          local-dir: bundle/app/
+          server-dir: precious-real-estate-web/
+          state-name: .ftp-deploy-app.json
+          timeout: 600000
+
+      - name: Upload app code (retry)
+        if: steps.app_upload.outcome == 'failure'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -116,6 +135,22 @@ jobs:
           timeout: 600000
 
       - name: Upload public files
+        id: docroot_upload
+        continue-on-error: true
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          security: loose
+          local-dir: bundle/docroot/
+          server-dir: public_html/
+          state-name: .ftp-deploy-docroot.json
+          timeout: 600000
+
+      - name: Upload public files (retry)
+        if: steps.docroot_upload.outcome == 'failure'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
