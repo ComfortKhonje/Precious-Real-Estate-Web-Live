@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,7 +22,8 @@ class CreateCmsUser extends Command
     protected $signature = 'prec:create-user
                             {name : Full name of the staff member}
                             {email : Login email}
-                            {--password= : Password (omit to generate one)}';
+                            {--password= : Password (omit to generate one)}
+                            {--role=super_admin : super_admin, admin or editor}';
 
     protected $description = 'Create (or update) a CMS staff account';
 
@@ -38,11 +40,12 @@ class CreateCmsUser extends Command
         }
 
         $validator = Validator::make(
-            ['name' => $name, 'email' => $email, 'password' => $password],
+            ['name' => $name, 'email' => $email, 'password' => $password, 'role' => $this->option('role')],
             [
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'email'],
                 'password' => ['required', Password::min(8)],
+                'role' => ['required', Rule::in(array_keys(User::ROLES))],
             ]
         );
 
@@ -56,7 +59,7 @@ class CreateCmsUser extends Command
 
         $user = User::updateOrCreate(
             ['email' => $email],
-            ['name' => $name, 'password' => $password]
+            ['name' => $name, 'password' => $password, 'role' => $this->option('role'), 'must_change_password' => $generated]
         );
 
         $this->info(($user->wasRecentlyCreated ? 'Created' : 'Updated')." CMS account for {$email}");

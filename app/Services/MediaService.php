@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use enshrined\svgSanitize\Sanitizer;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -97,11 +99,36 @@ class MediaService
         $uuid = Str::uuid()->toString();
         $directory = "{$this->basePath}/{$folder}/{$uuid}";
 
+        $blackSvg = $this->sanitizeSvg($black);
+        $yellowSvg = $this->sanitizeSvg($yellow);
+
         Storage::disk($this->disk)->makeDirectory($directory);
-        Storage::disk($this->disk)->put("{$directory}/black.svg", file_get_contents($black->getRealPath()));
-        Storage::disk($this->disk)->put("{$directory}/yellow.svg", file_get_contents($yellow->getRealPath()));
+        Storage::disk($this->disk)->put("{$directory}/black.svg", $blackSvg);
+        Storage::disk($this->disk)->put("{$directory}/yellow.svg", $yellowSvg);
 
         return $directory;
+    }
+
+    /**
+     * SVG is XML and can carry <script>, event handlers and external
+     * references. These files are served from the site's own domain, so an
+     * unsanitized one would run script as the site. Strip everything that
+     * isn't plain drawing markup; refuse the file if nothing usable is left.
+     */
+    protected function sanitizeSvg(UploadedFile $file): string
+    {
+        $sanitizer = new Sanitizer;
+        $sanitizer->removeRemoteReferences(true);
+
+        $clean = $sanitizer->sanitize((string) file_get_contents($file->getRealPath()));
+
+        if (! $clean) {
+            throw ValidationException::withMessages([
+                'icon' => "{$file->getClientOriginalName()} isn't a valid SVG file.",
+            ]);
+        }
+
+        return $clean;
     }
 
     /**

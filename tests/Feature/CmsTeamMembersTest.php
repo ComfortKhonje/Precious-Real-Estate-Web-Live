@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
-    $this->user = User::create([
+    $this->user = User::create(['role' => 'super_admin',
         'name' => 'Admin User',
         'email' => 'admin@example.com',
         'password' => Hash::make('password'),

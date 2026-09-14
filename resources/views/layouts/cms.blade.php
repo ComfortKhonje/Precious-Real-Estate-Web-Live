@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     {{-- Alpine.js for CMS interactions --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
@@ -52,18 +52,21 @@
             <nav class="flex-1 overflow-y-auto px-3 py-6 space-y-1">
                 @php
                 // 'match' is a route-name pattern so child pages (create/edit/show)
-                // keep their parent nav item highlighted.
+                // keep their parent nav item highlighted. 'role' hides items the
+                // signed-in user's role can't open (routes enforce it too).
                 $nav = [
                 ['label' => 'Dashboard Overview', 'route' => 'cms.dashboard', 'match' => 'cms.dashboard', 'icon' => 'layout-dashboard'],
-                ['label' => 'Analytics', 'route' => 'cms.analytics.index', 'match' => 'cms.analytics.*', 'icon' => 'chart-bar'],
+                ['label' => 'Analytics', 'route' => 'cms.analytics.index', 'match' => 'cms.analytics.*', 'icon' => 'chart-bar', 'role' => 'admin'],
                 ['label' => 'Property Listings', 'route' => 'cms.properties.index', 'match' => 'cms.properties.*', 'icon' => 'home'],
                 ['label' => 'Services Content', 'route' => 'cms.services.index', 'match' => 'cms.services.*', 'icon' => 'briefcase'],
                 ['label' => 'Inquiries', 'route' => 'cms.inquiries.index', 'match' => 'cms.inquiries.*', 'icon' => 'mail'],
                 ['label' => 'Announcements & News', 'route' => 'cms.announcements.index', 'match' => 'cms.announcements.*', 'icon' => 'megaphone'],
                 ['label' => 'Team Members', 'route' => 'cms.team-members.index', 'match' => 'cms.team-members.*', 'icon' => 'users'],
-                ['label' => 'Contact Information', 'route' => 'cms.contact.index', 'match' => 'cms.contact.*', 'icon' => 'phone'],
+                ['label' => 'Contact Information', 'route' => 'cms.contact.index', 'match' => 'cms.contact.*', 'icon' => 'phone', 'role' => 'admin'],
+                ['label' => 'Staff Accounts', 'route' => 'cms.users.index', 'match' => 'cms.users.*', 'icon' => 'shield-check', 'role' => 'admin'],
                 ['label' => 'Settings', 'route' => 'cms.settings.index', 'match' => 'cms.settings.*', 'icon' => 'settings'],
                 ];
+                $nav = array_filter($nav, fn ($item) => ! isset($item['role']) || Auth::user()?->hasRoleAtLeast($item['role']));
                 @endphp
 
                 @foreach($nav as $item)
@@ -121,7 +124,7 @@
                                      actually logged in. Fixed 2026-09-08. --}}
                                 <div class="hidden sm:block text-left leading-tight">
                                     <div class="text-sm font-semibold text-brand-black">{{ Auth::user()->name ?? 'Admin' }}</div>
-                                    <div class="text-xs text-brand-black/60">{{ Auth::user()->email ?? 'PREC Staff' }}</div>
+                                    <div class="text-xs text-brand-black/60">{{ Auth::user()?->roleLabel() ?? 'PREC Staff' }}</div>
                                 </div>
                                 <i data-lucide="chevron-down" class="w-4 h-4 text-brand-black/70"></i>
                             </button>

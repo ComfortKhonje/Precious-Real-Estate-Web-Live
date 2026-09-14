@@ -9,7 +9,7 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [dev, dev-test]   # main is tested by deploy.yml before it deploys
   pull_request:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: gd, fileinfo, mbstring, pdo_sqlite, zip
           coverage: none
 

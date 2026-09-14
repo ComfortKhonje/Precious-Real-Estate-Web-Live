@@ -29,10 +29,6 @@
     <x-shared.inquiry-footer />
 @endsection
 
-@push('scripts')
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-@endpush
-
 @push('styles')
 <style>
     /* Hide the default navbar and footer for this page */

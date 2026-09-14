@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Cms\AnnouncementsController;
+use App\Http\Controllers\Cms\AuthController as CmsAuthController;
 use App\Http\Controllers\Cms\DashboardController;
 use App\Http\Controllers\Cms\InquiriesController;
 use App\Http\Controllers\Cms\TeamMembersController;
+use App\Http\Controllers\Cms\UsersController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CreditsController;
 use App\Http\Controllers\HomeController;
@@ -16,9 +18,6 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TermsController;
 use App\Http\Controllers\UpdatesController;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -54,62 +53,24 @@ Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 | Production can mount this group on a CMS subdomain (e.g. cms.preciousrealestate.mw).
 */
 Route::prefix('cms')->name('cms.')->group(function () {
-    Route::get('/login', function () {
-        return view('cms.auth.login');
-    })->name('login');
+    // Login is rate limited inside AuthController (per IP+email and per IP).
+    Route::get('/login', [CmsAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [CmsAuthController::class, 'login'])->name('login.submit');
+    Route::post('/logout', [CmsAuthController::class, 'logout'])->name('logout');
 
-    Route::post('/login', function (Request $request) {
-        // 2026-09-02: this had zero rate limiting — unlimited credential
-        // guesses against a login that's currently reachable by anyone
-        // (the /cms path isn't secret). 5 attempts / minute per IP+email
-        // combo; Laravel's built-in throttle, not a custom implementation.
-        $throttleKey = 'cms-login:'.$request->ip().'|'.$request->input('email');
-        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
-            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($throttleKey);
+    Route::get('/forgot-password', [CmsAuthController::class, 'showForgot'])->name('password.request');
+    Route::post('/forgot-password', [CmsAuthController::class, 'sendResetLink'])->middleware('throttle:5,1')->name('password.email');
+    Route::get('/reset-password/{token}', [CmsAuthController::class, 'showReset'])->name('password.reset');
+    Route::post('/reset-password', [CmsAuthController::class, 'resetPassword'])->middleware('throttle:10,1')->name('password.update');
 
-            return back()
-                ->withErrors(['login' => "Too many attempts. Try again in {$seconds} seconds."])
-                ->withInput(['email' => $request->input('email')]);
-        }
-
-        $validated = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
-
-        $user = User::where('email', $validated['email'])->first();
-
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
-            \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
-
-            return back()
-                ->withErrors(['login' => 'Invalid credentials.'])
-                ->withInput(['email' => $validated['email']]);
-        }
-
-        \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
-
-        // Log the user into the web guard and keep legacy session flag for middleware compatibility
-        auth()->login($user, $request->filled('remember'));
-        $request->session()->regenerate();
-        $request->session()->put('cms_authenticated', true);
-
-        return redirect()->route('cms.dashboard');
-    })->name('login.submit');
-
-    Route::post('/logout', function (Request $request) {
-        // logout from web guard and clear cms session flag
-        if (auth()->check()) {
-            auth()->logout();
-        }
-
-        $request->session()->forget('cms_authenticated');
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('cms.login')->with('status', 'Logged out.');
-    })->name('logout');
-
+    /*
+     * Roles (2026-09-14) — see User::ROLES.
+     *   editor:      the routes directly in this group
+     *   admin+:      the cms.role:admin group below
+     *   super_admin: enforced per-account inside UsersController
+     * Every role can open Settings for their own profile and password; the
+     * site-wide parts of that page are admin-only.
+     */
     Route::middleware('cms.auth')->group(function () {
         Route::get('/', fn() => redirect()->route('cms.dashboard'));
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
@@ -140,7 +101,6 @@ Route::prefix('cms')->name('cms.')->group(function () {
 
         Route::get('/inquiries', [InquiriesController::class, 'index'])->name('inquiries.index');
         Route::get('/inquiries/{inquiry}', [InquiriesController::class, 'show'])->name('inquiries.show');
-        Route::delete('/inquiries/{inquiry}', [InquiriesController::class, 'destroy'])->name('inquiries.destroy');
 
         Route::get('/announcements', [AnnouncementsController::class, 'index'])->name('announcements.index');
         Route::get('/announcements/create', [AnnouncementsController::class, 'create'])->name('announcements.create');
@@ -158,13 +118,26 @@ Route::prefix('cms')->name('cms.')->group(function () {
         Route::put('/team-members/{teamMember}', [TeamMembersController::class, 'update'])->name('team-members.update');
         Route::delete('/team-members/{teamMember}', [TeamMembersController::class, 'destroy'])->name('team-members.destroy');
 
-        Route::get('/contact', [App\Http\Controllers\Cms\ContactController::class, 'index'])->name('contact.index');
-        Route::put('/contact', [App\Http\Controllers\Cms\ContactController::class, 'update'])->name('contact.update');
-        Route::get('/analytics', [App\Http\Controllers\Cms\AnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'index'])->name('settings.index');
-        Route::put('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'update'])->name('settings.update');
         Route::put('/settings/profile', [App\Http\Controllers\Cms\SettingsController::class, 'updateProfile'])->name('settings.profile');
         Route::put('/settings/password', [App\Http\Controllers\Cms\SettingsController::class, 'updatePassword'])->name('settings.password');
-        Route::post('/settings/maintenance', [App\Http\Controllers\Cms\SettingsController::class, 'toggleMaintenance'])->name('settings.maintenance');
+
+        Route::middleware('cms.role:admin')->group(function () {
+            Route::delete('/inquiries/{inquiry}', [InquiriesController::class, 'destroy'])->name('inquiries.destroy');
+
+            Route::get('/contact', [App\Http\Controllers\Cms\ContactController::class, 'index'])->name('contact.index');
+            Route::put('/contact', [App\Http\Controllers\Cms\ContactController::class, 'update'])->name('contact.update');
+            Route::get('/analytics', [App\Http\Controllers\Cms\AnalyticsController::class, 'index'])->name('analytics.index');
+            Route::put('/settings', [App\Http\Controllers\Cms\SettingsController::class, 'update'])->name('settings.update');
+            Route::post('/settings/maintenance', [App\Http\Controllers\Cms\SettingsController::class, 'toggleMaintenance'])->name('settings.maintenance');
+            Route::post('/settings/test-email', [App\Http\Controllers\Cms\SettingsController::class, 'sendTestEmail'])->middleware('throttle:5,1')->name('settings.test-email');
+
+            Route::get('/users', [UsersController::class, 'index'])->name('users.index');
+            Route::get('/users/create', [UsersController::class, 'create'])->name('users.create');
+            Route::post('/users', [UsersController::class, 'store'])->name('users.store');
+            Route::get('/users/{user}/edit', [UsersController::class, 'edit'])->name('users.edit');
+            Route::put('/users/{user}', [UsersController::class, 'update'])->name('users.update');
+            Route::delete('/users/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
+        });
     });
 });

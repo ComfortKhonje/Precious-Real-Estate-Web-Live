@@ -31,6 +31,12 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
+        // HTTPS-only from here on. Only sent over a real HTTPS request in
+        // production, so it can never pin a local http:// dev setup.
+        if ($request->isSecure() && app()->isProduction()) {
+            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        }
+
         return $response;
     }
 }

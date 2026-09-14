@@ -8,6 +8,15 @@
     {{-- Result now shows as a global toast (bottom-right) — see
          x-shared.toast-container in the CMS layout. --}}
 
+    @php $isAdmin = auth()->user()->hasRoleAtLeast('admin'); @endphp
+
+    @if(auth()->user()->must_change_password)
+        <div class="mb-6 p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900">
+            <div class="font-semibold">Choose your own password to continue.</div>
+            <p class="text-sm mt-1">This account's password was set by someone else. Use <a href="#password-management" class="underline font-semibold">Password Management</a> below — the rest of the CMS unlocks once it's changed.</p>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('cms.settings.profile') }}" class="space-y-6 mb-6">
         @csrf
         @method('PUT')
@@ -34,6 +43,7 @@
         </div>
     </form>
 
+    @if($isAdmin)
     <form method="POST" action="{{ route('cms.settings.update') }}" class="space-y-6 mb-6">
         @csrf
         @method('PUT')
@@ -103,7 +113,38 @@
         </form>
     </div>
 
-    <form method="POST" action="{{ route('cms.settings.password') }}" class="space-y-6">
+    <div class="cms-panel p-6 mb-6">
+        <h3 class="cms-section-title mb-1">Outgoing Email</h3>
+        <p class="text-sm text-brand-black/60 mb-6">
+            Inquiry and contact-form notifications and password-reset links are sent from
+            <strong>{{ config('mail.from.address') }}</strong>. Send yourself a test to confirm delivery works.
+        </p>
+        <form method="POST" action="{{ route('cms.settings.test-email') }}">
+            @csrf
+            <button type="submit" class="btn-primary" data-loading-text="Sending…">Send Test Email to {{ auth()->user()->email }}</button>
+        </form>
+    </div>
+
+    <div class="cms-panel p-6 mb-6">
+        <h3 class="cms-section-title mb-1">Deployment</h3>
+        <dl class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mt-4">
+            <div>
+                <dt class="text-brand-black/50">Live release</dt>
+                <dd class="font-mono font-semibold mt-1">{{ $deploy['release'] ? \Illuminate\Support\Str::limit($deploy['release'], 12, '') : '—' }}</dd>
+            </div>
+            <div>
+                <dt class="text-brand-black/50">Went live</dt>
+                <dd class="font-semibold mt-1">{{ $deploy['deployed_at']?->timezone('Africa/Blantyre')->format('j M Y, H:i') ?? '—' }}</dd>
+            </div>
+            <div>
+                <dt class="text-brand-black/50">Status</dt>
+                <dd class="font-semibold mt-1">{{ $deploy['pending'] ? 'New release uploaded — finishing (up to 1 minute)…' : 'Up to date' }}</dd>
+            </div>
+        </dl>
+    </div>
+    @endif
+
+    <form id="password-management" method="POST" action="{{ route('cms.settings.password') }}" class="space-y-6">
         @csrf
         @method('PUT')
 

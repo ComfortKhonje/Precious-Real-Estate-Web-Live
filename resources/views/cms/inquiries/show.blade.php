@@ -100,6 +100,7 @@
                             <i data-lucide="home" class="w-4 h-4"></i> Edit Property
                         </a>
                     @endif
+                    @if(auth()->user()->hasRoleAtLeast('admin'))
                     <form id="delete-inquiry-form-{{ $inquiry->id }}" method="POST" action="{{ route('cms.inquiries.destroy', $inquiry) }}" class="pt-2 border-t border-gray-100">
                         @csrf
                         @method('DELETE')
@@ -109,6 +110,7 @@
                             <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Inquiry
                         </button>
                     </form>
+                    @endif
                 </div>
             </div>
         </div>

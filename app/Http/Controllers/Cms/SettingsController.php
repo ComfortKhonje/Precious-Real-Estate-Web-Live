@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Cms;
 
+use App\Console\Commands\PostDeploy;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
 /**
@@ -31,8 +33,9 @@ class SettingsController extends Controller
     {
         $settings = Setting::whereIn('key', self::KEYS)->pluck('value', 'key');
         $isDownForMaintenance = app()->isDownForMaintenance();
+        $deploy = PostDeploy::status();
 
-        return view('cms.settings.index', compact('settings', 'isDownForMaintenance'));
+        return view('cms.settings.index', compact('settings', 'isDownForMaintenance', 'deploy'));
     }
 
     public function update(Request $request)
@@ -75,9 +78,34 @@ class SettingsController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        $request->user()->update(['password' => $request->input('password')]);
+        $request->user()->update([
+            'password' => $request->input('password'),
+            'must_change_password' => false,
+        ]);
 
-        return back()->with('status', 'Password updated.');
+        return redirect()->route('cms.settings.index')->with('status', 'Password updated.');
+    }
+
+    /**
+     * Sends a plain test message through the live mail settings, so SMTP
+     * problems show up here — not as silently missing inquiry emails.
+     */
+    public function sendTestEmail(Request $request)
+    {
+        $to = $request->user()->email;
+
+        try {
+            Mail::raw(
+                "This is a test email from the ".config('app.name')." CMS.\n\nIf you're reading this, outgoing email works — inquiry and contact-form notifications will be delivered.",
+                fn ($message) => $message->to($to)->subject('PREC CMS test email')
+            );
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Sending failed: '.Str::limit($e->getMessage(), 200));
+        }
+
+        return back()->with('status', "Test email sent to {$to}. Check the inbox (and spam folder).");
     }
 
     /**

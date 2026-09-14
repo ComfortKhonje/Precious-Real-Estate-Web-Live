@@ -38,7 +38,7 @@ class ContactSubmissionController extends Controller
         ]);
 
         // Create inquiry from contact form
-        $inquiry = Inquiry::create([
+        Inquiry::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
@@ -52,11 +52,16 @@ class ContactSubmissionController extends Controller
         $toEmail = Setting::where('key', 'inquiry_email_destination')->value('value')
             ?: config('mail.to_address');
 
-        Mail::to($toEmail)->send(new ContactFormSubmission($data, config('mail.signature', '')));
+        // Saved already — a mail failure must not show the visitor an error
+        // (see the same note in InquiriesController::storePublic()).
+        try {
+            Mail::to($toEmail)->send(new ContactFormSubmission($data, config('mail.signature', '')));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return response()->json([
             'success' => true,
-            'inquiry' => $inquiry,
             'message' => 'Thank you for contacting us. We will get back to you shortly.',
         ], 201);
     }

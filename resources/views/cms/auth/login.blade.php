@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-body text-brand-black bg-brand-white bg-grid min-h-screen flex items-center justify-center px-6 py-16">
@@ -25,6 +25,10 @@
                 <div class="text-sm text-brand-black/60">Staff login</div>
             </div>
         </div>
+
+        @if (session('status'))
+            <div class="mb-5 p-4 rounded-2xl bg-green-50 border border-green-100 text-sm text-green-700">{{ session('status') }}</div>
+        @endif
 
         @if ($errors->any())
             <div class="mb-5 p-4 rounded-2xl bg-red-50 border border-red-100 text-sm text-red-700">
@@ -50,7 +54,7 @@
                     <input type="checkbox" name="remember" class="rounded border-gray-300 text-brand-black focus:ring-primary">
                     Remember me
                 </label>
-                <a href="{{ route('home') }}" class="text-sm font-semibold text-brand-black hover:underline">Back to website</a>
+                <a href="{{ route('cms.password.request') }}" class="text-sm font-semibold text-brand-black hover:underline">Forgot password?</a>
             </div>
 
             <button type="submit" class="w-full mt-2 px-6 py-4 bg-brand-black text-white rounded-full font-bold uppercase tracking-widest hover:opacity-90 transition">
@@ -60,6 +64,7 @@
 
         <p class="mt-6 text-xs text-brand-black/60 leading-relaxed">
             For security, access is limited to authorized PREC staff.
+            <a href="{{ route('home') }}" class="font-semibold text-brand-black hover:underline">Back to website</a>
         </p>
     </div>
 
