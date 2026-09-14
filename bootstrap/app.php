@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CmsAuthenticate;
+use App\Http\Middleware\CmsRole;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\TrackPageView;
 use Illuminate\Foundation\Application;
@@ -10,7 +11,7 @@ use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'cms.auth' => CmsAuthenticate::class,
+            'cms.role' => CmsRole::class,
         ]);
 
         // 2026-09-02 full review: baseline security headers + a lightweight
@@ -28,6 +30,12 @@ return Application::configure(basePath: dirname(__DIR__))
             SecurityHeaders::class,
             TrackPageView::class,
         ]);
+
+        // 2026-09-09: for the CMS's own maintenance-mode toggle (Settings >
+        // Site Status) — without this, putting the public site into
+        // maintenance mode would also lock staff out of /cms itself, with
+        // no way back in except SSH/Terminal access to run `php artisan up`.
+        $middleware->preventRequestsDuringMaintenance(['cms/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // 2026-09-04: a CMS photo/gallery upload exceeding PHP's own
@@ -71,3 +79,22 @@ return Application::configure(basePath: dirname(__DIR__))
             return redirect($fallback)->with('error', 'That page isn\'t reachable directly — you were redirected here instead.');
         });
     })->create();
+
+/*
+ * cPanel layout (see deploy/README.md): the app lives in
+ * /home/prec/precious-real-estate-web and the web root is the sibling
+ * /home/prec/public_html. The deploy bundle ships no public/ folder inside
+ * the app, so when that folder is absent and public_html sits next to the
+ * app, public_html IS the public path — for web requests and for artisan
+ * alike. Without this, Vite looks for build/manifest.json inside the app
+ * folder (every page 500s) and storage:link puts the uploads symlink where
+ * the web server can't see it (every uploaded photo 404s). Locally public/
+ * exists, so nothing changes there.
+ */
+$cpanelDocroot = dirname(__DIR__, 2).'/public_html';
+
+if (! is_dir(dirname(__DIR__).'/public') && is_dir($cpanelDocroot)) {
+    $app->usePublicPath($cpanelDocroot);
+}
+
+return $app;

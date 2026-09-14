@@ -1,0 +1,145 @@
+name: Deploy to cPanel
+
+# Push to main = deploy to https://preciousrealestate.mw
+#
+# The hosting account has no shell access, so nothing can be built or run on
+# the server by hand. Instead this workflow:
+#   1. runs the full test suite (a red test blocks the deploy)
+#   2. builds a complete, ready-to-run copy of the app here on GitHub —
+#      production composer dependencies (vendor/) and fresh Vite assets
+#   3. uploads it over FTPS, syncing only files that changed:
+#        app code   -> /home/prec/precious-real-estate-web/
+#        public/    -> /home/prec/public_html/
+#   4. uploads RELEASE (the commit SHA) LAST
+#
+# cPanel's cron runs `php artisan schedule:run` every minute; that runs
+# `prec:post-deploy`, which sees the new RELEASE and runs migrations, the
+# storage link and the config/route/view caches. Progress is written to
+# storage/logs/deploy.log and shown on CMS > Settings > Deployment.
+#
+# Repository secrets required (Settings > Secrets and variables > Actions):
+#   FTP_SERVER    e.g. ftp.preciousrealestate.mw
+#   FTP_USERNAME  the cPanel account's main FTP login (home dir /home/prec)
+#   FTP_PASSWORD
+#
+# Never uploaded: .env, storage/ (uploads, logs, sessions), tests, node_modules.
+# See deploy/README.md for the one-time server setup.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, fileinfo, mbstring, pdo_sqlite, zip
+          coverage: none
+
+      - run: composer install --prefer-dist --no-interaction --no-progress
+      - run: composer audit
+      - run: |
+          cp .env.example .env
+          php artisan key:generate
+      - run: php artisan test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'   # matches the host (cPanel MultiPHP: 8.4)
+          extensions: gd, fileinfo, mbstring, zip
+          coverage: none
+
+      - name: Production PHP dependencies
+        run: composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --no-progress
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Build frontend assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Stage deploy bundle
+        run: |
+          set -euo pipefail
+          mkdir -p bundle/app bundle/docroot bundle/release
+
+          # App code (no public/ — bootstrap/app.php then uses the sibling
+          # public_html as the public path).
+          cp -R app bootstrap config database resources routes vendor bundle/app/
+          cp artisan composer.json composer.lock bundle/app/
+          find bundle/app/bootstrap/cache -type f ! -name '.gitignore' -delete
+
+          # Document root. index.php is the variant that points at the app
+          # folder one level up.
+          rsync -a --exclude 'index.php' --exclude 'hot' --exclude 'storage' public/ bundle/docroot/
+          cp deploy/public_html-index.php bundle/docroot/index.php
+
+          echo "${GITHUB_SHA}" > bundle/release/RELEASE
+
+      - name: Upload app code
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          # Still encrypted; tolerates the host's shared certificate not
+          # matching the FTP hostname, which is common on cPanel.
+          security: loose
+          local-dir: bundle/app/
+          server-dir: precious-real-estate-web/
+          state-name: .ftp-deploy-app.json
+          timeout: 600000
+
+      - name: Upload public files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          # Still encrypted; tolerates the host's shared certificate not
+          # matching the FTP hostname, which is common on cPanel.
+          security: loose
+          local-dir: bundle/docroot/
+          server-dir: public_html/
+          state-name: .ftp-deploy-docroot.json
+          timeout: 600000
+
+      # Last on purpose: cron only starts migrations/caching once this
+      # lands, i.e. after every other file is already in place.
+      - name: Publish release marker
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          # Still encrypted; tolerates the host's shared certificate not
+          # matching the FTP hostname, which is common on cPanel.
+          security: loose
+          local-dir: bundle/release/
+          server-dir: precious-real-estate-web/
+          state-name: .ftp-deploy-release.json

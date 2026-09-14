@@ -8,6 +8,42 @@
     {{-- Result now shows as a global toast (bottom-right) — see
          x-shared.toast-container in the CMS layout. --}}
 
+    @php $isAdmin = auth()->user()->hasRoleAtLeast('admin'); @endphp
+
+    @if(auth()->user()->must_change_password)
+        <div class="mb-6 p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900">
+            <div class="font-semibold">Choose your own password to continue.</div>
+            <p class="text-sm mt-1">This account's password was set by someone else. Use <a href="#password-management" class="underline font-semibold">Password Management</a> below — the rest of the CMS unlocks once it's changed.</p>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('cms.settings.profile') }}" class="space-y-6 mb-6">
+        @csrf
+        @method('PUT')
+
+        <div class="cms-panel p-6">
+            <h3 class="cms-section-title mb-1">Profile Settings</h3>
+            <p class="text-sm text-brand-black/60 mb-6">Your own name and email — shown in the CMS header and used to log in.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Full Name</label>
+                    <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" class="cms-input">
+                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Email Address</label>
+                    <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" class="cms-input">
+                    @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3 justify-end">
+            <button type="submit" class="btn-primary">Save Profile</button>
+        </div>
+    </form>
+
+    @if($isAdmin)
     <form method="POST" action="{{ route('cms.settings.update') }}" class="space-y-6 mb-6">
         @csrf
         @method('PUT')
@@ -43,24 +79,72 @@
             </div>
         </div>
 
-        <div class="cms-panel p-6">
-            <h3 class="cms-section-title mb-1">Access & Notifications</h3>
-            <p class="text-sm text-brand-black/60 mb-6">Keep the login surface small and easy to manage.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold tracking-wider">Session Timeout (minutes)</label>
-                    <input type="number" name="session_timeout_minutes" min="5" max="1440" value="{{ old('session_timeout_minutes', $settings['session_timeout_minutes'] ?? 120) }}" class="cms-input">
-                    <p class="text-xs text-brand-black/40">Stored for reference — actually changing session behavior needs a code change to `config/session.php` (`SESSION_LIFETIME`), not wired to this value automatically.</p>
-                </div>
-            </div>
-        </div>
-
         <div class="flex flex-wrap gap-3 justify-end">
             <button type="submit" class="btn-primary">Save Settings</button>
         </div>
     </form>
 
-    <form method="POST" action="{{ route('cms.settings.password') }}" class="space-y-6">
+    <div class="cms-panel p-6 mb-6">
+        <div class="flex items-center justify-between gap-4 mb-1">
+            <h3 class="cms-section-title">Site Status</h3>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $isDownForMaintenance ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
+                <span class="w-2 h-2 rounded-full {{ $isDownForMaintenance ? 'bg-red-500' : 'bg-green-500' }}"></span>
+                {{ $isDownForMaintenance ? 'Under Maintenance' : 'Live' }}
+            </span>
+        </div>
+        <p class="text-sm text-brand-black/60 mb-6">
+            @if($isDownForMaintenance)
+                Visitors see a "We'll be right back" page. The CMS stays reachable so you can keep working and switch it back.
+            @else
+                The public site is visible to everyone. Turn this on before major changes you don't want visitors to see mid-edit.
+            @endif
+        </p>
+
+        <form id="maintenance-toggle-form" method="POST" action="{{ route('cms.settings.maintenance') }}">
+            @csrf
+            @if($isDownForMaintenance)
+                <button type="submit" class="btn-primary">Bring Site Back Online</button>
+            @else
+                <button type="button" class="btn-danger"
+                    @click="confirmFormId = 'maintenance-toggle-form'; confirmTitle = 'Enable Maintenance Mode?'; confirmMessage = 'This takes the public website offline for every visitor immediately. The CMS stays reachable so you can switch it back here. Continue?'; confirmActionLabel = 'Yes, Enable'; confirmLoadingLabel = 'Enabling&hellip;'; confirmModalOpen = true">
+                    Enable Maintenance Mode
+                </button>
+            @endif
+        </form>
+    </div>
+
+    <div class="cms-panel p-6 mb-6">
+        <h3 class="cms-section-title mb-1">Outgoing Email</h3>
+        <p class="text-sm text-brand-black/60 mb-6">
+            Inquiry and contact-form notifications and password-reset links are sent from
+            <strong>{{ config('mail.from.address') }}</strong>. Send yourself a test to confirm delivery works.
+        </p>
+        <form method="POST" action="{{ route('cms.settings.test-email') }}">
+            @csrf
+            <button type="submit" class="btn-primary" data-loading-text="Sending…">Send Test Email to {{ auth()->user()->email }}</button>
+        </form>
+    </div>
+
+    <div class="cms-panel p-6 mb-6">
+        <h3 class="cms-section-title mb-1">Deployment</h3>
+        <dl class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mt-4">
+            <div>
+                <dt class="text-brand-black/50">Live release</dt>
+                <dd class="font-mono font-semibold mt-1">{{ $deploy['release'] ? \Illuminate\Support\Str::limit($deploy['release'], 12, '') : '—' }}</dd>
+            </div>
+            <div>
+                <dt class="text-brand-black/50">Went live</dt>
+                <dd class="font-semibold mt-1">{{ $deploy['deployed_at']?->timezone('Africa/Blantyre')->format('j M Y, H:i') ?? '—' }}</dd>
+            </div>
+            <div>
+                <dt class="text-brand-black/50">Status</dt>
+                <dd class="font-semibold mt-1">{{ $deploy['pending'] ? 'New release uploaded — finishing (up to 1 minute)…' : 'Up to date' }}</dd>
+            </div>
+        </dl>
+    </div>
+    @endif
+
+    <form id="password-management" method="POST" action="{{ route('cms.settings.password') }}" class="space-y-6">
         @csrf
         @method('PUT')
 

@@ -44,7 +44,7 @@
                                     x-model="formData.name"
                                     placeholder="Enter your full name"
                                     required
-                                    class="w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white border-none placeholder:text-gray-500">
+                                    class="w-full bg-white border border-gray-200 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary/40 placeholder:text-gray-500">
                             </div>
 
                             {{-- Phone Number --}}
@@ -56,7 +56,7 @@
                                     x-model="formData.phone"
                                     placeholder="Enter your phone number"
                                     required
-                                    class="w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white border-none placeholder:text-gray-500">
+                                    class="w-full bg-white border border-gray-200 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary/40 placeholder:text-gray-500">
                             </div>
 
                             {{-- Email Address --}}
@@ -68,7 +68,7 @@
                                     x-model="formData.email"
                                     placeholder="Enter your email address"
                                     required
-                                    class="w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white border-none placeholder:text-gray-500">
+                                    class="w-full bg-white border border-gray-200 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary/40 placeholder:text-gray-500">
                             </div>
 
                             {{-- Service Needed --}}
@@ -78,7 +78,7 @@
                                     name="serviceNeeded"
                                     x-model="formData.serviceNeeded"
                                     required
-                                    class="w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white cursor-pointer border-none">
+                                    class="select-popup w-full bg-white border border-gray-200 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary/40 cursor-pointer">
                                     <option value="">Select the service you need</option>
                                     <option value="Property Valuation">Property Valuation</option>
                                     <option value="Property Management">Property Management</option>
@@ -98,7 +98,7 @@
                                     rows="4"
                                     placeholder="Tell us briefly how we can assist you..."
                                     required
-                                    class="w-full bg-gray-100 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-2 focus:ring-primary focus:bg-white border-none placeholder:text-gray-500"></textarea>
+                                    class="w-full bg-white border border-gray-200 rounded-xl py-4 px-4 text-brand-black font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary/40 placeholder:text-gray-500"></textarea>
                             </div>
 
                             {{-- Submit Button --}}

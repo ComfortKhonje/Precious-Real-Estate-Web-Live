@@ -56,8 +56,7 @@ class ServicesController extends Controller
 
     public function edit(string $slug)
     {
-        $title = str($slug)->replace('-', ' ')->title();
-        $service = Service::where('title', $title)->firstOrFail();
+        $service = $this->findBySlug($slug);
         $icons = ServiceIcon::orderBy('name')->get();
 
         return view('cms.services.edit', compact('service', 'icons'));
@@ -65,8 +64,7 @@ class ServicesController extends Controller
 
     public function update(Request $request, string $slug)
     {
-        $title = str($slug)->replace('-', ' ')->title();
-        $service = Service::where('title', $title)->firstOrFail();
+        $service = $this->findBySlug($slug);
 
         $data = $request->validate([
             'title' => 'required|string|max:255|unique:services,title,' . $service->id,
@@ -96,6 +94,26 @@ class ServicesController extends Controller
         $service->update($data);
 
         return redirect()->route('cms.services.index')->with('status', 'Service updated successfully.');
+    }
+
+    /**
+     * The route param is a slug (e.g. cms.services.edit links built from
+     * str($service->title)->slug()), but services have no dedicated slug
+     * column — this used to reverse it back into a title
+     * (str($slug)->replace('-', ' ')->title()) and look that up, which only
+     * round-trips correctly for a title that's already simple Title Case
+     * ASCII words. Any title with punctuation, an acronym, or anything
+     * slug() actually had to strip would silently 404 on its own edit
+     * link. Matching forward (slug every real title, compare to the param)
+     * is the same transform the link was built with, so it can't drift.
+     */
+    private function findBySlug(string $slug): Service
+    {
+        $service = Service::all()->first(fn (Service $s) => str($s->title)->slug()->value() === $slug);
+
+        abort_if(! $service, 404);
+
+        return $service;
     }
 
     /**

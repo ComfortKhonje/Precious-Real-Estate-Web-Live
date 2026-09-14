@@ -10,23 +10,9 @@
     @csrf
     @method('PUT')
 
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-            <h3 class="font-heading text-3xl leading-none">{{ $service->title }}</h3>
-            <p class="text-sm text-brand-black/60 mt-1">Update service content and visibility for the public site.</p>
-        </div>
-        <div class="flex flex-wrap gap-2 items-center">
-            <button type="submit" class="btn-primary">Save Service</button>
-            <a href="{{ route('cms.services.index') }}" class="btn-secondary">Back to list</a>
-            <div>
-                <form action="{{ route('cms.services.destroy', $service) }}" method="POST"
-                    onsubmit="return confirm('Delete this service? This cannot be undone.');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn-danger">Delete Service</button>
-                </form>
-            </div>
-        </div>
+    <div class="mb-6">
+        <h3 class="font-heading text-3xl leading-none">{{ $service->title }}</h3>
+        <p class="text-sm text-brand-black/60 mt-1">Update service content and visibility for the public site.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -34,38 +20,33 @@
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Service Title</label>
                 <input type="text" name="title" value="{{ old('title', $service->title) }}"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    class="cms-input">
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Heading / Tagline</label>
                 <input type="text" name="tagline" value="{{ old('tagline', $service->tagline) }}"
                     placeholder="e.g., Accurate Valuations You Can Trust"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    class="cms-input">
                 <p class="text-xs text-brand-black/50 mt-1">Large headline on the services page. Falls back to the service title if left blank.</p>
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Short Description</label>
                 <textarea name="short_description" rows="3" placeholder="Short summary..."
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('short_description', $service->short_description) }}</textarea>
+                    class="cms-input">{{ old('short_description', $service->short_description) }}</textarea>
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Long Description (Services Page)</label>
                 <textarea name="content" rows="7" placeholder="Longer, more detailed description shown on the services page..."
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('content', $service->content) }}</textarea>
+                    class="cms-input">{{ old('content', $service->content) }}</textarea>
                 <p class="text-xs text-brand-black/50 mt-1">Used on the services page instead of the short description above. Falls back to the short description if left blank. The home page always uses the short description.</p>
             </div>
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Highlights (Optional)</label>
-                <input type="text" name="features" value="{{ old('features', is_array($service->features) ? implode(', ', $service->features) : '') }}"
-                    placeholder="e.g., Registered valuers, Bank-accepted reports, Same-week turnaround"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
-                <p class="text-xs text-brand-black/50 mt-1">Comma-separated. Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid.</p>
+                <x-cms.tag-input name="features" :value="old('features', is_array($service->features) ? implode(', ', $service->features) : '')"
+                    placeholder="e.g., Registered valuers, Bank-accepted reports..."
+                    help="Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid." />
             </div>
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Banner Image</label>
-                <input type="file" name="banner_image" accept="image/*"
-                    class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
-            </div>
+            <x-cms.image-upload name="banner_image" label="Click to replace banner image" help="Leave empty to keep the current one" />
 
             <div class="space-y-2" x-data="serviceIconPicker({{ Js::from($icons->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'black_url' => $i->blackUrl(), 'yellow_url' => $i->yellowUrl()])) }}, {{ old('service_icon_id') ? (int) old('service_icon_id') : ($service->service_icon_id ?? 'null') }})">
                 <label class="text-sm font-semibold tracking-wider">Icon</label>
@@ -138,23 +119,8 @@
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Visibility</label>
-                <div class="flex items-center gap-4">
-                    <label class="inline-flex items-center gap-2">
-                        <input type="radio" name="visible" value="1"
-                            {{ old('visible', $service->visible) == 1 ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span>Visible</span>
-                    </label>
-                    <label class="inline-flex items-center gap-2">
-                        <input type="radio" name="visible" value="0"
-                            {{ old('visible', $service->visible) == 0 ? 'checked' : '' }}
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span>Hidden</span>
-                    </label>
-                </div>
-            </div>
+            <x-cms.toggle name="visible" :checked="old('visible', $service->visible)"
+                label="Visible" description="Shown on the public site." />
         </div>
 
         <div class="space-y-5">
@@ -164,7 +130,7 @@
                 </p>
                 <div class="border-2 border-dashed border-gray-200 rounded-3xl p-10 text-center bg-white">
                     @if ($service->banner_image)
-                    <img loading="lazy" decoding="async" src="{{ str_starts_with($service->banner_image, 'http') ? $service->banner_image : asset('storage/' . $service->banner_image . '/medium.webp') }}" alt="{{ $service->title }} banner"
+                    <img loading="lazy" decoding="async" src="{{ $service->bannerImageUrl('medium') }}" alt="{{ $service->title }} banner"
                         class="mx-auto h-40 object-cover rounded-3xl">
                     @else
                     <p class="font-semibold">No banner image configured yet</p>

@@ -1,234 +1,187 @@
 # Deploying PREC to cPanel
 
-Written 2026-09-03 alongside the full audit. Read this once before the first
-deploy; after that only the "Routine deploy" section matters.
+Rewritten 2026-09-14 for launch. The hosting account (`prec`, PHP 8.4) has
+**no shell access** — no Terminal, no SSH, and cPanel Git Version Control
+can't pull a private GitHub repo without it. So nothing on the server is
+ever run by hand. Deploys are fully automatic:
+
+```
+git push origin main
+  -> GitHub Actions: tests, composer install --no-dev, npm run build
+  -> FTPS upload of changed files only
+  -> RELEASE file (commit SHA) uploaded last
+cPanel cron, every minute: php artisan schedule:run
+  -> prec:post-deploy sees the new RELEASE:
+     migrate, first-run seed, storage link, config/route/view cache
+```
+
+Progress: GitHub > Actions tab, then `storage/logs/deploy.log` on the server
+(File Manager), or CMS > Settings > Deployment.
 
 ---
 
-## 0. Why the odd folder layout
-
-Laravel's document root is supposed to be its `public/` folder only —
-everything else (including `.env`, which holds the database password) must sit
-**above** the web root or it is downloadable over HTTP.
-
-cPanel's document root is fixed at `public_html/`, so the standard workaround
-is:
+## 0. Folder layout on the server
 
 ```
-/home/CPANELUSER/
-├── precious-real-estate-web/     <- the app (app/, config/, routes/, .env, vendor/, storage/)
-├── repositories/                 <- where cPanel Git clones the repo
-└── public_html/                  <- document root
-    ├── index.php                 <- deploy/public_html-index.php, renamed
-    ├── .htaccess                 <- from public/.htaccess
-    ├── build/                    <- from public/build
-    ├── brand-assets/             <- from public/brand-assets
-    ├── storage                   <- symlink to ../precious-real-estate-web/storage/app/public
-    └── robots.txt, favicon.ico, ...
+/home/prec/
+├── precious-real-estate-web/     <- app code, vendor/, storage/, .env  (NOT web-reachable)
+│   └── RELEASE                   <- commit SHA of the latest upload
+└── public_html/                  <- web root: index.php, .htaccess, build/, brand-assets/
+    └── storage -> ../precious-real-estate-web/storage/app/public   (created automatically)
 ```
 
-`deploy/public_html-index.php` is the front controller rewritten to point one
-level up at the app folder. It is the only file that knows about this layout.
+`.env` holds the database and mailbox passwords, so it must live **above**
+`public_html`. `bootstrap/app.php` detects this layout (no `public/` inside
+the app folder, `public_html` next to it) and uses `public_html` as the
+public path. `deploy/public_html-index.php` becomes `public_html/index.php`.
 
 ---
 
-## 1. First-time setup
+## 1. One-time setup (in order)
 
-### 1.1 Create the app folder and upload code once
+### 1.1 PHP
+cPanel > **MultiPHP Manager** > preciousrealestate.mw > **PHP 8.4**.
+cPanel > **Select PHP Version** > Extensions (if that screen exists): make sure
+`pdo_mysql`, `mbstring`, `gd`, `fileinfo`, `zip`, `intl`, `bcmath` are ticked.
 
-Easiest first pass is a plain SFTP/File Manager upload of everything except
-`node_modules/`, then let Git take over for subsequent deploys.
+### 1.2 SSL
+cPanel > **SSL/TLS Status** > run AutoSSL for `preciousrealestate.mw` and
+`www.preciousrealestate.mw`. The site must load over `https://` before
+launch (secure cookies and HSTS depend on it).
 
-### 1.2 Production `.env`
+### 1.3 Database
+cPanel > **MySQL Databases**:
+1. Create database `prec_website` (cPanel shows it as `prec_website`).
+2. Create user `prec_webuser` with a generated strong password.
+3. Add the user to the database with **ALL PRIVILEGES**.
 
-Copy `.env.example` to `/home/CPANELUSER/precious-real-estate-web/.env` and set:
+### 1.4 Mailbox and email deliverability
+1. cPanel > **Email Accounts** > create `info@preciousrealestate.mw`
+   (skip if it exists). Note the password.
+2. cPanel > **Email Deliverability** > for `preciousrealestate.mw`, fix/install
+   **SPF** and **DKIM** if they show a problem. Without these, inquiry
+   notifications and password-reset emails land in spam or get rejected.
+3. The SMTP host/port are under Email Accounts > Connect Devices. Default
+   assumption: `mail.preciousrealestate.mw`, port 465, SSL.
 
-```dotenv
-APP_NAME="Precious Real Estate Consulting"
-APP_ENV=production
-APP_DEBUG=false           # <- non-negotiable, see below
-APP_URL=https://preciousrealestate.mw
-APP_KEY=                  # php artisan key:generate
+### 1.5 FTP credentials for GitHub
+Use the main cPanel account's FTP login (its home is `/home/prec`), or create
+one in cPanel > **FTP Accounts** with directory `/home/prec` (the account
+root, not `public_html`). In GitHub > repo > Settings > Secrets and
+variables > **Actions**, add:
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_DATABASE=<cpanel db name>
-DB_USERNAME=<cpanel db user>
-DB_PASSWORD=<strong password>
+| Secret | Value |
+| --- | --- |
+| `FTP_SERVER` | `ftp.preciousrealestate.mw` (or the server hostname cPanel shows) |
+| `FTP_USERNAME` | e.g. `prec` or `deploy@preciousrealestate.mw` |
+| `FTP_PASSWORD` | its password |
 
-SESSION_DRIVER=database
-SESSION_SECURE_COOKIE=true
-SESSION_LIFETIME=120
+Also create an Environment named `production` (Settings > Environments) —
+the deploy job runs in it, so you can add required reviewers later if you want.
 
-CACHE_STORE=database
-QUEUE_CONNECTION=sync
+### 1.6 Production `.env`
+1. Leave `APP_KEY=` empty — `prec:post-deploy` generates it on the first run.
+2. cPanel > **File Manager** > Settings > tick **Show Hidden Files**.
+3. Create folder `/home/prec/precious-real-estate-web` if it doesn't exist.
+4. Inside it create `.env`, paste `deploy/env.production.example`, and fill
+   in every `<...>`: DB password, mailbox password, and a strong
+   `CMS_BOOTSTRAP_PASSWORD` for the first Super Admin.
+5. Permissions on `.env`: **600** (File Manager > right click > Change Permissions).
 
-MAIL_MAILER=smtp
-MAIL_HOST=mail.preciousrealestate.mw
-MAIL_PORT=465
-MAIL_USERNAME=info@preciousrealestate.mw
-MAIL_PASSWORD=<mailbox password>
-MAIL_SCHEME=smtps
-MAIL_FROM_ADDRESS=info@preciousrealestate.mw
-MAIL_FROM_NAME="Precious Real Estate Consulting"
+`APP_DEBUG=false` is non-negotiable: with it on, any error page prints the
+database password to whoever triggered it.
 
-# Optional, once a GA4 property exists
-GOOGLE_ANALYTICS_ID=
-```
+### 1.7 Clear out the old site
+Back up anything currently in `public_html` you want to keep, then empty it
+(keep `cgi-bin` and `.well-known` if present — AutoSSL uses the latter).
 
-**`APP_DEBUG=false` is the single highest-priority setting on this server.**
-With it true, any error page prints the full stack trace, file paths, SQL and
-bound query values — including the database password — to whoever triggered it.
+### 1.8 First deploy
+Merge to `main` and push (or GitHub > Actions > Deploy to cPanel > Run
+workflow). The **first** upload includes all of `vendor/` — thousands of
+files — so allow 15–30 minutes. Later deploys only send what changed.
 
-### 1.3 Permissions and the storage symlink
+### 1.9 Cron (this is what finishes every deploy)
+cPanel > **Cron Jobs** > Add New Cron Job:
+- Common Settings: **Once Per Minute** (`* * * * *`)
+- Command:
+  ```
+  /opt/cpanel/ea-php84/root/usr/bin/php /home/prec/precious-real-estate-web/artisan schedule:run >> /dev/null 2>&1
+  ```
+  The full path pins PHP 8.4; plain `php` on cron can be an older default.
+
+Within a minute of the upload finishing, `storage/logs/deploy.log` should show
+migrations, the first-run seed (services, icons, team), the Super Admin
+creation, the storage link and the caches, ending in `Release <sha> is live.`
+
+### 1.10 Folder permissions
+File Manager: `precious-real-estate-web/storage` and
+`precious-real-estate-web/bootstrap/cache` need to be writable — **755** on
+folders is normal for cPanel (PHP runs as your user). If `deploy.log`
+doesn't appear, check these first.
+
+### 1.11 First login and staff accounts
+1. Open `https://preciousrealestate.mw/cms/login` and log in with
+   `CMS_BOOTSTRAP_EMAIL` / `CMS_BOOTSTRAP_PASSWORD`.
+2. **Delete the `CMS_BOOTSTRAP_PASSWORD` line from `.env`** (it's only ever
+   used while there are no accounts, but it shouldn't sit on disk).
+3. CMS > **Staff Accounts** > Add Account for each person. Leave
+   "Require a new password at first login" on.
+4. CMS > Settings > **Send Test Email** — confirms SMTP works.
+
+Roles:
+
+| Role | Can do |
+| --- | --- |
+| Super Admin | Everything, including managing other Super Admins |
+| Admin | All content, inquiries (incl. delete), contact info, analytics, settings, maintenance mode, staff accounts (Admins/Editors) |
+| Editor | Properties, services, updates, team members; read inquiries |
+
+Anyone can reset a forgotten password from the login page (emailed link, 60 minutes).
+
+---
+
+## 2. Routine deploy
 
 ```bash
-cd ~/precious-real-estate-web
-chmod -R 775 storage bootstrap/cache
-php artisan storage:link
+npm run build          # if CSS/JS changed — CI fails if public/build is stale
+php artisan test
+git push origin dev    # CI runs
+# merge dev -> dev-test -> main (PRs); the push to main deploys
 ```
 
-Then confirm `public_html/storage` exists and is a symlink. Without it every
-CMS-uploaded property photo and article cover 404s, no matter what the code
-does. If cPanel blocks symlink creation, create the link manually from the
-Terminal, or fall back to a cron that rsyncs `storage/app/public` into
-`public_html/storage`.
+## 3. If something goes wrong
 
-### 1.4 Database and first admin account
+- **GitHub Actions red on "test"** — nothing was uploaded; fix and push again.
+- **Upload finished but site unchanged/500** — read
+  `precious-real-estate-web/storage/logs/deploy.log` and `laravel-*.log`.
+  A failed post-deploy step is retried every minute until it succeeds.
+- **Force a re-run of post-deploy** — delete
+  `precious-real-estate-web/storage/app/deployed-release` in File Manager.
+- **Is cron running?** If `deploy.log` never appears, the cron command path is
+  wrong. cPanel emails cron output if you temporarily remove `>> /dev/null 2>&1`.
+- **Uploads > 2MB fail** — `public/.user.ini` raises the limits; if the host
+  ignores it, set `upload_max_filesize=6M` and `post_max_size=40M` in cPanel >
+  MultiPHP INI Editor.
 
-```bash
-php artisan migrate --force
-php artisan db:seed --class=ServiceSeeder
-php artisan db:seed --class=TeamMemberSeeder
-php artisan prec:create-user "Precious Tembo" precious@preciousrealestate.mw
-```
+## 4. Maintenance mode
 
-The command prints a generated password once — change it immediately from the
-CMS Settings page.
-
-Do **not** run `db:seed --class=UserSeeder`: it creates demo accounts whose
-password is literally `password`. It now refuses to run outside local/testing,
-but check the live `users` table anyway and delete anything ending in
-`@preciousrealestate.test`.
-
-### 1.5 Optimised images
-
-The repo ships a `.webp` sibling for every brand image, and `public/.htaccess`
-serves it automatically to browsers that support WebP. If new brand images are
-added later:
-
-```bash
-php artisan prec:optimize-images
-```
-
-Commit the generated `.webp` files.
-
-### 1.6 Upload size limits
-
-Found 2026-09-04: a team-member photo upload threw a raw
-`PostTooLargeException` page in production-equivalent conditions. Root cause
-was a mismatch, not a code bug — the app's own validation allows images up
-to 5MB (`max:5120`), but PHP's `upload_max_filesize`/`post_max_size` were
-smaller than that, so PHP rejected the request before Laravel ever got to
-validate it.
-
-`public/.user.ini` in this repo raises both — most cPanel hosts (PHP-FPM or
-suPHP) honor a `.user.ini` in the docroot automatically, no hosting-panel
-change needed. **Verify after deploy**: try a >2MB image upload in the CMS.
-If it still fails, the host has disabled `.user.ini` overrides — go to
-cPanel → **MultiPHP INI Editor** → select the domain → raise
-`upload_max_filesize` and `post_max_size` there directly (match the values
-in `public/.user.ini`).
-
-A friendly error (not a raw exception page) now shows either way — see
-`bootstrap/app.php`'s `PostTooLargeException` handler — but the goal is for
-users to never hit it, since the CMS upload form now also blocks
-oversized files client-side before they're submitted.
-
----
-
-## 2. Wiring up GitHub -> cPanel
-
-### Path A — cPanel Git Version Control (preferred if available)
-
-1. cPanel -> Files -> **Git™ Version Control** -> Create.
-2. Clone URL: `https://github.com/jannytheedesigner/precious-real-estate-web.git`
-   Repository path: `/home/CPANELUSER/repositories/precious-real-estate-web`.
-3. Edit `.cpanel.yml` in the repo root and replace **`CPANELUSER`** with the
-   real cPanel username in both `export` lines. Commit and push.
-4. In cPanel, open the repo -> **Pull or Deploy** -> *Update from Remote*, then
-   *Deploy HEAD Commit*.
-
-This is deploy-on-click, not deploy-on-push. Push-triggered deploys need a
-webhook receiver, which is more moving parts than this project needs.
-
-If `composer` isn't on PATH for the account, comment out the composer line in
-`.cpanel.yml` and upload `vendor/` by SFTP after any dependency change.
-
-### Path B — GitHub Actions -> SFTP (if Git Version Control is unavailable)
-
-Add FTP credentials as repository secrets (`FTP_SERVER`, `FTP_USERNAME`,
-`FTP_PASSWORD`) and add a deploy job using `SamKirkland/FTP-Deploy-Action`.
-Everything the server needs is already committed, so no build step is required
-on the host.
-
-Either way, `.github/workflows/ci.yml` runs the test suite and fails the build
-if `public/build` is stale — so a broken deploy gets caught before it ships.
-
----
-
-## 3. Routine deploy
-
-```bash
-npm run build          # only if CSS/JS changed
-php artisan test       # must be green
-git add -A && git commit && git push
-```
-
-Then in cPanel: Git Version Control -> *Update from Remote* -> *Deploy HEAD Commit*.
-
-After any deploy that changed `config/`, `routes/` or Blade files:
-
-```bash
-php artisan config:cache && php artisan route:cache && php artisan view:cache
-```
-
-`.cpanel.yml` already does this. If a page 500s right after a deploy, the first
-thing to try is `php artisan optimize:clear` — a stale compiled view was the
-exact cause of one of the bugs found in the 2026-09-03 audit.
-
----
-
-## 4. Taking the site down for maintenance
-
-The correct way is a real `503` with `Retry-After`, not a redirect — a redirect
-risks Google indexing the maintenance page in place of real URLs. Put this at
-the very top of `public_html/.htaccess`:
-
-```apache
-RewriteEngine On
-RewriteCond %{REQUEST_URI} !^/assets/
-RewriteCond %{REQUEST_URI} !^/maintenance\.html$
-RewriteCond %{REMOTE_ADDR} !^YOUR\.IP\.HERE$
-RewriteRule ^(.*)$ - [R=503,L]
-
-ErrorDocument 503 /maintenance.html
-Header always set Retry-After "7200"
-```
-
-Remove those lines to bring the site back. Nothing in the app is touched.
-
----
+CMS > Settings > Site Status > Enable Maintenance Mode. Real `503` with
+`Retry-After`; `/cms` stays reachable so it can always be turned back off.
 
 ## 5. Post-deploy smoke check
 
-Open each of these and confirm a 200, not a 500:
+- `/`, `/about`, `/services`, `/team`, `/contact`, `/inquiry`, `/updates`,
+  `/properties` and one property detail page — all 200
+- `/sitemap.xml`, `/robots.txt`
+- `/.env` and `/precious-real-estate-web/.env` — must NOT be downloadable
+- `/cms/login`, then every CMS screen
+- Submit the inquiry form; confirm it appears in CMS > Inquiries **and** the
+  notification email arrives
+- Add a property with a photo; confirm the photo shows on the public site
+  (storage link check)
 
-- `/` , `/about`, `/services`, `/team`, `/contact`, `/inquiry`, `/news`
-- `/properties` and one property detail page
-- `/sitemap.xml` and `/robots.txt`
-- `/cms/login`, then every CMS screen after logging in
-- Submit the inquiry form on a property page and confirm the row appears under
-  CMS -> Inquiries with the property reference attached
-- Add one property with a photo and confirm the image renders on the public site
-  (this is the storage-symlink check)
+## 6. If shell access is ever enabled
+
+`php artisan prec:create-user "Name" email --role=admin` works for
+accounts, and `php artisan prec:post-deploy --force` re-runs the deploy steps.
+The FTP workflow keeps working either way.

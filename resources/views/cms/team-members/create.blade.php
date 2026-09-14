@@ -5,34 +5,13 @@
 @section('page_subtitle', 'Add a new team member to your staff directory.')
 
 @section('content')
-    @if ($errors->any())
-        <div class="mb-6 bg-red-50 border border-red-200 rounded-3xl p-6">
-            <h3 class="font-semibold text-red-900 mb-3">Errors:</h3>
-            <ul class="space-y-2 text-sm text-red-800">
-                @foreach ($errors->all() as $error)
-                    <li>• {{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <form method="POST" action="{{ route('cms.team-members.store') }}" enctype="multipart/form-data"
         class="bg-white border border-gray-100 rounded-3xl p-6 space-y-6">
         @csrf
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div>
-                <h3 class="font-heading text-3xl leading-none">New Team Member</h3>
-                <p class="text-sm text-brand-black/60 mt-1">Add a new person to your team.</p>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <a href="{{ route('cms.team-members.index') }}" class="inline-flex items-center px-6 py-3 rounded-full border border-gray-200 font-semibold hover:bg-gray-50 transition">
-                    Cancel
-                </a>
-                <button type="submit" class="inline-flex items-center px-6 py-3 rounded-full bg-primary text-brand-black font-semibold hover:bg-primary/90 transition">
-                    <i data-lucide="check" class="w-4 h-4 mr-2"></i> Create Member
-                </button>
-            </div>
+        <div class="mb-6">
+            <h3 class="font-heading text-3xl leading-none">New Team Member</h3>
+            <p class="text-sm text-brand-black/60 mt-1">Add a new person to your team.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -43,7 +22,7 @@
                     <label class="text-sm font-semibold tracking-wider">Full Name *</label>
                     <input type="text" name="name" value="{{ old('name') }}" required
                         placeholder="e.g., John Smith"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 @error('name') ring-2 ring-red-500 @enderror">
+                        class="cms-input @error('name') ring-2 ring-red-500 @enderror">
                     @error('name')
                         <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -54,7 +33,7 @@
                     <label class="text-sm font-semibold tracking-wider">Job Title/Role *</label>
                     <input type="text" name="role" value="{{ old('role') }}" required
                         placeholder="e.g., Property Manager"
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 @error('role') ring-2 ring-red-500 @enderror">
+                        class="cms-input @error('role') ring-2 ring-red-500 @enderror">
                     @error('role')
                         <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                     @enderror
@@ -66,13 +45,13 @@
                         <label class="text-sm font-semibold tracking-wider">Qualifications</label>
                         <input type="text" name="qualifications" value="{{ old('qualifications') }}"
                             placeholder="e.g., MSc Real Estate, MIS(SA)"
-                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                            class="cms-input">
                     </div>
                     <div class="space-y-2">
                         <label class="text-sm font-semibold tracking-wider">Years of Experience</label>
                         <input type="number" name="years_experience" value="{{ old('years_experience') }}" min="0" max="100"
                             placeholder="e.g., 12"
-                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                            class="cms-input">
                     </div>
                 </div>
 
@@ -80,7 +59,7 @@
                 <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Biography</label>
                     <textarea name="bio" rows="4" placeholder="Brief biography or professional description..."
-                        class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('bio') }}</textarea>
+                        class="cms-input">{{ old('bio') }}</textarea>
                     <p class="text-xs text-brand-black/50 mt-1">Max 1000 characters</p>
                 </div>
 
@@ -95,25 +74,14 @@
                         <label class="text-sm font-semibold tracking-wider">Display Order</label>
                         <input type="number" name="order" value="{{ old('order') }}" min="0"
                             placeholder="0"
-                            class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                            class="cms-input">
                         <p class="text-xs text-brand-black/50 mt-1">Lower numbers appear first</p>
                     </div>
 
                     <!-- Visibility -->
                     <div class="space-y-2">
-                        <label class="text-sm font-semibold tracking-wider">Visibility</label>
-                        <div class="flex items-center gap-4 mt-4">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="visible" value="1" checked
-                                    class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                                <span class="text-sm">Visible</span>
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="visible" value="0"
-                                    class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                                <span class="text-sm">Hidden</span>
-                            </label>
-                        </div>
+                        <x-cms.toggle name="visible" :checked="old('visible', true)"
+                            label="Visible" description="Shown on the team page." />
                     </div>
                 </div>
             </div>

@@ -5,36 +5,13 @@
 @section('page_subtitle', 'Add a new service to your offerings.')
 
 @section('content')
-@if ($errors->any())
-<div class="mb-6 bg-red-50 border border-red-200 rounded-3xl p-6">
-    <h3 class="font-semibold text-red-900 mb-3">Errors:</h3>
-    <ul class="space-y-2 text-sm text-red-800">
-        @foreach ($errors->all() as $error)
-        <li>• {{ $error }}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
-
 <form method="POST" action="{{ route('cms.services.store') }}" enctype="multipart/form-data"
     class="bg-white border border-gray-100 rounded-3xl p-6 space-y-6">
     @csrf
 
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-            <h3 class="font-heading text-3xl leading-none">New Service</h3>
-            <p class="text-sm text-brand-black/60 mt-1">Add a new service to your offerings.</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-            <a href="{{ route('cms.services.index') }}"
-                class="inline-flex items-center px-6 py-3 rounded-full border border-gray-200 font-semibold hover:bg-gray-50 transition">
-                Cancel
-            </a>
-            <button type="submit"
-                class="inline-flex items-center px-6 py-3 rounded-full bg-primary text-brand-black font-semibold hover:bg-primary/90 transition">
-                <i data-lucide="check" class="w-4 h-4 mr-2"></i> Create Service
-            </button>
-        </div>
+    <div class="mb-6">
+        <h3 class="font-heading text-3xl leading-none">New Service</h3>
+        <p class="text-sm text-brand-black/60 mt-1">Add a new service to your offerings.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -43,7 +20,7 @@
                 <label class="text-sm font-semibold tracking-wider">Service Title *</label>
                 <input type="text" name="title" value="{{ old('title') }}" required
                     placeholder="e.g., Property Management"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20 @error('title') ring-2 ring-red-500 @enderror">
+                    class="cms-input @error('title') ring-2 ring-red-500 @enderror">
                 @error('title')
                 <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                 @enderror
@@ -53,38 +30,32 @@
                 <label class="text-sm font-semibold tracking-wider">Heading / Tagline</label>
                 <input type="text" name="tagline" value="{{ old('tagline') }}"
                     placeholder="e.g., Accurate Valuations You Can Trust"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
+                    class="cms-input">
                 <p class="text-xs text-brand-black/50 mt-1">Large headline on the services page. Falls back to the service title if left blank.</p>
             </div>
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Short Description</label>
                 <textarea name="short_description" rows="3" placeholder="Brief summary of the service..."
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('short_description') }}</textarea>
+                    class="cms-input">{{ old('short_description') }}</textarea>
                 <p class="text-xs text-brand-black/50 mt-1">Max 500 characters</p>
             </div>
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Long Description (Services Page)</label>
                 <textarea name="content" rows="7" placeholder="Longer, more detailed description shown on the services page..."
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">{{ old('content') }}</textarea>
+                    class="cms-input">{{ old('content') }}</textarea>
                 <p class="text-xs text-brand-black/50 mt-1">Used on the services page instead of the short description above. Falls back to the short description if left blank. The home page always uses the short description.</p>
             </div>
 
             <div class="space-y-2">
                 <label class="text-sm font-semibold tracking-wider">Highlights (Optional)</label>
-                <input type="text" name="features" value="{{ old('features') }}"
-                    placeholder="e.g., Registered valuers, Bank-accepted reports, Same-week turnaround"
-                    class="w-full bg-gray-100 rounded-2xl py-4 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
-                <p class="text-xs text-brand-black/50 mt-1">Comma-separated. Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid.</p>
+                <x-cms.tag-input name="features" :value="old('features', '')"
+                    placeholder="e.g., Registered valuers, Bank-accepted reports..."
+                    help="Shown as a checklist on the services page — a short list (4 or fewer) stacks as one column, more become a two-column grid." />
             </div>
 
-            <div class="space-y-2">
-                <label class="text-sm font-semibold tracking-wider">Banner Image</label>
-                <input type="file" name="banner_image" accept="image/*"
-                    class="w-full bg-gray-100 rounded-2xl py-3 px-5 focus:ring-2 focus:ring-primary focus:bg-white border border-transparent focus:border-primary/20">
-                <p class="text-xs text-brand-black/50 mt-1">Upload banner image for this service</p>
-            </div>
+            <x-cms.image-upload name="banner_image" label="Banner Image" help="Upload a banner image for this service" />
 
             <div class="space-y-2" x-data="serviceIconPicker({{ Js::from($icons->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'black_url' => $i->blackUrl(), 'yellow_url' => $i->yellowUrl()])) }}, {{ old('service_icon_id') ? (int) old('service_icon_id') : 'null' }})">
                 <label class="text-sm font-semibold tracking-wider">Icon (Optional)</label>
@@ -157,24 +128,9 @@
                 </div>
             </div>
 
-            <div class="space-y-3 pt-4 border-t border-gray-100">
-                <label class="text-sm font-semibold tracking-wider">Visibility</label>
-                <div class="space-y-2">
-                    <label
-                        class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer transition">
-                        <input type="radio" name="visible" value="1" checked
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span class="font-semibold">Visible</span>
-                        <span class="text-xs text-brand-black/50 ml-auto">Shown on frontend</span>
-                    </label>
-                    <label
-                        class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer transition">
-                        <input type="radio" name="visible" value="0"
-                            class="rounded border-gray-300 text-brand-black focus:ring-primary">
-                        <span class="font-semibold">Hidden</span>
-                        <span class="text-xs text-brand-black/50 ml-auto">Not shown on frontend</span>
-                    </label>
-                </div>
+            <div class="pt-4 border-t border-gray-100">
+                <x-cms.toggle name="visible" :checked="old('visible', true)"
+                    label="Visible" description="Shown on the public site." />
             </div>
         </div>
 

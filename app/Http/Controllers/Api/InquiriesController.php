@@ -11,32 +11,6 @@ use Illuminate\Support\Facades\Mail;
 
 class InquiriesController extends Controller
 {
-    public function index()
-    {
-        return response()->json(Inquiry::latest()->paginate(20));
-    }
-
-    public function show(Inquiry $inquiry)
-    {
-        return response()->json($inquiry);
-    }
-
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|string',
-            'type' => 'nullable|string',
-            'message' => 'nullable|string',
-            'property_id' => 'nullable|exists:properties,id',
-        ]);
-
-        $inquiry = Inquiry::create($data);
-
-        return response()->json($inquiry, 201);
-    }
-
     /**
      * Store a new inquiry from public frontend form (no authentication required)
      * Handles multi-step inquiry form with service-specific fields
@@ -127,19 +101,18 @@ class InquiriesController extends Controller
         $toEmail = Setting::where('key', 'inquiry_email_destination')->value('value')
             ?: config('mail.to_address');
 
-        Mail::to($toEmail)->send(new InquiryFormSubmission($data, config('mail.signature', '')));
+        // The inquiry is already saved and visible in the CMS at this point.
+        // An SMTP hiccup must not turn that into an error for the visitor —
+        // they'd assume it failed and submit again. Log it and move on.
+        try {
+            Mail::to($toEmail)->send(new InquiryFormSubmission($data, config('mail.signature', '')));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return response()->json([
             'success' => true,
-            'inquiry' => $inquiry,
             'message' => 'Thank you for your inquiry. Our team will get back to you within 24 hours.',
         ], 201);
-    }
-
-    public function destroy(Inquiry $inquiry)
-    {
-        $inquiry->delete();
-
-        return response()->json(['deleted' => true]);
     }
 }

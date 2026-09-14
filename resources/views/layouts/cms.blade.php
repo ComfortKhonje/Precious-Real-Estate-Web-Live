@@ -15,14 +15,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     {{-- Alpine.js for CMS interactions --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
 
 <body class="font-body text-brand-black bg-brand-white antialiased min-h-screen"
-    x-data="{ sidebarOpen: false, userMenuOpen: false, confirmModalOpen: false, confirmFormId: null, confirmMessage: 'Are you sure?', confirmDeleting: false }"
+    x-data="{ sidebarOpen: false, userMenuOpen: false, confirmModalOpen: false, confirmFormId: null, confirmTitle: 'Confirm Deletion', confirmMessage: 'Are you sure?', confirmActionLabel: 'Yes, Delete', confirmLoadingLabel: 'Deleting&hellip;', confirmDeleting: false }"
     x-init="$watch('confirmModalOpen', (open) => { if (open) confirmDeleting = false })">
     <div class="min-h-screen flex">
         {{-- Mobile overlay --}}
@@ -52,18 +52,21 @@
             <nav class="flex-1 overflow-y-auto px-3 py-6 space-y-1">
                 @php
                 // 'match' is a route-name pattern so child pages (create/edit/show)
-                // keep their parent nav item highlighted.
+                // keep their parent nav item highlighted. 'role' hides items the
+                // signed-in user's role can't open (routes enforce it too).
                 $nav = [
                 ['label' => 'Dashboard Overview', 'route' => 'cms.dashboard', 'match' => 'cms.dashboard', 'icon' => 'layout-dashboard'],
-                ['label' => 'Analytics', 'route' => 'cms.analytics.index', 'match' => 'cms.analytics.*', 'icon' => 'chart-bar'],
+                ['label' => 'Analytics', 'route' => 'cms.analytics.index', 'match' => 'cms.analytics.*', 'icon' => 'chart-bar', 'role' => 'admin'],
                 ['label' => 'Property Listings', 'route' => 'cms.properties.index', 'match' => 'cms.properties.*', 'icon' => 'home'],
                 ['label' => 'Services Content', 'route' => 'cms.services.index', 'match' => 'cms.services.*', 'icon' => 'briefcase'],
                 ['label' => 'Inquiries', 'route' => 'cms.inquiries.index', 'match' => 'cms.inquiries.*', 'icon' => 'mail'],
                 ['label' => 'Announcements & News', 'route' => 'cms.announcements.index', 'match' => 'cms.announcements.*', 'icon' => 'megaphone'],
                 ['label' => 'Team Members', 'route' => 'cms.team-members.index', 'match' => 'cms.team-members.*', 'icon' => 'users'],
-                ['label' => 'Contact Information', 'route' => 'cms.contact.index', 'match' => 'cms.contact.*', 'icon' => 'phone'],
+                ['label' => 'Contact Information', 'route' => 'cms.contact.index', 'match' => 'cms.contact.*', 'icon' => 'phone', 'role' => 'admin'],
+                ['label' => 'Staff Accounts', 'route' => 'cms.users.index', 'match' => 'cms.users.*', 'icon' => 'shield-check', 'role' => 'admin'],
                 ['label' => 'Settings', 'route' => 'cms.settings.index', 'match' => 'cms.settings.*', 'icon' => 'settings'],
                 ];
+                $nav = array_filter($nav, fn ($item) => ! isset($item['role']) || Auth::user()?->hasRoleAtLeast($item['role']));
                 @endphp
 
                 @foreach($nav as $item)
@@ -121,7 +124,7 @@
                                      actually logged in. Fixed 2026-09-08. --}}
                                 <div class="hidden sm:block text-left leading-tight">
                                     <div class="text-sm font-semibold text-brand-black">{{ Auth::user()->name ?? 'Admin' }}</div>
-                                    <div class="text-xs text-brand-black/60">{{ Auth::user()->email ?? 'PREC Staff' }}</div>
+                                    <div class="text-xs text-brand-black/60">{{ Auth::user()?->roleLabel() ?? 'PREC Staff' }}</div>
                                 </div>
                                 <i data-lucide="chevron-down" class="w-4 h-4 text-brand-black/70"></i>
                             </button>
@@ -204,7 +207,7 @@
                     <i data-lucide="alert-triangle" class="w-6 h-6"></i>
                 </div>
                 <div class="flex-1 mt-1">
-                    <h3 class="font-heading text-2xl leading-tight mb-2">Confirm Deletion</h3>
+                    <h3 class="font-heading text-2xl leading-tight mb-2" x-text="confirmTitle"></h3>
                     <p class="text-brand-black/70 text-sm leading-relaxed" x-text="confirmMessage"></p>
                 </div>
             </div>
@@ -216,12 +219,17 @@
                 </button>
                 {{-- form.submit() (as opposed to a real submit-button click) never
                      fires the form's 'submit' event, so the generic double-submit
-                     guard below can't catch this one — guarded here directly instead. --}}
+                     guard below can't catch this one — guarded here directly instead.
+                     Generalized beyond delete (2026-09-09, for the maintenance-mode
+                     toggle) via confirmTitle/confirmActionLabel/confirmLoadingLabel —
+                     every existing call site only ever set confirmFormId/
+                     confirmMessage, so they fall through to the same "Confirm
+                     Deletion" / "Yes, Delete" defaults as before. --}}
                 <button type="button" @click="confirmDeleting = true; document.getElementById(confirmFormId).submit()"
                     :disabled="confirmDeleting"
                     class="px-6 py-3 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition text-sm shadow-sm shadow-red-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <span x-show="!confirmDeleting">Yes, Delete</span>
-                    <span x-show="confirmDeleting">Deleting&hellip;</span>
+                    <span x-show="!confirmDeleting" x-text="confirmActionLabel"></span>
+                    <span x-show="confirmDeleting" x-text="confirmLoadingLabel"></span>
                 </button>
             </div>
         </div>
@@ -236,43 +244,9 @@
             lucide.createIcons();
         });
 
-        // Generic double-submit guard for every plain server-rendered CMS
-        // form (create/edit/save-settings/etc.) — this app has no client-side
-        // framework wiring each of those individually, so one delegated
-        // listener covers all of them instead of touching every view.
-        // Skips GET forms (search/filter bars — navigating again is harmless
-        // and sometimes wanted) and the delete-confirmation flow (its
-        // "Yes, Delete" button is guarded directly above, since form.submit()
-        // never fires this 'submit' event at all).
-        //
-        // Reflects the ACTUAL button clicked (event.submitter) rather than a
-        // generic "Loading..." everywhere, per Comfort's ask for proactive,
-        // per-action feedback — "Save Property" becomes "Save Property…"
-        // rather than every button in the CMS saying the same generic thing.
-        // A button can opt out entirely with data-no-submit-guard, or supply
-        // exact wording with data-loading-text.
-        document.addEventListener('submit', (event) => {
-            const form = event.target;
-            if (!(form instanceof HTMLFormElement)) return;
-            if ((form.method || 'get').toLowerCase() !== 'post') return;
-
-            const button = event.submitter
-                ?? form.querySelector('button[type="submit"]:not([type="button"])');
-            if (!button || button.hasAttribute('data-no-submit-guard')) return;
-
-            // A second submit event on an already-disabled button can't
-            // happen (disabled elements don't submit), but guard anyway in
-            // case something re-enables it programmatically mid-flight.
-            if (button.disabled) {
-                event.preventDefault();
-                return;
-            }
-
-            button.disabled = true;
-            button.classList.add('opacity-60', 'cursor-not-allowed');
-            button.dataset.originalHtml = button.innerHTML;
-            button.innerHTML = button.dataset.loadingText || (button.textContent.trim() + '&hellip;');
-        });
+        // Double-submit guard (spinner + disabled state on save/create
+        // buttons) lives in resources/js/app.js now — it used to also be
+        // duplicated here, and the two conflicted (see app.js for why).
     </script>
 </body>
 
