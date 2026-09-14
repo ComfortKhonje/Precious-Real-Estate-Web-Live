@@ -50,6 +50,8 @@ class PostDeploy extends Command
                 $this->step('key:generate', ['--force' => true]);
             }
 
+            $this->installFrontController();
+
             $this->step('migrate', ['--force' => true]);
 
             if (Service::count() === 0) {
@@ -119,6 +121,30 @@ class PostDeploy extends Command
         ]);
 
         $this->log("Created first Super Admin {$admin['email']}. Remove CMS_BOOTSTRAP_PASSWORD from .env now.");
+    }
+
+    /**
+     * public_html/index.php is installed from here instead of over FTP:
+     * the host refused that one file on every FTPS upload (the transfer
+     * died with a TLS alert on exactly that file, twice). It ships inside
+     * the app folder as deploy/public_html-index.php and is copied across
+     * locally. Only in the cPanel layout — never over a local public/.
+     */
+    private function installFrontController(): void
+    {
+        $source = base_path('deploy/public_html-index.php');
+        $target = public_path('index.php');
+
+        if (public_path() === base_path('public') || ! File::exists($source)) {
+            return;
+        }
+
+        if (File::exists($target) && File::get($target) === File::get($source)) {
+            return;
+        }
+
+        File::copy($source, $target);
+        $this->log('Installed public_html/index.php');
     }
 
     private function step(string $command, array $arguments = []): void
