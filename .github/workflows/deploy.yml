@@ -105,6 +105,9 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
+          # Still encrypted; tolerates the host's shared certificate not
+          # matching the FTP hostname, which is common on cPanel.
+          security: loose
           local-dir: bundle/app/
           server-dir: precious-real-estate-web/
           state-name: .ftp-deploy-app.json
@@ -117,6 +120,9 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
+          # Still encrypted; tolerates the host's shared certificate not
+          # matching the FTP hostname, which is common on cPanel.
+          security: loose
           local-dir: bundle/docroot/
           server-dir: public_html/
           state-name: .ftp-deploy-docroot.json
@@ -131,6 +137,9 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
+          # Still encrypted; tolerates the host's shared certificate not
+          # matching the FTP hostname, which is common on cPanel.
+          security: loose
           local-dir: bundle/release/
           server-dir: precious-real-estate-web/
           state-name: .ftp-deploy-release.json

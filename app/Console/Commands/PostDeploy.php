@@ -43,6 +43,13 @@ class PostDeploy extends Command
         $this->log("Deploying release {$release} (previous: ".($deployed ?? 'none').')');
 
         try {
+            // First deploy: the .env is created by hand in File Manager with
+            // an empty APP_KEY= line (nobody on the team can run
+            // key:generate). Fill it in here, before anything is encrypted.
+            if (empty(config('app.key'))) {
+                $this->step('key:generate', ['--force' => true]);
+            }
+
             $this->step('migrate', ['--force' => true]);
 
             if (Service::count() === 0) {

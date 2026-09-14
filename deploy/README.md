@@ -80,11 +80,11 @@ Also create an Environment named `production` (Settings > Environments) —
 the deploy job runs in it, so you can add required reviewers later if you want.
 
 ### 1.6 Production `.env`
-1. Locally: `php artisan key:generate --show`, copy the `base64:...` value.
+1. Leave `APP_KEY=` empty — `prec:post-deploy` generates it on the first run.
 2. cPanel > **File Manager** > Settings > tick **Show Hidden Files**.
 3. Create folder `/home/prec/precious-real-estate-web` if it doesn't exist.
 4. Inside it create `.env`, paste `deploy/env.production.example`, and fill
-   in every `<...>`: APP_KEY, DB password, mailbox password, and a strong
+   in every `<...>`: DB password, mailbox password, and a strong
    `CMS_BOOTSTRAP_PASSWORD` for the first Super Admin.
 5. Permissions on `.env`: **600** (File Manager > right click > Change Permissions).
 
@@ -105,10 +105,9 @@ cPanel > **Cron Jobs** > Add New Cron Job:
 - Common Settings: **Once Per Minute** (`* * * * *`)
 - Command:
   ```
-  /usr/local/bin/php /home/prec/precious-real-estate-web/artisan schedule:run >> /dev/null 2>&1
+  /opt/cpanel/ea-php84/root/usr/bin/php /home/prec/precious-real-estate-web/artisan schedule:run >> /dev/null 2>&1
   ```
-  If the host's PHP 8.4 binary lives elsewhere, cPanel's MultiPHP docs list it,
-  typically `/opt/cpanel/ea-php84/root/usr/bin/php`.
+  The full path pins PHP 8.4; plain `php` on cron can be an older default.
 
 Within a minute of the upload finishing, `storage/logs/deploy.log` should show
 migrations, the first-run seed (services, icons, team), the Super Admin
