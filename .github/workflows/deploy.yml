@@ -56,7 +56,9 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The first upload sends every vendor/ file one by one over FTP and
+    # took well over an hour; later deploys only send changed files.
+    timeout-minutes: 180
     environment: production
     steps:
       - uses: actions/checkout@v4
