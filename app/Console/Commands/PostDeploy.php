@@ -54,9 +54,16 @@ class PostDeploy extends Command
             // config and every web request would 500 with
             // MissingAppKeyException (happened on the first real deploy,
             // 2026-09-14). A fresh process a minute later reads the new key.
-            if (empty(config('app.key'))) {
-                $this->step('key:generate', ['--force' => true]);
-                $this->log('Application key generated. The rest of this deploy runs on the next cron tick.');
+            //
+            // The key is checked in the .env FILE, never via config(): a
+            // cached config from an earlier run can hold a stale empty key,
+            // which made every run regenerate it. key:generate isn't used
+            // either — it only replaces the text after "APP_KEY=" that
+            // matches the (stale) configured value, so on a line that
+            // already had a key it prepended a second one, corrupting it.
+            if (! $this->hasValidEnvKey()) {
+                $this->writeEnvKey('base64:'.base64_encode(random_bytes(32)));
+                $this->log('Application key written to .env. The rest of this deploy runs on the next cron tick.');
 
                 return self::SUCCESS;
             }
@@ -132,6 +139,32 @@ class PostDeploy extends Command
         ]);
 
         $this->log("Created first Super Admin {$admin['email']}. Remove CMS_BOOTSTRAP_PASSWORD from .env now.");
+    }
+
+    private function hasValidEnvKey(): bool
+    {
+        $path = base_path('.env');
+
+        if (! File::exists($path) || ! preg_match('/^APP_KEY=(.*)$/m', File::get($path), $match)) {
+            return false;
+        }
+
+        $key = trim($match[1], " \t\"'");
+
+        return str_starts_with($key, 'base64:')
+            && strlen((string) base64_decode(substr($key, 7), true)) === 32;
+    }
+
+    private function writeEnvKey(string $key): void
+    {
+        $path = base_path('.env');
+        $contents = File::exists($path) ? File::get($path) : '';
+
+        $contents = preg_match('/^APP_KEY=.*$/m', $contents)
+            ? preg_replace('/^APP_KEY=.*$/m', 'APP_KEY='.$key, $contents)
+            : rtrim($contents)."\nAPP_KEY={$key}\n";
+
+        File::put($path, $contents);
     }
 
     /**
