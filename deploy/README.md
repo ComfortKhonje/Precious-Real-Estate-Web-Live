@@ -105,9 +105,12 @@ cPanel > **Cron Jobs** > Add New Cron Job:
 - Common Settings: **Once Per Minute** (`* * * * *`)
 - Command:
   ```
-  /opt/cpanel/ea-php84/root/usr/bin/php /home/prec/precious-real-estate-web/artisan schedule:run >> /dev/null 2>&1
+  /opt/alt/php84/usr/bin/php /home/prec/precious-real-estate-web/artisan schedule:run >> /home/prec/cron.log 2>&1
   ```
-  The full path pins PHP 8.4; plain `php` on cron can be an older default.
+  This server is CloudLinux: the domain runs `alt-php84` (MultiPHP Manager),
+  whose binary is `/opt/alt/php84/usr/bin/php`. The `ea-php84` paths do not
+  exist here. `cron.log` in the home folder shows any error; switch the end
+  to `>> /dev/null 2>&1` once things are stable if it grows too large.
 
 Within a minute of the upload finishing, `storage/logs/deploy.log` should show
 migrations, the first-run seed (services, icons, team), the Super Admin
