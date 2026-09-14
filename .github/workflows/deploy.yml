@@ -93,6 +93,13 @@ jobs:
           cp artisan composer.json composer.lock bundle/app/
           find bundle/app/bootstrap/cache -type f ! -name '.gitignore' -delete
 
+          # Empty storage/ skeleton (only the tracked .gitignore placeholders).
+          # Laravel can't boot without storage/framework/{cache,sessions,views}
+          # and storage/logs, and the first deploy has no storage/ at all.
+          # Uploaded photos, logs and sessions on the server are never part
+          # of the bundle, so the sync never touches them.
+          git ls-files storage | grep '/\.gitignore$' | xargs -I{} cp --parents {} bundle/app/
+
           # public_html/index.php travels inside the app folder and is put in
           # place by prec:post-deploy on the server — the host refuses that
           # one file when it arrives over FTPS.
