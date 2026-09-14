@@ -46,8 +46,19 @@ class PostDeploy extends Command
             // First deploy: the .env is created by hand in File Manager with
             // an empty APP_KEY= line (nobody on the team can run
             // key:generate). Fill it in here, before anything is encrypted.
+            //
+            // Then stop and let the next cron tick finish the deploy. This
+            // process loaded the empty APP_KEY into its environment at boot,
+            // and Dotenv never overwrites an existing variable — so a
+            // config:cache run here would bake the EMPTY key into the cached
+            // config and every web request would 500 with
+            // MissingAppKeyException (happened on the first real deploy,
+            // 2026-09-14). A fresh process a minute later reads the new key.
             if (empty(config('app.key'))) {
                 $this->step('key:generate', ['--force' => true]);
+                $this->log('Application key generated. The rest of this deploy runs on the next cron tick.');
+
+                return self::SUCCESS;
             }
 
             $this->installFrontController();
