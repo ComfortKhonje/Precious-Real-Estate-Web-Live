@@ -93,10 +93,14 @@ jobs:
           cp artisan composer.json composer.lock bundle/app/
           find bundle/app/bootstrap/cache -type f ! -name '.gitignore' -delete
 
-          # Document root. index.php is the variant that points at the app
-          # folder one level up.
+          # public_html/index.php travels inside the app folder and is put in
+          # place by prec:post-deploy on the server — the host refuses that
+          # one file when it arrives over FTPS.
+          mkdir -p bundle/app/deploy
+          cp deploy/public_html-index.php bundle/app/deploy/
+
+          # Document root (everything in public/ except its index.php).
           rsync -a --exclude 'index.php' --exclude 'hot' --exclude 'storage' public/ bundle/docroot/
-          cp deploy/public_html-index.php bundle/docroot/index.php
 
           echo "${GITHUB_SHA}" > bundle/release/RELEASE
 
