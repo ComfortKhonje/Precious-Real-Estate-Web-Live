@@ -127,7 +127,7 @@
                     <div class="pt-2">
                         <p class="font-bold text-brand-black">Precious Real Estate Consulting (PREC)</p>
                         <p><span class="font-bold">Email:</span> {{ \App\Support\ContactInfo::email() }}</p>
-                        <p><span class="font-bold">Phone:</span> +265 884 366 756</p>
+                        <p><span class="font-bold">Phone:</span> {{ implode(' / ', array_filter([\App\Support\ContactInfo::phone(), \App\Support\ContactInfo::phoneSecondary()])) }}</p>
                     </div>
                 </div>
             </div>

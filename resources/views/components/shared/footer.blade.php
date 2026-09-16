@@ -50,6 +50,7 @@
                     $facebookUrl = \App\Support\ContactInfo::facebookUrl();
                     $instagramUrl = \App\Support\ContactInfo::instagramUrl();
                     $linkedinUrl = \App\Support\ContactInfo::linkedinUrl();
+                    $tiktokUrl = \App\Support\ContactInfo::tiktokUrl();
                     $whatsapp = \App\Support\ContactInfo::whatsapp();
                 @endphp
                 <div class="flex space-x-4">
@@ -71,6 +72,13 @@
                     <a href="{{ $linkedinUrl }}" target="_blank" rel="noopener" class="bg-brand-black text-white p-3 rounded-xl hover:bg-primary hover:text-brand-black transition">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 110-4.124 2.062 2.062 0 010 4.124zM7.114 20.452H3.56V9h3.554v11.452z"></path>
+                        </svg>
+                    </a>
+                    @endif
+                    @if($tiktokUrl)
+                    <a href="{{ $tiktokUrl }}" target="_blank" rel="noopener" class="bg-brand-black text-white p-3 rounded-xl hover:bg-primary hover:text-brand-black transition">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1.04-.1z"></path>
                         </svg>
                     </a>
                     @endif

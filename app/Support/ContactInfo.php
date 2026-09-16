@@ -41,6 +41,11 @@ class ContactInfo
         return static::setting('office_phone', config('site.phones.0'));
     }
 
+    public static function phoneSecondary(): ?string
+    {
+        return static::setting('office_phone_secondary', config('site.phones.1'));
+    }
+
     public static function whatsapp(): ?string
     {
         return static::setting('whatsapp_number', config('site.phones.1'));
@@ -86,5 +91,10 @@ class ContactInfo
     public static function linkedinUrl(): ?string
     {
         return static::setting('linkedin_url');
+    }
+
+    public static function tiktokUrl(): ?string
+    {
+        return static::setting('tiktok_url', config('site.social.1'));
     }
 }
