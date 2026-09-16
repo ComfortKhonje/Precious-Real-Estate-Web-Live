@@ -33,9 +33,9 @@ test('saving contact information updates an existing setting by key', function (
     $this->actingAs($this->user)
         ->withSession(['cms_authenticated' => true])
         ->put(route('cms.contact.update'), [
-            'office_phone' => '+265884366756',
+            'office_phone' => '+265994818122',
         ])
         ->assertRedirect(route('cms.contact.index'));
 
-    expect(Setting::find('office_phone')->value)->toBe('+265884366756');
+    expect(Setting::find('office_phone')->value)->toBe('+265994818122');
 });

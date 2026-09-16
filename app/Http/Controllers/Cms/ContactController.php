@@ -20,6 +20,7 @@ class ContactController extends Controller
             'office_address_blantyre',
             'postal_address',
             'office_phone',
+            'office_phone_secondary',
             'office_email',
             'working_hours',
             'latitude',
@@ -27,6 +28,7 @@ class ContactController extends Controller
             'facebook_url',
             'instagram_url',
             'linkedin_url',
+            'tiktok_url',
             'whatsapp_number',
         ])->pluck('value', 'key');
 
@@ -44,6 +46,7 @@ class ContactController extends Controller
             'office_address_blantyre' => 'nullable|string|max:500',
             'postal_address' => 'nullable|string|max:500',
             'office_phone' => 'nullable|string|max:20',
+            'office_phone_secondary' => 'nullable|string|max:20',
             'office_email' => 'nullable|email|max:255',
             'working_hours' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric',
@@ -51,6 +54,7 @@ class ContactController extends Controller
             'facebook_url' => 'nullable|url|max:500',
             'instagram_url' => 'nullable|url|max:500',
             'linkedin_url' => 'nullable|url|max:500',
+            'tiktok_url' => 'nullable|url|max:500',
             'whatsapp_number' => 'nullable|string|max:20',
         ]);
 

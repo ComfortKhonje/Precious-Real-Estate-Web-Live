@@ -30,12 +30,13 @@ return [
 
     'founded' => '2016',
 
-    'phones' => ['+265884366756', '+265997943049'],
+    'phones' => ['+265994818122', '+265997943049'],
 
     'email' => 'info@preciousrealestate.mw',
 
     'social' => [
         'https://www.facebook.com/p/Precious-Real-Estate-Consulting-100052172436707',
+        'https://www.tiktok.com/@preciousrealestateconsul',
     ],
 
     'offices' => [

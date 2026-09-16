@@ -64,6 +64,12 @@
                     @error('office_phone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">Office Phone (Second Line)</label>
+                    <input type="tel" name="office_phone_secondary" placeholder="+265 1 2345 6789"
+                        value="{{ old('office_phone_secondary', $settings['office_phone_secondary'] ?? '') }}" class="cms-input">
+                    @error('office_phone_secondary') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="space-y-2">
                     <label class="text-sm font-semibold tracking-wider">Office Email</label>
                     <input type="email" name="office_email" placeholder="info@preciousrealestate.mw"
                         value="{{ old('office_email', $settings['office_email'] ?? '') }}" class="cms-input">
@@ -122,6 +128,12 @@
                     <input type="url" name="linkedin_url" placeholder="https://linkedin.com/..."
                         value="{{ old('linkedin_url', $settings['linkedin_url'] ?? '') }}" class="cms-input">
                     @error('linkedin_url') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold tracking-wider">TikTok URL</label>
+                    <input type="url" name="tiktok_url" placeholder="https://tiktok.com/@..."
+                        value="{{ old('tiktok_url', $settings['tiktok_url'] ?? '') }}" class="cms-input">
+                    @error('tiktok_url') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
         </div>
