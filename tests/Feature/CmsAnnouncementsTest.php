@@ -121,3 +121,29 @@ test('the article page shows Quill bullet lists and a reading time', function ()
         ->assertSee('article-prose', escape: false)
         ->assertSee('1 min read');
 });
+
+/*
+ * Production 500 on 2026-09-29: a 330-character summary passed `max:500`
+ * validation but the column was VARCHAR(255). SQLite doesn't enforce VARCHAR
+ * lengths, so check the column types themselves.
+ */
+test('summary columns hold everything validation allows', function () {
+    expect(\Illuminate\Support\Facades\Schema::getColumnType('announcements', 'summary'))->toBe('text');
+    expect(\Illuminate\Support\Facades\Schema::getColumnType('services', 'short_description'))->toBe('text');
+});
+
+test('an update with a long summary is created', function () {
+    $summary = str_repeat('Precious Real Estate Consulting attended the SIM CPD Conference. ', 5);
+
+    asEditor()->post(route('cms.announcements.store'), updatePayload([
+        'title' => 'PREC Attends SIM CPD Conference 2026',
+        'summary' => $summary,
+        'cover_image' => UploadedFile::fake()->image('cover.jpg'),
+        'event_start_date' => '2026-05-20',
+        'event_end_date' => '2026-05-21',
+    ]))->assertRedirect(route('cms.announcements.index'));
+
+    $created = Announcement::where('title', 'PREC Attends SIM CPD Conference 2026')->firstOrFail();
+    expect(mb_strlen($created->summary))->toBeGreaterThan(255);
+    expect($created->eventDateRange())->toBe('20–21 May 2026');
+});

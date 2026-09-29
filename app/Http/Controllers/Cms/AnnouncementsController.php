@@ -69,7 +69,16 @@ class AnnouncementsController extends Controller
             unset($data['cover_image']);
         }
 
-        $announcement = Announcement::create($data);
+        // The cover is processed before the row exists; if the insert fails,
+        // don't leave its files orphaned in storage (every failed attempt
+        // on 2026-09-29 left one behind).
+        try {
+            $announcement = Announcement::create($data);
+        } catch (\Throwable $e) {
+            app(MediaService::class)->delete($data['cover_image'] ?? null);
+
+            throw $e;
+        }
 
         $media = app(MediaService::class);
         foreach ($request->file('gallery', []) as $i => $file) {
