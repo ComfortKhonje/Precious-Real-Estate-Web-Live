@@ -11,7 +11,7 @@
     search-placeholder="Search announcements..."
     :clear-route="request()->anyFilled(['search', 'status']) ? route('cms.announcements.index') : null"
     :create-route="route('cms.announcements.create')"
-    create-label="Add Announcement">
+    create-label="Add Update">
     <x-slot:filters>
         <select name="status" onchange="this.form.submit()" class="cms-select bg-white border-gray-200 py-3 px-4 text-sm w-auto min-w-[9rem] max-w-[11rem] truncate">
             <option value="">All Status</option>
@@ -79,7 +79,7 @@
 
                     <a href="{{ route('cms.announcements.edit', $announcement) }}"
                         class="mt-3 block w-full text-center px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold transition flex items-center justify-center gap-1">
-                        Edit Announcement <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        Edit Update <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </a>
                 </div>
             </div>

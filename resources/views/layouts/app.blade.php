@@ -52,7 +52,7 @@
     @endif
 </head>
 
-<body class="font-body text-brand-black antialiased min-h-screen flex flex-col bg-grid">
+<body class="font-body text-brand-black antialiased min-h-screen flex flex-col @yield('body_class', 'bg-grid')">
     {{-- Keyboard users shouldn't have to tab through the whole nav on every
          page before reaching the content. Visually hidden until focused. --}}
     <a href="#main-content"

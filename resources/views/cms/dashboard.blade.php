@@ -24,7 +24,7 @@ $secondaryStats = [
 ];
 $quickActions = [
 ['label' => 'Add Property', 'route' => 'cms.properties.create', 'icon' => 'plus'],
-['label' => 'Add Announcement', 'route' => 'cms.announcements.create', 'icon' => 'megaphone'],
+['label' => 'Add Update', 'route' => 'cms.announcements.create', 'icon' => 'megaphone'],
 ['label' => 'Edit Services', 'route' => 'cms.services.index', 'icon' => 'briefcase'],
 ['label' => 'View Inquiries', 'route' => 'cms.inquiries.index', 'icon' => 'mail'],
 // Team Members got a stat card above but no shortcut down here — the
