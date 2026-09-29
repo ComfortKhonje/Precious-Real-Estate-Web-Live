@@ -63,6 +63,15 @@
       prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/10 prose-blockquote:rounded-r-2xl prose-blockquote:py-3 prose-blockquote:px-6 prose-blockquote:not-italic prose-blockquote:font-medium prose-blockquote:text-brand-black;
   }
 
+  /* Horizontal chip rows that scroll by swipe, without a scrollbar. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   .article-prose ol > li[data-list="bullet"] {
     list-style-type: disc;
   }
