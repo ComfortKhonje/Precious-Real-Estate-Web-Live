@@ -6,11 +6,40 @@
     $imageAspect = $isBlog ? 'aspect-[4/3]' : 'aspect-video';
 @endphp
 
+{{--
+    2026-09-29 mobile pass: on phones a regular (non-featured) card was
+    nearly a full screen tall, so the feed showed about one update per
+    screen. Below sm it's now a compact news-feed row — thumbnail, category,
+    date, title — the way news sites and apps list stories. The full card
+    below is unchanged from sm up, and the featured story stays large
+    everywhere. The hidden variant is display:none, so it takes no grid
+    cell and isn't read by screen readers.
+--}}
+@unless ($featured)
+    <a href="{{ route('updates.show', $announcement->id) }}"
+        class="sm:hidden group flex items-center gap-4 rounded-2xl p-3 pr-4 {{ $isAnnouncement ? 'bg-brand-black' : 'bg-white border border-[#ece8d4]' }}">
+        <img loading="lazy" decoding="async" src="{{ $announcement->coverImageUrl('thumbnail') ?: asset('brand-assets/no-image-placeholder.svg') }}" alt=""
+            class="w-24 h-24 rounded-xl object-cover shrink-0 bg-[#f4f3ea]">
+        <div class="min-w-0">
+            <p class="text-[10px] font-bold uppercase tracking-[0.15em] {{ $isAnnouncement ? 'text-primary' : 'text-brand-black/55' }}">
+                {{ $announcement->category ?? 'Update' }}<span class="mx-1.5 opacity-50">·</span>{{ $announcement->published_at?->format('M j, Y') }}
+            </p>
+            <h3 class="mt-1 font-heading text-lg leading-snug line-clamp-3 {{ $isAnnouncement ? 'text-white' : 'text-brand-black' }}">{{ $announcement->title }}</h3>
+            @if ($announcement->eventDateRange())
+                <p class="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold {{ $isAnnouncement ? 'text-primary' : 'text-brand-black/65' }}">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    {{ $announcement->eventDateRange() }}
+                </p>
+            @endif
+        </div>
+    </a>
+@endunless
+
 <a href="{{ route('updates.show', $announcement->id) }}"
-    class="group flex flex-col h-full rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(30,30,30,0.04)] hover:shadow-lg transition-shadow duration-300 {{ $isAnnouncement ? 'bg-brand-black border border-brand-black' : 'bg-white border border-[#ece8d4]' }}">
+    class="group {{ $featured ? 'flex' : 'hidden sm:flex' }} flex-col h-full rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(30,30,30,0.04)] hover:shadow-lg transition-shadow duration-300 {{ $isAnnouncement ? 'bg-brand-black border border-brand-black' : 'bg-white border border-[#ece8d4]' }}">
 
     {{-- Cover image — flex-1 so a featured card fills whatever height the sidebar next to it reaches, no JS needed --}}
-    <div class="relative w-full overflow-hidden {{ $featured ? 'flex-1 min-h-[220px]' : $imageAspect }}">
+    <div class="relative w-full overflow-hidden {{ $featured ? 'flex-1 min-h-[200px] md:min-h-[220px]' : $imageAspect }}">
         <img loading="lazy" decoding="async" src="{{ $announcement->coverImageUrl('medium') ?: asset('brand-assets/no-image-placeholder.svg') }}" alt="{{ $announcement->title }}"
             class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
 
@@ -19,7 +48,7 @@
         @endif
     </div>
 
-    <div class="flex flex-col p-6 {{ $featured ? 'md:p-8' : '' }}">
+    <div class="flex flex-col p-5 sm:p-6 {{ $featured ? 'md:p-8' : '' }}">
         @if ($isAnnouncement)
             {{-- Bold, urgent tone: badge sits on the image via negative margin so the black card reads as one solid block --}}
             <div class="flex flex-wrap items-center gap-3 mb-3">
@@ -28,7 +57,7 @@
                     <span class="inline-flex items-center rounded-full border border-primary/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">Featured</span>
                 @endif
             </div>
-            <h3 class="font-heading {{ $featured ? 'text-4xl' : 'text-2xl' }} leading-tight text-white group-hover:text-primary transition-colors">{{ $announcement->title }}</h3>
+            <h3 class="font-heading {{ $featured ? 'text-3xl md:text-4xl' : 'text-2xl' }} leading-tight text-white group-hover:text-primary transition-colors">{{ $announcement->title }}</h3>
             <p class="mt-2 text-white/60 text-xs font-semibold uppercase tracking-wider">{{ $announcement->published_at?->format('M d, Y') }}</p>
             @if ($announcement->eventDateRange())
                 <p class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary">
@@ -37,7 +66,7 @@
                 </p>
             @endif
             @if ($announcement->summary)
-                <p class="mt-4 text-white/70 {{ $featured ? 'text-lg' : 'text-sm' }} leading-relaxed line-clamp-3">{{ $announcement->summary }}</p>
+                <p class="mt-4 text-white/70 {{ $featured ? 'text-base md:text-lg' : 'text-sm' }} leading-relaxed line-clamp-3">{{ $announcement->summary }}</p>
             @endif
         @else
             {{-- Clean/editorial tone shared by News and Blog: date-forward eyebrow line --}}
@@ -48,7 +77,7 @@
                     <span class="inline-flex items-center rounded-full bg-brand-black px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-primary">Featured</span>
                 @endif
             </div>
-            <h3 class="font-heading {{ $featured ? 'text-4xl' : 'text-2xl' }} leading-tight text-brand-black group-hover:text-primary transition-colors">{{ $announcement->title }}</h3>
+            <h3 class="font-heading {{ $featured ? 'text-3xl md:text-4xl' : 'text-2xl' }} leading-tight text-brand-black group-hover:text-primary transition-colors">{{ $announcement->title }}</h3>
             @if ($announcement->eventDateRange())
                 <p class="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-brand-black/70">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -56,7 +85,7 @@
                 </p>
             @endif
             @if ($announcement->summary)
-                <p class="mt-3 text-brand-black/65 {{ $featured ? 'text-lg' : 'text-sm' }} leading-relaxed line-clamp-3">{{ $announcement->summary }}</p>
+                <p class="mt-3 text-brand-black/65 {{ $featured ? 'text-base md:text-lg' : 'text-sm' }} leading-relaxed line-clamp-3">{{ $announcement->summary }}</p>
             @endif
 
             @if ($isBlog && $announcement->teamMember)

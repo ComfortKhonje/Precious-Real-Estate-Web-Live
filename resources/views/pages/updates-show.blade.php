@@ -33,14 +33,14 @@
         $shareTitle = urlencode($article->title);
     @endphp
 
-    <article class="px-6 pt-8 md:pt-10 pb-16">
+    <article class="px-5 sm:px-6 pt-6 md:pt-10 pb-14 md:pb-16">
         <div class="max-w-3xl mx-auto">
             <a href="{{ route('updates') }}" class="group inline-flex items-center gap-2 text-sm font-semibold text-brand-black/60 hover:text-brand-black transition-colors">
                 <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 Back to Updates
             </a>
 
-            <header class="mt-8">
+            <header class="mt-6 md:mt-8">
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
                     <span class="inline-flex items-center rounded-full bg-primary/40 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-black">{{ $article->category ?? 'Update' }}</span>
                     @if($article->is_featured)
@@ -93,12 +93,12 @@
         </div>
 
         @if($article->cover_image)
-            <figure class="max-w-5xl mx-auto mt-10 rounded-[2rem] overflow-hidden border border-[#ece8d4] bg-[#f4f3ea]">
+            <figure class="max-w-5xl mx-auto mt-8 md:mt-10 rounded-2xl md:rounded-[2rem] overflow-hidden border border-[#ece8d4] bg-[#f4f3ea]">
                 <img fetchpriority="high" decoding="async" src="{{ $article->coverImageUrl('large') }}" alt="{{ $article->title }}" class="w-full aspect-[16/9] max-h-[560px] object-cover">
             </figure>
         @endif
 
-        <div class="max-w-3xl mx-auto mt-12">
+        <div class="max-w-3xl mx-auto mt-8 md:mt-12">
             @if($isBlog)
                 {{-- Gallery photos woven between paragraphs as the reader scrolls
                      instead of dumped in a grid after all the text — see
@@ -109,7 +109,7 @@
                         @if($block['type'] === 'html')
                             <div class="article-prose">{!! $block['value'] !!}</div>
                         @else
-                            <figure class="md:-mx-16 rounded-[2rem] overflow-hidden bg-[#f4f3ea]">
+                            <figure class="md:-mx-16 rounded-2xl md:rounded-[2rem] overflow-hidden bg-[#f4f3ea]">
                                 <img loading="lazy" decoding="async" src="{{ $block['value']->url('large') }}" alt="Photo from {{ $article->title }}" class="w-full aspect-[3/2] object-cover">
                             </figure>
                         @endif
@@ -135,7 +135,7 @@
                 @endif
             @endif
 
-            <footer class="mt-14 border-t border-[#ece8d4] pt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4" x-data="{ copied: false }">
+            <footer class="mt-12 md:mt-14 border-t border-[#ece8d4] pt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4" x-data="{ copied: false }">
                 <p class="font-semibold text-brand-black">Share this update</p>
                 <div class="flex flex-wrap gap-2">
                     <a href="https://wa.me/?text={{ $shareTitle }}%20{{ $shareUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp" class="w-10 h-10 rounded-full bg-[#f4f3ea] hover:bg-primary/40 text-brand-black flex items-center justify-center transition-colors">
@@ -161,14 +161,14 @@
     </article>
 
     @if($recentUpdates->count() > 0)
-        <section class="px-6 pt-16 pb-24 border-t border-[#ece8d4]">
+        <section class="px-4 sm:px-6 pt-10 md:pt-16 pb-16 md:pb-24 border-t border-[#ece8d4]">
             <div class="max-w-7xl mx-auto">
-                <div class="flex items-center justify-between mb-8">
-                    <h2 class="font-heading text-4xl text-brand-black">More Updates</h2>
+                <div class="flex items-center justify-between mb-5 md:mb-8">
+                    <h2 class="font-heading text-3xl md:text-4xl text-brand-black">More Updates</h2>
                     <a href="{{ route('updates') }}" class="text-sm font-semibold uppercase tracking-wide text-brand-black/60 hover:text-brand-black transition-colors">View All</a>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
                     @foreach($recentUpdates as $recent)
                         <x-updates.update-card :announcement="$recent" />
                     @endforeach
