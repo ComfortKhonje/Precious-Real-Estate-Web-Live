@@ -147,3 +147,23 @@ test('an update with a long summary is created', function () {
     expect(mb_strlen($created->summary))->toBeGreaterThan(255);
     expect($created->eventDateRange())->toBe('20–21 May 2026');
 });
+
+/*
+ * 2026-09-29: photos open in an in-page viewer instead of linking to the raw
+ * file, and the untouched originals (which can carry GPS EXIF data) are
+ * blocked from being fetched directly.
+ */
+test('article photos open in the viewer, not as raw file links', function () {
+    AnnouncementImage::create(['announcement_id' => $this->announcement->id, 'image_path' => 'precious-real-estate/announcements/gallery/one', 'sort_order' => 0]);
+
+    $html = $this->get(route('updates.show', $this->announcement->id))->assertOk()->getContent();
+
+    expect($html)->not->toMatch('/<a[^>]+href="[^"]*\/storage\//');
+    expect($html)->toContain("open-lightbox");
+});
+
+test('original uploads are not publicly reachable', function () {
+    expect(file_get_contents(public_path('.htaccess')))
+        ->toContain('<FilesMatch "^original\.">')
+        ->toContain('Require all denied');
+});
