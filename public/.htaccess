@@ -91,6 +91,15 @@
     Require all denied
 </FilesMatch>
 
+# Uploaded photos are served as resized WebP copies (large/medium/
+# thumbnail), which carry no camera metadata. MediaService also keeps the
+# untouched upload as original.<ext> beside them; the site never shows it,
+# and a phone photo can hold GPS location in its EXIF data. Anyone could
+# fetch it by swapping the file name in an image URL (checked 2026-09-29).
+<FilesMatch "^original\.">
+    Require all denied
+</FilesMatch>
+
 <Files "index.php">
     Require all granted
 </Files>

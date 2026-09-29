@@ -31,9 +31,17 @@
         $isMultiDay = $article->event_end_date && ! $article->event_end_date->isSameDay($article->event_start_date);
         $shareUrl = urlencode(request()->url());
         $shareTitle = urlencode($article->title);
+
+        // Every photo on the page, in reading order, for the in-page viewer
+        // (x-shared.lightbox). Cover first, then the gallery.
+        $galleryOffset = $article->cover_image ? 1 : 0;
+        $lightboxImages = collect($article->cover_image ? [$article->coverImageUrl('large')] : [])
+            ->merge($article->images->map(fn ($image) => $image->url('large')))
+            ->values();
+        $galleryIndex = $article->images->pluck('id')->flip()->map(fn ($i) => $i + $galleryOffset);
     @endphp
 
-    <article class="px-5 sm:px-6 pt-6 md:pt-10 pb-14 md:pb-16">
+    <article class="px-5 sm:px-6 pt-6 md:pt-10 pb-14 md:pb-16" x-data="{ photos: @js($lightboxImages) }">
         <div class="max-w-3xl mx-auto">
             <a href="{{ route('updates') }}" class="group inline-flex items-center gap-2 text-sm font-semibold text-brand-black/60 hover:text-brand-black transition-colors">
                 <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -94,7 +102,9 @@
 
         @if($article->cover_image)
             <figure class="max-w-5xl mx-auto mt-8 md:mt-10 rounded-2xl md:rounded-[2rem] overflow-hidden border border-[#ece8d4] bg-[#f4f3ea]">
-                <img fetchpriority="high" decoding="async" src="{{ $article->coverImageUrl('large') }}" alt="{{ $article->title }}" class="w-full aspect-[16/9] max-h-[560px] object-cover">
+                <button type="button" x-on:click="$dispatch('open-lightbox', { images: photos, index: 0 })" class="block w-full cursor-zoom-in" aria-label="View photo larger">
+                    <img fetchpriority="high" decoding="async" src="{{ $article->coverImageUrl('large') }}" alt="{{ $article->title }}" class="w-full aspect-[16/9] max-h-[560px] object-cover">
+                </button>
             </figure>
         @endif
 
@@ -110,7 +120,9 @@
                             <div class="article-prose">{!! $block['value'] !!}</div>
                         @else
                             <figure class="md:-mx-16 rounded-2xl md:rounded-[2rem] overflow-hidden bg-[#f4f3ea]">
-                                <img loading="lazy" decoding="async" src="{{ $block['value']->url('large') }}" alt="Photo from {{ $article->title }}" class="w-full aspect-[3/2] object-cover">
+                                <button type="button" x-on:click="$dispatch('open-lightbox', { images: photos, index: {{ $galleryIndex[$block['value']->id] ?? 0 }} })" class="block w-full cursor-zoom-in" aria-label="View photo larger">
+                                    <img loading="lazy" decoding="async" src="{{ $block['value']->url('large') }}" alt="Photo from {{ $article->title }}" class="w-full aspect-[3/2] object-cover">
+                                </button>
                             </figure>
                         @endif
                     @endforeach
@@ -126,9 +138,10 @@
                         <h2 class="font-heading text-2xl text-brand-black mb-4">Photos</h2>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             @foreach($article->images as $image)
-                                <a href="{{ $image->url('large') }}" target="_blank" rel="noopener" class="group block aspect-square rounded-2xl overflow-hidden bg-[#f4f3ea]">
+                                <button type="button" x-on:click="$dispatch('open-lightbox', { images: photos, index: {{ $galleryIndex[$image->id] }} })" aria-label="View photo {{ $loop->iteration }} larger"
+                                    class="group block w-full aspect-square rounded-2xl overflow-hidden bg-[#f4f3ea] cursor-zoom-in">
                                     <img loading="lazy" decoding="async" src="{{ $image->url('medium') }}" alt="Photo from {{ $article->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                </a>
+                                </button>
                             @endforeach
                         </div>
                     </div>
@@ -159,6 +172,8 @@
             </footer>
         </div>
     </article>
+
+    <x-shared.lightbox :title="$article->title" />
 
     @if($recentUpdates->count() > 0)
         <section class="px-4 sm:px-6 pt-10 md:pt-16 pb-16 md:pb-24 border-t border-[#ece8d4]">
