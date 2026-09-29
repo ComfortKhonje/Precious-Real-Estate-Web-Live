@@ -294,10 +294,19 @@ document.addEventListener('submit', (event) => {
         return;
     }
 
-    button.disabled = true;
-    button.classList.add('opacity-60', 'cursor-not-allowed');
-    const label = button.dataset.loadingText || (button.textContent.trim() + '…');
-    button.innerHTML = `<span class="inline-flex items-center justify-center gap-2">${SUBMIT_SPINNER_SVG}<span>${label}</span></span>`;
+    // Locked only once the whole submit event has run, and only if nothing
+    // cancelled it. This listener runs first (capture phase); a later one
+    // can still stop the submit — e.g. <x-cms.image-upload>'s "this image
+    // is required" check — and locking right away left Save greyed out with
+    // no way to retry (2026-09-29).
+    setTimeout(() => {
+        if (event.defaultPrevented) return;
+
+        button.disabled = true;
+        button.classList.add('opacity-60', 'cursor-not-allowed');
+        const label = button.dataset.loadingText || (button.textContent.trim() + '…');
+        button.innerHTML = `<span class="inline-flex items-center justify-center gap-2">${SUBMIT_SPINNER_SVG}<span>${label}</span></span>`;
+    }, 0);
 }, true);
 
 // ============================================================================

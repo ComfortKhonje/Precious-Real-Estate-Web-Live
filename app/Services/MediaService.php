@@ -38,6 +38,8 @@ class MediaService
 
         Storage::disk($this->disk)->makeDirectory($directory);
 
+        $this->ensureProcessingHeadroom();
+
         try {
             $image = $this->manager->decode(
                 file_get_contents($file->getRealPath())
@@ -73,7 +75,7 @@ class MediaService
 
             return $directory;
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             Log::error('Media upload failed: '.$e->getMessage());
 
@@ -85,6 +87,42 @@ class MediaService
 
             return $directory;
         }
+    }
+
+    /**
+     * GD holds a decoded photo uncompressed in memory: a 12-megapixel phone
+     * photo peaks around 120MB while its WebP sizes are made, and takes a
+     * couple of seconds. On shared hosting's usual 128MB / 30s defaults, a
+     * large photo — or a gallery of several — ended in a fatal "memory
+     * exhausted" or "maximum execution time" error, which no catch block
+     * can handle, so staff saw a bare 500 (reported 2026-09-29). Raise both
+     * for this request only; public/.user.ini raises them too, but some
+     * hosts ignore that file. Never lowers a limit that is already higher.
+     */
+    protected function ensureProcessingHeadroom(): void
+    {
+        $limit = ini_get('memory_limit');
+
+        if ($limit !== '-1' && $this->bytes($limit) < 256 * 1024 * 1024) {
+            @ini_set('memory_limit', '256M');
+        }
+
+        // Fresh allowance per image, so a whole gallery isn't bound by one
+        // 30-second budget.
+        @set_time_limit(60);
+    }
+
+    protected function bytes(string $value): int
+    {
+        $value = trim($value);
+        $number = (int) $value;
+
+        return match (strtolower(substr($value, -1))) {
+            'g' => $number * 1024 ** 3,
+            'm' => $number * 1024 ** 2,
+            'k' => $number * 1024,
+            default => $number,
+        };
     }
 
     /**
