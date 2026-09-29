@@ -30,6 +30,12 @@
             </div>
             <h3 class="font-heading {{ $featured ? 'text-4xl' : 'text-2xl' }} leading-tight text-white group-hover:text-primary transition-colors">{{ $announcement->title }}</h3>
             <p class="mt-2 text-white/60 text-xs font-semibold uppercase tracking-wider">{{ $announcement->published_at?->format('M d, Y') }}</p>
+            @if ($announcement->eventDateRange())
+                <p class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    {{ $announcement->eventDateRange() }}
+                </p>
+            @endif
             @if ($announcement->summary)
                 <p class="mt-4 text-white/70 {{ $featured ? 'text-lg' : 'text-sm' }} leading-relaxed line-clamp-3">{{ $announcement->summary }}</p>
             @endif
@@ -43,6 +49,12 @@
                 @endif
             </div>
             <h3 class="font-heading {{ $featured ? 'text-4xl' : 'text-2xl' }} leading-tight text-brand-black group-hover:text-primary transition-colors">{{ $announcement->title }}</h3>
+            @if ($announcement->eventDateRange())
+                <p class="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-brand-black/70">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    {{ $announcement->eventDateRange() }}
+                </p>
+            @endif
             @if ($announcement->summary)
                 <p class="mt-3 text-brand-black/65 {{ $featured ? 'text-lg' : 'text-sm' }} leading-relaxed line-clamp-3">{{ $announcement->summary }}</p>
             @endif

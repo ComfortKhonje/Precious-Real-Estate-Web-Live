@@ -20,12 +20,51 @@ class Announcement extends Model
      */
     public const CATEGORIES = ['Announcement', 'News', 'Blog'];
 
-    protected $fillable = ['title', 'category', 'team_member_id', 'summary', 'content', 'cover_image', 'status', 'published_at', 'is_featured'];
+    protected $fillable = ['title', 'category', 'team_member_id', 'summary', 'content', 'cover_image', 'status', 'published_at', 'event_start_date', 'event_end_date', 'is_featured'];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'event_start_date' => 'date',
+        'event_end_date' => 'date',
         'is_featured' => 'bool',
     ];
+
+    /**
+     * The event's own date span, compacted the way people write it:
+     * "14 Sep 2026", "12–14 Sep 2026", "28 Sep – 2 Oct 2026",
+     * "30 Dec 2026 – 2 Jan 2027". Null when no event date was set.
+     */
+    public function eventDateRange(): ?string
+    {
+        $start = $this->event_start_date;
+        $end = $this->event_end_date;
+
+        if (! $start) {
+            return null;
+        }
+
+        if (! $end || $end->isSameDay($start)) {
+            return $start->format('j M Y');
+        }
+
+        if ($start->isSameMonth($end)) {
+            return $start->format('j').'–'.$end->format('j M Y');
+        }
+
+        if ($start->isSameYear($end)) {
+            return $start->format('j M').' – '.$end->format('j M Y');
+        }
+
+        return $start->format('j M Y').' – '.$end->format('j M Y');
+    }
+
+    /** Rough reading time for the article page, at ~200 words a minute. */
+    public function readingMinutes(): int
+    {
+        $words = str_word_count(strip_tags((string) $this->content));
+
+        return max(1, (int) ceil($words / 200));
+    }
 
     /**
      * Get featured announcements

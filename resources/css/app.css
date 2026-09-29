@@ -36,6 +36,49 @@
     background-size: 40px 40px;
   }
 
+  /* Reading pages (single update): same grid, less than half the strength,
+     so it doesn't compete with body text. */
+  .bg-grid-soft {
+    background-image:
+      linear-gradient(to right, rgba(30, 30, 30, 0.01) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(30, 30, 30, 0.01) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Body text of a single update. Content comes from the CMS's Quill
+     editor, whose HTML needs a few corrections to read well:
+     - bullet lists are saved as <ol><li data-list="bullet">, so they'd
+       otherwise render numbered;
+     - blank lines are saved as <p><br></p>, which prose turns into large
+       gaps — hidden, since paragraph spacing already separates the text;
+     - Quill's alignment classes are honoured. */
+  .article-prose {
+    @apply prose prose-lg md:prose-xl max-w-none
+      prose-headings:font-heading prose-headings:font-semibold prose-headings:text-brand-black prose-headings:leading-tight
+      prose-h2:mt-12 prose-h2:mb-4 prose-h3:mt-10 prose-h3:mb-3
+      prose-p:text-brand-black/80 prose-p:leading-relaxed
+      prose-li:text-brand-black/80 prose-li:my-1 prose-li:marker:text-brand-black/40
+      prose-strong:text-brand-black
+      prose-a:text-brand-black prose-a:underline prose-a:decoration-primary prose-a:decoration-2 prose-a:underline-offset-4 hover:prose-a:decoration-brand-black
+      prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/10 prose-blockquote:rounded-r-2xl prose-blockquote:py-3 prose-blockquote:px-6 prose-blockquote:not-italic prose-blockquote:font-medium prose-blockquote:text-brand-black;
+  }
+
+  .article-prose ol > li[data-list="bullet"] {
+    list-style-type: disc;
+  }
+
+  .article-prose p:has(> br:only-child) {
+    display: none;
+  }
+
+  .article-prose > :first-child {
+    margin-top: 0;
+  }
+
+  .article-prose .ql-align-center { text-align: center; }
+  .article-prose .ql-align-right { text-align: right; }
+  .article-prose .ql-align-justify { text-align: justify; }
+
   .btn-primary {
     @apply inline-flex items-center justify-center px-6 py-3 bg-brand-black text-primary uppercase text-sm rounded-full font-medium hover:bg-gray-800 transition duration-300;
   }

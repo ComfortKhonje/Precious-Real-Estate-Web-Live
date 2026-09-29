@@ -37,6 +37,8 @@ class AnnouncementsController extends Controller
 
     public function store(Request $request)
     {
+        $this->normalizeEventDates($request);
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|in:'.implode(',', Announcement::CATEGORIES),
@@ -50,6 +52,8 @@ class AnnouncementsController extends Controller
             'status' => 'required|string|in:draft,published,archived',
             'is_featured' => 'nullable|boolean',
             'published_at' => 'nullable|date',
+            'event_start_date' => 'nullable|date',
+            'event_end_date' => 'nullable|date|after_or_equal:event_start_date',
         ]);
 
         unset($data['gallery']);
@@ -77,7 +81,7 @@ class AnnouncementsController extends Controller
             ]);
         }
 
-        return redirect()->route('cms.announcements.index')->with('status', 'Announcement created.');
+        return redirect()->route('cms.announcements.index')->with('status', 'Update created.');
     }
 
     public function edit(Announcement $announcement)
@@ -89,6 +93,8 @@ class AnnouncementsController extends Controller
 
     public function update(Request $request, Announcement $announcement)
     {
+        $this->normalizeEventDates($request);
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|in:'.implode(',', Announcement::CATEGORIES),
@@ -103,6 +109,8 @@ class AnnouncementsController extends Controller
             'status' => 'required|string|in:draft,published,archived',
             'is_featured' => 'nullable|boolean',
             'published_at' => 'nullable|date',
+            'event_start_date' => 'nullable|date',
+            'event_end_date' => 'nullable|date|after_or_equal:event_start_date',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'integer',
         ]);
@@ -141,13 +149,28 @@ class AnnouncementsController extends Controller
             ]);
         }
 
-        return redirect()->route('cms.announcements.index')->with('status', 'Announcement updated.');
+        return redirect()->route('cms.announcements.index')->with('status', 'Update saved.');
+    }
+
+    /**
+     * An end date on its own is really a single-day event — moved into the
+     * start slot before validation, so `after_or_equal` always has a start
+     * to compare against and the public range formatter always has one too.
+     */
+    private function normalizeEventDates(Request $request): void
+    {
+        if (! $request->filled('event_start_date') && $request->filled('event_end_date')) {
+            $request->merge([
+                'event_start_date' => $request->input('event_end_date'),
+                'event_end_date' => null,
+            ]);
+        }
     }
 
     public function destroy(Announcement $announcement)
     {
         $announcement->delete();
 
-        return redirect()->route('cms.announcements.index')->with('status', 'Announcement deleted.');
+        return redirect()->route('cms.announcements.index')->with('status', 'Update deleted.');
     }
 }
